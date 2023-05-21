@@ -50,4 +50,12 @@ export class BuildingsController {
       payload,
     };
   }
+
+  @Delete(':id')
+  deleteBuilding(@Param('id') id: number) {
+    return {
+      id,
+      messsage: 'Building deleted',
+    };
+  }
 }
