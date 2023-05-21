@@ -17,7 +17,10 @@ export class BuildingsController {
   }
 
   @Get(':id')
-  getBuilding(@Param('id') id: number): string {
-    return `Building ${id}`;
+  getBuilding(@Param('id') id: number) {
+    return {
+      id,
+      name: 'Building name',
+    };
   }
 }
