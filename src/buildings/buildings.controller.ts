@@ -8,9 +8,12 @@ import {
   Put,
   Delete,
 } from '@nestjs/common';
+import { BuildingsService } from './buildings.service';
 
 @Controller('buildings')
 export class BuildingsController {
+  constructor(private buildingsService: BuildingsService) {}
+
   @Get()
   getBuildings(
     @Query('limit') limit = 10,
@@ -22,40 +25,26 @@ export class BuildingsController {
     @Query('zone') zone: string,
     @Query('nApartments') nApartments: number,
   ) {
-    return {
-      buildings: [],
-    };
+    return this.buildingsService.findAll();
   }
 
   @Get(':id')
   getBuilding(@Param('id') id: number) {
-    return {
-      id,
-      name: 'Building name',
-    };
+    return this.buildingsService.findOne(id);
   }
 
   @Post()
   createBuilding(@Body() payload: any) {
-    return {
-      payload,
-      messsage: 'Building created',
-    };
+    return this.buildingsService.create(payload);
   }
 
   @Put(':id')
   updateBuilding(@Param('id') id: number, @Body() payload: any) {
-    return {
-      id,
-      payload,
-    };
+    return this.buildingsService.update(id, payload);
   }
 
   @Delete(':id')
   deleteBuilding(@Param('id') id: number) {
-    return {
-      id,
-      messsage: 'Building deleted',
-    };
+    return this.buildingsService.remove(id);
   }
 }
