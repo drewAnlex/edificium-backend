@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { Building } from '../entities/building';
 
@@ -14,7 +14,7 @@ export class BuildingsService {
       zone: 'Zone',
       nApartments: 10,
       apartments: [],
-      administrator: 'Administrator',
+      administrators: [{ id: 1, name: 'Administrator name' }],
       coOwners: [],
       bills: [],
       news: [],
@@ -26,7 +26,11 @@ export class BuildingsService {
   }
 
   findOne(id: number) {
-    return this.buildings.find((building) => building.id === id);
+    const building = this.buildings.find((building) => building.id === id);
+    if (!building) {
+      throw new NotFoundException(`Building #${id} not found`);
+    }
+    return building;
   }
 
   create(payload: any) {
@@ -39,6 +43,9 @@ export class BuildingsService {
   }
 
   update(id: number, payload: any) {
+    if (!this.findOne(id)) {
+      throw new NotFoundException(`Building #${id} not found`);
+    }
     const index = this.buildings.findIndex((building) => building.id === id);
     this.buildings[index] = {
       ...this.buildings[index],
@@ -48,6 +55,9 @@ export class BuildingsService {
   }
 
   remove(id: number) {
+    if (!this.findOne(id)) {
+      throw new NotFoundException(`Building #${id} not found`);
+    }
     const index = this.buildings.findIndex((building) => building.id === id);
     this.buildings.splice(index, 1);
     return true;

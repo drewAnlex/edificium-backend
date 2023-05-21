@@ -7,7 +7,7 @@ export class Building {
   zone: string;
   nApartments: number;
   apartments: any[];
-  administrator: string;
+  administrators: any[];
   coOwners: any[];
   bills: any[];
   news: any[];

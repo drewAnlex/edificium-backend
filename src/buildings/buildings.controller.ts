@@ -29,8 +29,8 @@ export class BuildingsController {
   }
 
   @Get(':id')
-  getBuilding(@Param('id') id: number) {
-    return this.buildingsService.findOne(id);
+  getBuilding(@Param('id') id: string) {
+    return this.buildingsService.findOne(+id);
   }
 
   @Post()
@@ -39,12 +39,12 @@ export class BuildingsController {
   }
 
   @Put(':id')
-  updateBuilding(@Param('id') id: number, @Body() payload: any) {
-    return this.buildingsService.update(id, payload);
+  updateBuilding(@Param('id') id: string, @Body() payload: any) {
+    return this.buildingsService.update(+id, payload);
   }
 
   @Delete(':id')
-  deleteBuilding(@Param('id') id: number) {
-    return this.buildingsService.remove(id);
+  deleteBuilding(@Param('id') id: string) {
+    return this.buildingsService.remove(+id);
   }
 }
