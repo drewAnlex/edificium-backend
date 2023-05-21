@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
+import { Controller, Get, Query, Param, Post, Body } from '@nestjs/common';
 
 @Controller('buildings')
 export class BuildingsController {
@@ -12,8 +12,10 @@ export class BuildingsController {
     @Query('city') city: string,
     @Query('zone') zone: string,
     @Query('nApartments') nApartments: number,
-  ): string {
-    return `All buildings ${limit} ${offset}`;
+  ) {
+    return {
+      buildings: [],
+    };
   }
 
   @Get(':id')
@@ -21,6 +23,14 @@ export class BuildingsController {
     return {
       id,
       name: 'Building name',
+    };
+  }
+
+  @Post()
+  createBuilding(@Body() payload: any) {
+    return {
+      payload,
+      messsage: 'Building created',
     };
   }
 }
