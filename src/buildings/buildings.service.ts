@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { Building } from '../entities/building';
-import { CreateBuildingDto } from '../dtos/building.dto';
+import { CreateBuildingDto, UpdateBuildingDto } from '../dtos/building.dto';
 
 @Injectable()
 export class BuildingsService {
@@ -49,7 +49,7 @@ export class BuildingsService {
     return newBuilding;
   }
 
-  update(id: number, payload: any) {
+  update(id: number, payload: UpdateBuildingDto) {
     if (!this.findOne(id)) {
       throw new NotFoundException(`Building #${id} not found`);
     }

@@ -10,7 +10,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { BuildingsService } from './buildings.service';
-import { CreateBuildingDto } from '../dtos/building.dto';
+import { CreateBuildingDto, UpdateBuildingDto } from '../dtos/building.dto';
 
 @Controller('buildings')
 export class BuildingsController {
@@ -41,7 +41,10 @@ export class BuildingsController {
   }
 
   @Put(':id')
-  updateBuilding(@Param('id', ParseIntPipe) id: number, @Body() payload: any) {
+  updateBuilding(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdateBuildingDto,
+  ) {
     return this.buildingsService.update(id, payload);
   }
 
