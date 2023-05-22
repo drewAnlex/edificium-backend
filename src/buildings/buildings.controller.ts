@@ -7,6 +7,7 @@ import {
   Body,
   Put,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { BuildingsService } from './buildings.service';
 
@@ -23,14 +24,14 @@ export class BuildingsController {
     @Query('state') state: string,
     @Query('city') city: string,
     @Query('zone') zone: string,
-    @Query('nApartments') nApartments: number,
+    @Query('nApartments') nApartments = 100,
   ) {
     return this.buildingsService.findAll();
   }
 
   @Get(':id')
-  getBuilding(@Param('id') id: string) {
-    return this.buildingsService.findOne(+id);
+  getBuilding(@Param('id', ParseIntPipe) id: number) {
+    return this.buildingsService.findOne(id);
   }
 
   @Post()
@@ -39,12 +40,12 @@ export class BuildingsController {
   }
 
   @Put(':id')
-  updateBuilding(@Param('id') id: string, @Body() payload: any) {
-    return this.buildingsService.update(+id, payload);
+  updateBuilding(@Param('id', ParseIntPipe) id: number, @Body() payload: any) {
+    return this.buildingsService.update(id, payload);
   }
 
   @Delete(':id')
-  deleteBuilding(@Param('id') id: string) {
-    return this.buildingsService.remove(+id);
+  deleteBuilding(@Param('id', ParseIntPipe) id: number) {
+    return this.buildingsService.remove(id);
   }
 }
