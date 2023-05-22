@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { Building } from '../entities/building';
+import { CreateBuildingDto } from '../dtos/building.dto';
 
 @Injectable()
 export class BuildingsService {
@@ -34,10 +35,15 @@ export class BuildingsService {
     return building;
   }
 
-  create(payload: any) {
+  create(payload: CreateBuildingDto) {
     const newBuilding = {
       id: this.buildings.length + 1,
       ...payload,
+      apartments: [],
+      administrators: [],
+      coOwners: [],
+      bills: [],
+      news: [],
     };
     this.buildings.push(newBuilding);
     return newBuilding;
