@@ -11,4 +11,5 @@ export class Building {
   coOwners: any[];
   bills: any[];
   news: any[];
+  status: number;
 }

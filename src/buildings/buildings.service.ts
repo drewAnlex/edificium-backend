@@ -18,6 +18,7 @@ export class BuildingsService {
       coOwners: [],
       bills: [],
       news: [],
+      status: 3,
     },
   ];
 
