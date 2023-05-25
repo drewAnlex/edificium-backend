@@ -1,10 +1,32 @@
+import { IsString, IsNumber, IsNotEmpty } from 'class-validator';
+
 export class CreateBuildingDto {
+  @IsNotEmpty()
+  @IsString()
   readonly name: string;
+
+  @IsNotEmpty()
+  @IsString()
   readonly country: string;
+
+  @IsNotEmpty()
+  @IsString()
   readonly state: string;
+
+  @IsNotEmpty()
+  @IsString()
   readonly city: string;
+
+  @IsNotEmpty()
+  @IsString()
   readonly zone: string;
+
+  @IsNotEmpty()
+  @IsNumber()
   readonly nApartments: number;
+
+  @IsNotEmpty()
+  @IsNumber()
   readonly status: number;
 }
 export class UpdateBuildingDto {
