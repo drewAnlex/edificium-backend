@@ -1,4 +1,5 @@
 import { IsString, IsNumber, IsNotEmpty, IsPositive } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateBuildingDto {
   @IsNotEmpty()
@@ -30,17 +31,4 @@ export class CreateBuildingDto {
   @IsNumber()
   readonly status: number;
 }
-export class UpdateBuildingDto {
-  readonly name?: string;
-  readonly country?: string;
-  readonly state?: string;
-  readonly city?: string;
-  readonly zone?: string;
-  readonly nApartments?: number;
-  readonly apartments?: any[];
-  readonly administrators?: any[];
-  readonly coOwners?: any[];
-  readonly bills?: any[];
-  readonly news?: any[];
-  readonly status?: number;
-}
+export class UpdateBuildingDto extends PartialType(CreateBuildingDto) {}
