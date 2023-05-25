@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsNotEmpty } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, IsPositive } from 'class-validator';
 
 export class CreateBuildingDto {
   @IsNotEmpty()
@@ -23,6 +23,7 @@ export class CreateBuildingDto {
 
   @IsNotEmpty()
   @IsNumber()
+  @IsPositive()
   readonly nApartments: number;
 
   @IsNotEmpty()
