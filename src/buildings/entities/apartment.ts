@@ -8,6 +8,6 @@ export class Apartment {
   floor: number;
   owner: User;
   share: number;
-  payments: any[];
+  bills: any[];
   balance: number;
 }
