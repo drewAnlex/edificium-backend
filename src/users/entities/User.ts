@@ -1,5 +1,4 @@
 import { Apartment } from 'src/buildings/entities/apartment';
-import { Building } from 'src/buildings/entities/building';
 
 export class User {
   id: number;
