@@ -9,8 +9,8 @@ import {
   Delete,
   ParseIntPipe,
 } from '@nestjs/common';
-import { BuildingsService } from './buildings.service';
-import { CreateBuildingDto, UpdateBuildingDto } from './dtos/building.dto';
+import { BuildingsService } from '../services/buildings.service';
+import { CreateBuildingDto, UpdateBuildingDto } from '../dtos/building.dto';
 
 @Controller('buildings')
 export class BuildingsController {
