@@ -9,6 +9,7 @@ export class UsersService {
       id: 1,
       name: 'User name',
       email: 'User email',
+      phone: 'User phone',
       password: 'User password',
       role: 'User role',
       status: 1,
