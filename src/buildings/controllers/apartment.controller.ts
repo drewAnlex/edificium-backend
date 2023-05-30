@@ -11,7 +11,7 @@ import {
 import { ApartmentsService } from '../services/apartments.service';
 import { CreateAparmentDTO, UpdateAparmentDTO } from '../dtos/apartment.dto';
 
-@Controller('apartment')
+@Controller('apartments')
 export class ApartmentController {
   constructor(private apartmentsService: ApartmentsService) {}
 
