@@ -1,4 +1,10 @@
-import { IsString, IsNumber, IsNotEmpty, IsPositive } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsNotEmpty,
+  IsPositive,
+  IsEmail,
+} from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
 export class CreateUserDto {
@@ -8,6 +14,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
+  @IsEmail()
   readonly email: string;
 
   @IsNotEmpty()
@@ -24,6 +31,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsNumber()
+  @IsPositive()
   readonly status: number;
 }
 
