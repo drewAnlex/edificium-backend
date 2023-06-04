@@ -2,7 +2,7 @@ import {
   IsString,
   IsNumber,
   IsNotEmpty,
-  IsDate,
+  IsDateString,
   IsBoolean,
 } from 'class-validator';
 
@@ -18,6 +18,10 @@ export class CreateServiceDTO {
   name: string;
 
   @IsNotEmpty()
+  @IsString()
+  description: string;
+
+  @IsNotEmpty()
   @IsNumber()
   contractorId: number;
 
@@ -26,11 +30,11 @@ export class CreateServiceDTO {
   price: number;
 
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   startDate: Date;
 
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   endDate: Date;
 
   @IsNotEmpty()
