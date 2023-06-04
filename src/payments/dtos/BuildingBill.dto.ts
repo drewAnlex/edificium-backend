@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsNumber, IsPositive, IsString } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
-export class CreateBuildingBillDTO {
+export class CreateBuildingBillDTO implements Readonly<CreateBuildingBillDTO> {
   @IsNotEmpty()
   @IsNumber()
   buildingId: number;

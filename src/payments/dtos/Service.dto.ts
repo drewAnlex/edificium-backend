@@ -8,7 +8,7 @@ import {
 
 import { PartialType } from '@nestjs/mapped-types';
 
-export class CreateServiceDTO {
+export class CreateServiceDTO implements Readonly<CreateServiceDTO> {
   @IsNotEmpty()
   @IsNumber()
   buildingBillId: number;
