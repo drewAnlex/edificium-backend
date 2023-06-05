@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { BuildingsModule } from './buildings/buildings.module';
 import { UsersModule } from './users/users.module';
 import { PaymentsModule } from './payments/payments.module';
-import { PaymentMethodModule } from './payment-method.module';
+import { PaymentMethodModule } from './payment-method/payment-method.module';
 
 @Module({
   imports: [BuildingsModule, UsersModule, PaymentsModule, PaymentMethodModule],
