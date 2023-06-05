@@ -12,3 +12,5 @@ export class CreateAdminDTO implements Readonly<CreateAdminDTO> {
   @IsPositive()
   userId: number;
 }
+
+export class UpdateAdminDTO extends PartialType(CreateAdminDTO) {}
