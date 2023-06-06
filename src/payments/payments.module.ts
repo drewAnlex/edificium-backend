@@ -7,9 +7,11 @@ import { IndividualBillsService } from './services/individual-bills.service';
 import { IndividualBillsController } from './controllers/individual-bills.controller';
 import { PaymentsService } from './services/payments.service';
 import { PaymentsController } from './controllers/payments.controller';
+import { PaymentInfoService } from './services/payment-info.service';
+import { PaymentInfoController } from './controllers/payment-info.controller';
 
 @Module({
-  providers: [ServicesService, ProductsService, IndividualBillsService, PaymentsService],
-  controllers: [ServicesController, ProductsController, IndividualBillsController, PaymentsController]
+  providers: [ServicesService, ProductsService, IndividualBillsService, PaymentsService, PaymentInfoService],
+  controllers: [ServicesController, ProductsController, IndividualBillsController, PaymentsController, PaymentInfoController]
 })
 export class PaymentsModule {}
