@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PaymentMethodList } from '../entities/payment-method-list';
+import { PaymentMethodList } from '../entities/payment-method-list.entity';
 import {
   PaymentMethodListDto,
   PartialPaymentMethodListDto,

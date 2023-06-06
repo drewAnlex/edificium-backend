@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PaymentInfoDto, UpdatePaymentInfoDto } from '../dtos/payment-info.dto';
-import { PaymentInfo } from '../entities/payment-info';
+import { PaymentInfo } from '../entities/payment-info.entity';
 
 @Injectable()
 export class PaymentInfoService {

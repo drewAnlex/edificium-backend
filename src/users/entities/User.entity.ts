@@ -1,4 +1,4 @@
-import { Apartment } from 'src/buildings/entities/apartment';
+import { Apartment } from 'src/buildings/entities/apartment.entity';
 
 export class User {
   id: number;

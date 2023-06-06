@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { BuildingAdmins } from '../entities/Admins';
+import { BuildingAdmins } from '../entities/Admins.entity';
 import { CreateAdminDTO, UpdateAdminDTO } from '../dtos/admins.dto';
 import { UsersService } from 'src/users/services/users.service';
 import { BuildingsService } from './buildings.service';

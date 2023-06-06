@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { BuildingBill } from '../entities/BuildingBill';
+import { BuildingBill } from '../entities/BuildingBill.entity';
 import {
   CreateBuildingBillDTO,
   UpdateBuildingBillDTO,

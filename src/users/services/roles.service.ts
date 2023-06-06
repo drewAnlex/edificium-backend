@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Role } from '../entities/Role';
+import { Role } from '../entities/Role.entity';
 import { CreateRoleDTO, UpdateRoleDTO } from '../dtos/roles.dto';
 
 @Injectable()

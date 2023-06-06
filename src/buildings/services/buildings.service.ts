@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { Building } from '../entities/building';
+import { Building } from '../entities/building.entity';
 import { CreateBuildingDto, UpdateBuildingDto } from '../dtos/building.dto';
 
 @Injectable()
