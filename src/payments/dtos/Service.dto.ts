@@ -6,7 +6,7 @@ import {
   IsBoolean,
 } from 'class-validator';
 
-import { PartialType } from '@nestjs/mapped-types';
+import { PartialType } from '@nestjs/swagger';
 
 export class CreateServiceDTO implements Readonly<CreateServiceDTO> {
   @IsNotEmpty()
