@@ -13,7 +13,9 @@ import {
   PaymentMethodListDto,
   PartialPaymentMethodListDto,
 } from '../dtos/payment-method-list.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('payment-method-list')
 @Controller('payment-method-list')
 export class PaymentMethodListController {
   constructor(

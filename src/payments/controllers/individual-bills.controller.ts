@@ -13,7 +13,9 @@ import {
   IndividualBillDto,
   UpdateIndividualBillDto,
 } from '../dtos/IndividualBill.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('individual-bills')
 @Controller('individual-bills')
 export class IndividualBillsController {
   constructor(

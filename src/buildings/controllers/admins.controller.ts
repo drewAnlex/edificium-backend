@@ -10,7 +10,9 @@ import {
 } from '@nestjs/common';
 import { CreateAdminDTO, UpdateAdminDTO } from '../dtos/admins.dto';
 import { AdminsService } from '../services/admins.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('admins')
 @Controller('admins')
 export class AdminsController {
   constructor(private adminsService: AdminsService) {}

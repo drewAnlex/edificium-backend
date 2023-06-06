@@ -15,7 +15,9 @@ import {
 } from '../dtos/BuildingBill.dto';
 
 import { BuildingBillsService } from '../services/building-bills.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('building-bills')
 @Controller('building-bills')
 export class BuildingBillsController {
   constructor(private buildingBillService: BuildingBillsService) {}

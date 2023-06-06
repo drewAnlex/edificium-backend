@@ -13,7 +13,9 @@ import {
   PaymentMethodDetailsDto,
   UpdatePaymentMethodDetailsDto,
 } from '../dtos/payment-method-details.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('payment-method-details')
 @Controller('payment-method-details')
 export class PaymentMethodDetailsController {
   constructor(private paymentMethodDetails: PaymentMethodDetailsService) {}

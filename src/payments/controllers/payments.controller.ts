@@ -10,7 +10,9 @@ import {
 } from '@nestjs/common';
 import { PaymentDTO, PaymentUpdateDTO } from '../dtos/Payment.dto';
 import { PaymentsService } from '../services/payments.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('payments')
 @Controller('payments')
 export class PaymentsController {
   constructor(private paymentService: PaymentsService) {}
