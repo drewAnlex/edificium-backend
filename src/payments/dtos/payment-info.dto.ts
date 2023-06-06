@@ -1,7 +1,11 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
 export class PaymentInfoDto implements Readonly<PaymentInfoDto> {
+  @IsNotEmpty()
+  @IsNumber()
+  methodId: number;
+
   @IsNotEmpty()
   @IsString()
   name: string;
