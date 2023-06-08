@@ -9,11 +9,13 @@ import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 
 import { environment } from './environments';
+import config from './config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: environment[process.env.NODE_ENV] || '.env',
+      load: [config],
       isGlobal: true,
     }),
     BuildingsModule,
