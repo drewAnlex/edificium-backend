@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from '../entities/User.entity';
 import { CreateUserDto, UpdateUserDto } from '../dtos/users.dto';
 
@@ -21,15 +26,32 @@ export class UsersService {
     return user;
   }
 
-  create(payload: CreateUserDto) {
+  async create(payload: CreateUserDto) {
     const newUser = this.userRepo.create(payload);
-    return this.userRepo.save(newUser);
+    try {
+      await this.userRepo.save(newUser);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred while trying to create the PaymentMethodDetails: ${error}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    return newUser;
   }
 
   async update(id: number, payload: UpdateUserDto) {
     const user = await this.findOne(id);
-    this.userRepo.merge(user, payload);
-    return this.userRepo.save(user);
+    try {
+      await this.userRepo.merge(user, payload);
+      await this.userRepo.save(user);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred while trying to create the PaymentMethodDetails: ${error}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return user;
   }
 
   remove(id: number) {
