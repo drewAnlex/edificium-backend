@@ -5,53 +5,43 @@ import {
   UpdatePaymentMethodDto,
 } from '../dtos/PaymentMethod.dto';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 @Injectable()
 export class PaymentMethodsService {
-  private PaymentMethods: PaymentMethod[] = [
-    {
-      id: 1,
-      name: 'Credit Card',
-      status: 1,
-    },
-  ];
+  constructor(
+    @InjectRepository(PaymentMethod)
+    private PaymentMethodRepo: Repository<PaymentMethod>,
+  ) {}
 
   findAll() {
-    return this.PaymentMethods;
+    return this.PaymentMethodRepo.find();
   }
 
-  findOne(id: number) {
-    const PaymentMethod = this.PaymentMethods.find((item) => item.id === id);
-    if (!PaymentMethod) {
+  async findOne(id: number) {
+    const PaymentMethod = await this.PaymentMethodRepo.findOneBy({ id: id });
+    if (PaymentMethod === null) {
       throw new NotFoundException(`Payment Method #${id} not found`);
     }
     return PaymentMethod;
   }
 
   create(data: PaymentMethodDto) {
-    const newPaymentMethod = {
-      id: this.PaymentMethods.length + 1,
-      ...data,
-    };
-    this.PaymentMethods.push(newPaymentMethod);
-    return newPaymentMethod;
+    const newPaymentMethod = this.PaymentMethodRepo.create(data);
+    return this.PaymentMethodRepo.save(newPaymentMethod);
   }
 
-  update(id: number, changes: UpdatePaymentMethodDto) {
-    const PaymentMethod = this.findOne(id);
-    const index = this.PaymentMethods.findIndex((item) => item.id === id);
-    this.PaymentMethods[index] = {
-      ...PaymentMethod,
-      ...changes,
-    };
-    return this.PaymentMethods[index];
+  async update(id: number, changes: UpdatePaymentMethodDto) {
+    const PaymentMethod = await this.findOne(id);
+    if (PaymentMethod === null) {
+      throw new NotFoundException(`Payment Method #${id} not found`);
+    }
+    this.PaymentMethodRepo.merge(PaymentMethod, changes);
+    return this.PaymentMethodRepo.save(PaymentMethod);
   }
 
   remove(id: number) {
-    const index = this.PaymentMethods.findIndex((item) => item.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`Payment Method #${id} not found`);
-    }
-    this.PaymentMethods.splice(index, 1);
-    return true;
+    return this.PaymentMethodRepo.delete(id);
   }
 }
