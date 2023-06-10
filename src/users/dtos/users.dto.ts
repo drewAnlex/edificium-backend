@@ -6,6 +6,7 @@ import {
   IsEmail,
 } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
+import { Role } from '../entities/role.entity';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -26,8 +27,7 @@ export class CreateUserDto {
   readonly password: string;
 
   @IsNotEmpty()
-  @IsString()
-  readonly role: string;
+  readonly role: Role;
 
   @IsNotEmpty()
   @IsNumber()
