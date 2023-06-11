@@ -7,8 +7,11 @@ import { AdminsService } from './services/admins.service';
 import { AdminsController } from './controllers/admins.controller';
 import { UsersModule } from 'src/users/users.module';
 
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Building } from './entities/building.entity';
+
 @Module({
-  imports: [UsersModule],
+  imports: [UsersModule, TypeOrmModule.forFeature([Building])],
   controllers: [BuildingsController, ApartmentController, AdminsController],
   providers: [BuildingsService, ApartmentsService, AdminsService],
 })
