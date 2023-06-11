@@ -1,56 +1,58 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAparmentDTO, UpdateAparmentDTO } from '../dtos/apartment.dto';
+
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Apartment } from '../entities/apartment.entity';
 
 @Injectable()
 export class ApartmentsService {
-  private apartments = [
-    {
-      id: 1,
-      identifier: 'A-101',
-      floor: 1,
-      share: 0.1,
-      balance: 0,
-      status: 1,
-    },
-  ];
+  constructor(
+    @InjectRepository(Apartment) private apartmentRepo: Repository<Apartment>,
+  ) {}
 
-  findAll() {
-    return this.apartments;
+  async findAll() {
+    return await this.apartmentRepo.find();
   }
 
-  findOne(id: number) {
-    return this.apartments.find((apartment) => apartment.id === id);
+  async findOne(id: number) {
+    const apartment = await this.apartmentRepo.findOneBy({ id: id });
+    if (!apartment) {
+      throw new NotFoundException(`Apartment #${id} not found`);
+    }
+    return apartment;
   }
 
-  create(payload: CreateAparmentDTO) {
-    const newApartment = {
-      id: this.apartments.length + 1,
-      ...payload,
-    };
-    this.apartments.push(newApartment);
+  async create(payload: CreateAparmentDTO) {
+    const newApartment = this.apartmentRepo.create(payload);
+    try {
+      await this.apartmentRepo.save(newApartment);
+    } catch (error) {
+      throw new HttpException(
+        `Creation Error ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     return newApartment;
   }
 
-  update(id: number, payload: UpdateAparmentDTO) {
-    if (!this.findOne(id)) {
-      throw new NotFoundException(`Apartment #${id} not found`);
+  async update(id: number, payload: UpdateAparmentDTO) {
+    const apartment = await this.findOne(id);
+    try {
+      await this.apartmentRepo.merge(apartment, payload);
+      await this.apartmentRepo.save(apartment);
+    } catch (error) {
+      throw new HttpException(`Update Error ${error}`, HttpStatus.BAD_REQUEST);
     }
-    const index = this.apartments.findIndex((apartment) => apartment.id === id);
-    this.apartments[index] = {
-      ...this.apartments[index],
-      ...payload,
-    };
-    return this.apartments[index];
+    return apartment;
   }
 
   remove(id: number) {
-    if (!this.findOne(id)) {
-      throw new NotFoundException(`Apartment #${id} not found`);
-    }
-    const apartmentIndex = this.apartments.findIndex(
-      (apartment) => apartment.id === id,
-    );
-    this.apartments.splice(apartmentIndex, 1);
-    return true;
+    return this.apartmentRepo.delete(id);
   }
 }
