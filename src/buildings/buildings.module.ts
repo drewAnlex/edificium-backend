@@ -11,9 +11,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Building } from './entities/building.entity';
 import { Apartment } from './entities/apartment.entity';
 import { User } from 'src/users/entities/User.entity';
+import { BuildingAdmins } from './entities/Admins.entity';
 
 @Module({
-  imports: [UsersModule, TypeOrmModule.forFeature([Building, Apartment, User])],
+  imports: [
+    UsersModule,
+    TypeOrmModule.forFeature([Building, Apartment, User, BuildingAdmins]),
+  ],
   controllers: [BuildingsController, ApartmentController, AdminsController],
   providers: [BuildingsService, ApartmentsService, AdminsService],
 })
