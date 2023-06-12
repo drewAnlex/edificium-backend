@@ -14,9 +14,13 @@ import { PaymentInfoController } from './controllers/payment-info.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BuildingBill } from './entities/BuildingBill.entity';
 import { BuildingBillsController } from './controllers/building-bills.controller';
+import { IndividualBill } from './entities/IndividualBill.entity';
+import { Apartment } from '../buildings/entities/Apartment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([BuildingBill])],
+  imports: [
+    TypeOrmModule.forFeature([Apartment, BuildingBill, IndividualBill]),
+  ],
   providers: [
     ServicesService,
     ProductsService,
