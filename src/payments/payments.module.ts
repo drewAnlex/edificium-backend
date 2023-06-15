@@ -16,10 +16,20 @@ import { BuildingBill } from './entities/BuildingBill.entity';
 import { BuildingBillsController } from './controllers/building-bills.controller';
 import { IndividualBill } from './entities/IndividualBill.entity';
 import { Apartment } from '../buildings/entities/Apartment.entity';
+import { Service } from './entities/Service.entity';
+import { Contractor } from './entities/Contractor.entity';
+import { ContractorService } from './services/contractor.service';
+import { ContractorController } from './controllers/contractor.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Apartment, BuildingBill, IndividualBill]),
+    TypeOrmModule.forFeature([
+      Apartment,
+      BuildingBill,
+      IndividualBill,
+      Service,
+      Contractor,
+    ]),
   ],
   providers: [
     ServicesService,
@@ -28,6 +38,7 @@ import { Apartment } from '../buildings/entities/Apartment.entity';
     IndividualBillsService,
     PaymentsService,
     PaymentInfoService,
+    ContractorService,
   ],
   controllers: [
     ServicesController,
@@ -36,6 +47,7 @@ import { Apartment } from '../buildings/entities/Apartment.entity';
     IndividualBillsController,
     PaymentsController,
     PaymentInfoController,
+    ContractorController,
   ],
 })
 export class PaymentsModule {}

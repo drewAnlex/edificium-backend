@@ -1,57 +1,55 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Service } from '../entities/Service.entity';
 import { CreateServiceDTO, UpdateServiceDTO } from '../dtos/Service.dto';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 @Injectable()
 export class ServicesService {
-  private services: Service[] = [
-    {
-      id: 1,
-      buildingBillId: 1,
-      name: 'Electricity',
-      description: 'Electricity bill',
-      contractorId: 1,
-      price: 100,
-      startDate: new Date('2021-01-01'),
-      endDate: new Date('2021-01-31'),
-      isPaid: false,
-    },
-  ];
+  constructor(
+    @InjectRepository(Service) private serviceRepo: Repository<Service>,
+  ) {}
 
   findAll() {
-    return this.services;
+    return this.serviceRepo.find();
   }
 
-  findOne(id: number) {
-    return this.services.find((service) => service.id === id);
+  async findOne(id: number) {
+    const service = await this.serviceRepo.findOneBy({ id: id });
+    if (!service) {
+      throw new NotFoundException(`Service #${id} not found`);
+    }
+    return service;
   }
 
-  create(payload: CreateServiceDTO) {
-    const newService = {
-      id: this.services.length + 1,
-      ...payload,
-    };
-    this.services.push(newService);
+  async create(payload: CreateServiceDTO) {
+    const newService = this.serviceRepo.create(payload);
+    try {
+      await this.serviceRepo.save(newService);
+    } catch (error) {
+      throw new HttpException(`Error ${error}`, HttpStatus.BAD_REQUEST);
+    }
     return newService;
   }
 
-  update(id: number, payload: UpdateServiceDTO) {
-    if (!this.findOne(id)) {
-      throw new NotFoundException('Service not found');
+  async update(id: number, payload: UpdateServiceDTO) {
+    const service = await this.findOne(id);
+    try {
+      await this.serviceRepo.merge(service, payload);
+      await this.serviceRepo.save(service);
+    } catch (error) {
+      throw new HttpException(`Error ${error}`, HttpStatus.BAD_REQUEST);
     }
-    const index = this.services.findIndex((service) => service.id === id);
-    this.services[index] = {
-      ...this.services[index],
-      ...payload,
-    };
-    return this.services[index];
+    return service;
   }
 
   remove(id: number) {
-    if (!this.findOne(id)) {
-      throw new NotFoundException('Service not found');
-    }
-    this.services = this.services.filter((service) => service.id !== id);
-    return true;
+    return this.serviceRepo.delete(id);
   }
 }
