@@ -13,7 +13,9 @@ import {
   CreateContractorDTO,
   UpdateContractorDTO,
 } from '../dtos/contractor.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('contractor')
 @Controller('contractor')
 export class ContractorController {
   constructor(private contractorService: ContractorService) {}
