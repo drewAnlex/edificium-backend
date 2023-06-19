@@ -20,6 +20,10 @@ import { Service } from './entities/Service.entity';
 import { Contractor } from './entities/Contractor.entity';
 import { ContractorService } from './services/contractor.service';
 import { ContractorController } from './controllers/contractor.controller';
+import { Supplier } from './entities/Supplier.entity';
+import { Product } from './entities/Product.entity';
+import { SupplierService } from './services/supplier.service';
+import { SupplierController } from './controllers/supplier.controller';
 
 @Module({
   imports: [
@@ -29,6 +33,8 @@ import { ContractorController } from './controllers/contractor.controller';
       IndividualBill,
       Service,
       Contractor,
+      Product,
+      Supplier,
     ]),
   ],
   providers: [
@@ -39,6 +45,7 @@ import { ContractorController } from './controllers/contractor.controller';
     PaymentsService,
     PaymentInfoService,
     ContractorService,
+    SupplierService,
   ],
   controllers: [
     ServicesController,
@@ -48,6 +55,7 @@ import { ContractorController } from './controllers/contractor.controller';
     PaymentsController,
     PaymentInfoController,
     ContractorController,
+    SupplierController,
   ],
 })
 export class PaymentsModule {}
