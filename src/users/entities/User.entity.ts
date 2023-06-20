@@ -1,6 +1,14 @@
 import { Apartment } from 'src/buildings/entities/apartment.entity';
 import { Role } from './role.entity';
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -24,6 +32,15 @@ export class User {
 
   @Column({ type: 'int' })
   status: number;
+
+  @OneToMany(() => Apartment, (apartment) => apartment.userId)
+  apartments: Apartment[];
+
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 }
 
 export class CoOwner extends User {
