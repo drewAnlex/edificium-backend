@@ -3,22 +3,16 @@ import { BuildingsController } from './controllers/buildings.controller';
 import { BuildingsService } from './services/buildings.service';
 import { ApartmentController } from './controllers/apartment.controller';
 import { ApartmentsService } from './services/apartments.service';
-import { AdminsService } from './services/admins.service';
-import { AdminsController } from './controllers/admins.controller';
 import { UsersModule } from 'src/users/users.module';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Building } from './entities/building.entity';
 import { Apartment } from './entities/apartment.entity';
 import { User } from 'src/users/entities/User.entity';
-import { BuildingAdmins } from './entities/Admins.entity';
 
 @Module({
-  imports: [
-    UsersModule,
-    TypeOrmModule.forFeature([Building, Apartment, User, BuildingAdmins]),
-  ],
-  controllers: [BuildingsController, ApartmentController, AdminsController],
-  providers: [BuildingsService, ApartmentsService, AdminsService],
+  imports: [UsersModule, TypeOrmModule.forFeature([Building, Apartment, User])],
+  controllers: [BuildingsController, ApartmentController],
+  providers: [BuildingsService, ApartmentsService],
 })
 export class BuildingsModule {}
