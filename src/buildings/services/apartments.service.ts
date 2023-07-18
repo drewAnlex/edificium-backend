@@ -17,11 +17,16 @@ export class ApartmentsService {
   ) {}
 
   async findAll() {
-    return await this.apartmentRepo.find();
+    return await this.apartmentRepo.find({
+      relations: ['buildingId', 'userId'],
+    });
   }
 
   async findOne(id: number) {
-    const apartment = await this.apartmentRepo.findOneBy({ id: id });
+    const apartment = await this.apartmentRepo.findOne({
+      where: { id },
+      relations: ['buildingId', 'userId'],
+    });
     if (!apartment) {
       throw new NotFoundException(`Apartment #${id} not found`);
     }

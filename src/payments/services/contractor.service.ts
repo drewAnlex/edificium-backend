@@ -21,11 +21,14 @@ export class ContractorService {
   ) {}
 
   findAll() {
-    return this.contractorRepo.find();
+    return this.contractorRepo.find({ relations: ['services'] });
   }
 
   async findOne(id: number) {
-    const contractor = await this.contractorRepo.findOneBy({ id: id });
+    const contractor = await this.contractorRepo.findOne({
+      where: { id: id },
+      relations: ['services'],
+    });
     if (!contractor) {
       throw new NotFoundException(`Contractor #${id} not found`);
     }

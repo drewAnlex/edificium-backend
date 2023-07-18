@@ -1,52 +1,54 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { Payment } from '../entities/Payment.entity';
 import { PaymentDTO, PaymentUpdateDTO } from '../dtos/Payment.dto';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 @Injectable()
 export class PaymentsService {
-  private payments: Payment[] = [
-    {
-      id: 1,
-      IndividualBill: 1,
-      UserId: 1,
-      Status: 1,
-      PayCode: '123456789',
-      Amount: 100,
-      MethodId: 1,
-    },
-  ];
+  constructor(
+    @InjectRepository(Payment) private paymentRepo: Repository<Payment>,
+  ) {}
 
   findAll() {
-    return this.payments;
+    return this.paymentRepo.find({
+      relations: ['IndividualBill', 'UserId', 'Method'],
+    });
   }
 
   findOne(id: number) {
-    const payment = this.payments.find((item) => item.id === id);
+    const payment = this.paymentRepo.findOne({
+      where: { id: id },
+      relations: ['IndividualBill', 'UserId', 'Method'],
+    });
     if (!payment) {
       throw new NotFoundException(`Payment #${id} not found`);
     }
     return payment;
   }
 
-  create(data: PaymentDTO) {
-    const newPayment = { id: this.payments.length + 1, ...data };
-    this.payments.push(newPayment);
-    return newPayment;
+  async create(data: PaymentDTO) {
+    const newPayment = this.paymentRepo.create(data);
+    try {
+      await this.paymentRepo.save(newPayment);
+    } catch (error) {
+      throw new HttpException(`Error ${error}`, 400);
+    }
   }
 
-  update(id: number, changes: PaymentUpdateDTO) {
-    const payment = this.findOne(id);
-    const index = this.payments.findIndex((item) => item.id === id);
-    this.payments[index] = { ...payment, ...changes };
-    return this.payments[index];
+  async update(id: number, changes: PaymentUpdateDTO) {
+    const payment = await this.findOne(id);
+    try {
+      await this.paymentRepo.merge(payment, changes);
+      await this.paymentRepo.save(payment);
+    } catch (error) {
+      throw new HttpException(`Error ${error}`, 400);
+    }
+    return payment;
   }
 
   remove(id: number) {
-    const index = this.payments.findIndex((item) => item.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`Payment #${id} not found`);
-    }
-    this.payments.splice(index, 1);
-    return true;
+    return this.paymentRepo.delete(id);
   }
 }
