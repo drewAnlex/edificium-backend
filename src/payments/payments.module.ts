@@ -24,6 +24,7 @@ import { Supplier } from './entities/Supplier.entity';
 import { Product } from './entities/Product.entity';
 import { SupplierService } from './services/supplier.service';
 import { SupplierController } from './controllers/supplier.controller';
+import { Payment } from './entities/Payment.entity';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { SupplierController } from './controllers/supplier.controller';
       BuildingBill,
       IndividualBill,
       Service,
+      Payment,
       Contractor,
       Product,
       Supplier,
