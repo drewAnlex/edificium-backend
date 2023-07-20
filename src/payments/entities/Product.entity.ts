@@ -29,9 +29,7 @@ export class Product {
   @Column({ type: 'int' })
   quantity: number;
 
-  @ManyToOne(() => Supplier, (supplier) => supplier.products, {
-    nullable: true,
-  })
+  @ManyToOne(() => Supplier, (supplier) => supplier.products)
   suplierId: Supplier;
 
   @Column({ type: 'boolean' })
