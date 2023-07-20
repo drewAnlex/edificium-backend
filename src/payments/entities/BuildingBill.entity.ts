@@ -15,10 +15,10 @@ export class BuildingBill {
   id: number;
 
   @ManyToOne(() => Building)
-  buildingId: number;
+  buildingId: Building;
 
   @ManyToOne(() => User)
-  userId: number;
+  userId: User;
 
   @Column({ type: 'varchar', length: 64 })
   name: string;
