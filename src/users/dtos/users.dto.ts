@@ -7,6 +7,7 @@ import {
 } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 import { Role } from '../entities/role.entity';
+import { Building } from 'src/buildings/entities/building.entity';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -33,6 +34,10 @@ export class CreateUserDto {
   @IsNumber()
   @IsPositive()
   readonly status: number;
+
+  @IsNumber()
+  @IsPositive()
+  readonly building: Building;
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}

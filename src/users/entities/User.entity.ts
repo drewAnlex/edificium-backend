@@ -7,7 +7,6 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
 } from 'typeorm';
 import { Building } from 'src/buildings/entities/building.entity';
 
@@ -34,11 +33,8 @@ export class User {
   @Column({ type: 'int' })
   status: number;
 
-  @OneToMany(() => Apartment, (apartment) => apartment.userId)
-  apartments: Apartment[];
-
-  @ManyToOne(() => Building, (building) => building.administatorId)
-  buildingId: Building;
+  @ManyToOne(() => Building, { nullable: true })
+  building: Building;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

@@ -1,11 +1,9 @@
-import { User } from 'src/users/entities/User.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -33,9 +31,6 @@ export class Building {
 
   @Column({ type: 'int' })
   status: number;
-
-  @OneToMany(() => User, (user) => user.buildingId)
-  administatorId: User;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
