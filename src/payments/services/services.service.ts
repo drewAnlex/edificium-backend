@@ -17,11 +17,16 @@ export class ServicesService {
   ) {}
 
   findAll() {
-    return this.serviceRepo.find();
+    return this.serviceRepo.find({
+      relations: ['contractorId', 'buildingBillId'],
+    });
   }
 
   async findOne(id: number) {
-    const service = await this.serviceRepo.findOneBy({ id: id });
+    const service = await this.serviceRepo.findOne({
+      where: { id: id },
+      relations: ['contractorId', 'buildingBillId'],
+    });
     if (!service) {
       throw new NotFoundException(`Service #${id} not found`);
     }
