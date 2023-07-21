@@ -1,25 +1,30 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PaymentInfoDto, UpdatePaymentInfoDto } from '../dtos/payment-info.dto';
 import { PaymentInfo } from '../entities/payment-info.entity';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 @Injectable()
 export class PaymentInfoService {
-  private paymentInfo: PaymentInfo[] = [
-    {
-      id: 1,
-      methodId: 1,
-      paymentId: 1,
-      name: 'CI',
-      value: '123456789',
-    },
-  ];
+  constructor(
+    @InjectRepository(PaymentInfo) private infoRepo: Repository<PaymentInfo>,
+  ) {}
 
   findAll() {
-    return this.paymentInfo;
+    return this.infoRepo.find({ relations: ['payment', 'methodId'] });
   }
 
   findOne(id: number) {
-    const paymentInfo = this.paymentInfo.find((item) => item.id === id);
+    const paymentInfo = this.infoRepo.findOne({
+      where: { id: id },
+      relations: ['payment', 'methodId'],
+    });
     if (!paymentInfo) {
       throw new NotFoundException(`Payment info #${id} not found`);
     }
@@ -27,40 +32,37 @@ export class PaymentInfoService {
   }
 
   findByPaymentId(paymentId: number) {
-    const paymentInfo = this.paymentInfo.filter(
-      (item) => item.paymentId === paymentId,
-    );
+    const paymentInfo = this.infoRepo.find({
+      where: { payment: { id: paymentId } },
+    });
     if (!paymentInfo) {
       throw new NotFoundException(`Payment info #${paymentId} not found`);
     }
     return paymentInfo;
   }
 
-  create(data: PaymentInfoDto) {
-    const newPaymentInfo = {
-      id: this.paymentInfo.length + 1,
-      ...data,
-    };
-    this.paymentInfo.push(newPaymentInfo);
+  async create(data: PaymentInfoDto) {
+    const newPaymentInfo = this.infoRepo.create(data);
+    try {
+      await this.infoRepo.save(newPaymentInfo);
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+    }
     return newPaymentInfo;
   }
 
-  update(id: number, changes: UpdatePaymentInfoDto) {
-    const paymentInfo = this.findOne(id);
-    const index = this.paymentInfo.findIndex((item) => item.id === id);
-    this.paymentInfo[index] = {
-      ...paymentInfo,
-      ...changes,
-    };
-    return this.paymentInfo[index];
+  async update(id: number, changes: UpdatePaymentInfoDto) {
+    const paymentInfo = await this.findOne(id);
+    try {
+      await this.infoRepo.merge(paymentInfo, changes);
+      await this.infoRepo.save(paymentInfo);
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+    }
+    return paymentInfo;
   }
 
   remove(id: number) {
-    const index = this.paymentInfo.findIndex((item) => item.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`Payment info #${id} not found`);
-    }
-    this.paymentInfo.splice(index, 1);
-    return true;
+    return this.infoRepo.delete(id);
   }
 }

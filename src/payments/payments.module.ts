@@ -25,6 +25,7 @@ import { Product } from './entities/Product.entity';
 import { SupplierService } from './services/supplier.service';
 import { SupplierController } from './controllers/supplier.controller';
 import { Payment } from './entities/Payment.entity';
+import { PaymentInfo } from './entities/payment-info.entity';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { Payment } from './entities/Payment.entity';
       IndividualBill,
       Service,
       Payment,
+      PaymentInfo,
       Contractor,
       Product,
       Supplier,
