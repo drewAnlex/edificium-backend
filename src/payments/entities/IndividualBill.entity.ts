@@ -3,11 +3,14 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { BuildingBill } from './BuildingBill.entity';
 import { Apartment } from '../../buildings/entities/Apartment.entity';
+import { Payment } from './Payment.entity';
 
 @Entity()
 export class IndividualBill {
@@ -34,6 +37,10 @@ export class IndividualBill {
 
   @Column({ type: 'boolean' })
   IsPaid: boolean;
+
+  @OneToOne(() => Payment, (payment) => payment.IndividualBill)
+  @JoinColumn()
+  payment: Payment;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
