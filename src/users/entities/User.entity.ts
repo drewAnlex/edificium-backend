@@ -5,6 +5,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   ManyToOne,
+  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -35,6 +36,9 @@ export class User {
 
   @ManyToOne(() => Building, { nullable: true })
   building: Building;
+
+  @OneToMany(() => Apartment, (apartment) => apartment.userId)
+  apartments: Apartment[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
