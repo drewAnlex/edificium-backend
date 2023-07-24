@@ -15,12 +15,17 @@ export class UsersService {
   constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
 
   findAll() {
-    return this.userRepo.find();
+    return this.userRepo.find({
+      relations: ['role', 'building', 'apartments'],
+    });
   }
 
   async findOne(id: number) {
-    const user = await this.userRepo.findOneBy({ id: id });
-    if (user === null) {
+    const user = await this.userRepo.findOne({
+      where: { id: id },
+      relations: ['role', 'building', 'apartments'],
+    });
+    if (!user) {
       throw new NotFoundException(`User #${id} not found`);
     }
     return user;
