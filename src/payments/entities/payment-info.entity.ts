@@ -3,7 +3,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -16,11 +15,9 @@ export class PaymentInfo {
   id: number;
 
   @ManyToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.paymentInfos)
-  @JoinColumn()
   methodId: PaymentMethod;
 
   @ManyToOne(() => Payment, (payment) => payment.paymentInfos)
-  @JoinColumn()
   payment: Payment;
 
   @Column({ type: 'varchar', length: 32 })

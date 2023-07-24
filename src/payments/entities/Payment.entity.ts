@@ -5,7 +5,6 @@ import {
   OneToOne,
   ManyToOne,
   OneToMany,
-  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -35,7 +34,6 @@ export class Payment {
   Amount: number;
 
   @ManyToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.payments)
-  @JoinColumn()
   Method: PaymentMethod;
 
   @OneToMany(() => PaymentInfo, (paymentInfo) => paymentInfo.payment)
