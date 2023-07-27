@@ -6,7 +6,10 @@ export class PaymentMethodDetails {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => PaymentMethod)
+  @ManyToOne(
+    () => PaymentMethod,
+    (paymentMethod) => paymentMethod.paymentDetails,
+  )
   MethodId: PaymentMethod;
 
   @Column({ type: 'varchar', length: 32 })
