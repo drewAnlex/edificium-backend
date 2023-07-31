@@ -1,9 +1,11 @@
+import { Supplier } from 'src/payments/entities/Supplier.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -31,6 +33,9 @@ export class Building {
 
   @Column({ type: 'int' })
   status: number;
+
+  @OneToMany(() => Building, (building) => building.id)
+  suppliers: Supplier[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

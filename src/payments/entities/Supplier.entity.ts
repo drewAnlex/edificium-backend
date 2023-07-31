@@ -5,8 +5,10 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { Product } from './Product.entity';
+import { Building } from 'src/buildings/entities/building.entity';
 
 @Entity()
 export class Supplier {
@@ -30,6 +32,9 @@ export class Supplier {
 
   @OneToMany(() => Product, (product) => product.suplierId)
   products: Product[];
+
+  @ManyToOne(() => Building, (building) => building.suppliers)
+  buildings: Building[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
