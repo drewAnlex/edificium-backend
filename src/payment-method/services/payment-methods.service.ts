@@ -16,11 +16,16 @@ export class PaymentMethodsService {
   ) {}
 
   findAll() {
-    return this.PaymentMethodRepo.find();
+    return this.PaymentMethodRepo.find({
+      relations: ['paymentInfos', 'paymentDetails', 'payments'],
+    });
   }
 
   async findOne(id: number) {
-    const PaymentMethod = await this.PaymentMethodRepo.findOneBy({ id: id });
+    const PaymentMethod = await this.PaymentMethodRepo.findOne({
+      where: { id: id },
+      relations: ['paymentInfos', 'paymentDetails', 'payments'],
+    });
     if (PaymentMethod === null) {
       throw new NotFoundException(`Payment Method #${id} not found`);
     }
