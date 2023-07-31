@@ -23,10 +23,10 @@ export class IndividualBill {
   @Column({ type: 'varchar', length: 128 })
   Description: string;
 
-  @ManyToOne(() => BuildingBill)
+  @ManyToOne(() => BuildingBill, (buildingBill) => buildingBill.individualBills)
   buildingBillId: BuildingBill;
 
-  @ManyToOne(() => Apartment)
+  @ManyToOne(() => Apartment, (apartment) => apartment.individualBills)
   apartmentId: Apartment;
 
   @Column({ type: 'float' })

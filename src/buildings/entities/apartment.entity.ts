@@ -8,7 +8,9 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { IndividualBill } from 'src/payments/entities/IndividualBill.entity';
 
 @Entity()
 export class Apartment {
@@ -26,6 +28,12 @@ export class Apartment {
 
   @ManyToOne(() => User)
   userId: User;
+
+  @OneToMany(
+    () => IndividualBill,
+    (individualBill) => individualBill.apartmentId,
+  )
+  individualBills: IndividualBill[];
 
   @Column({ type: 'float' })
   share: number;

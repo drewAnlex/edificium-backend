@@ -11,6 +11,7 @@ import { Building } from '../../buildings/entities/building.entity';
 import { User } from '../../users/entities/user.entity';
 import { Product } from './Product.entity';
 import { Service } from './Service.entity';
+import { IndividualBill } from './IndividualBill.entity';
 
 @Entity()
 export class BuildingBill {
@@ -28,6 +29,13 @@ export class BuildingBill {
 
   @OneToMany(() => Service, (service) => service.buildingBillId)
   services: Service[];
+
+  @OneToMany(
+    () => IndividualBill,
+    (individualBill) => individualBill.buildingBillId,
+    { cascade: true },
+  )
+  individualBills: IndividualBill[];
 
   @Column({ type: 'varchar', length: 64 })
   name: string;
