@@ -18,14 +18,14 @@ export class ApartmentsService {
 
   async findAll() {
     return await this.apartmentRepo.find({
-      relations: ['buildingId', 'userId'],
+      relations: ['buildingId', 'userId', 'individualBills'],
     });
   }
 
   async findOne(id: number) {
     const apartment = await this.apartmentRepo.findOne({
       where: { id },
-      relations: ['buildingId', 'userId'],
+      relations: ['buildingId', 'userId', 'individualBills'],
     });
     if (!apartment) {
       throw new NotFoundException(`Apartment #${id} not found`);
