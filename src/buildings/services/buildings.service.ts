@@ -13,11 +13,14 @@ export class BuildingsService {
   ) {}
 
   async findAll() {
-    return await this.buildingRepo.find();
+    return await this.buildingRepo.find({ relations: ['suppliers'] });
   }
 
   async findOne(id: number) {
-    const building = await this.buildingRepo.findOneBy({ id: id });
+    const building = await this.buildingRepo.findOne({
+      where: { id: id },
+      relations: ['suppliers'],
+    });
     if (!building) {
       throw new NotFoundException(`Building #${id} not found`);
     }

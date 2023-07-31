@@ -17,11 +17,14 @@ export class SupplierService {
   ) {}
 
   findAll() {
-    return this.supplierRepo.find();
+    return this.supplierRepo.find({ relations: ['products', 'buildings'] });
   }
 
   async findOne(id: number) {
-    const supplier = await this.supplierRepo.findOneBy({ id: id });
+    const supplier = await this.supplierRepo.findOne({
+      where: { id: id },
+      relations: ['products', 'buildings'],
+    });
     if (!supplier) {
       throw new NotFoundException(`Supplier #${id} Not Found`);
     }
