@@ -18,14 +18,14 @@ export class ProductsService {
 
   findAll() {
     return this.productRepo.find({
-      relations: ['supplierId', 'BuildingBillsId'],
+      relations: ['supplierId', 'BuildingBillsID'],
     });
   }
 
   async findOne(id: number) {
     const product = await this.productRepo.findOne({
       where: { id: id },
-      relations: ['supplierId', 'BuildingBillsId'],
+      relations: ['supplierId', 'BuildingBillsID'],
     });
     if (!product) {
       throw new NotFoundException(`Product #${id} Not Found`);
