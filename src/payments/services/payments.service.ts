@@ -13,14 +13,14 @@ export class PaymentsService {
 
   findAll() {
     return this.paymentRepo.find({
-      relations: ['IndividualBill', 'UserId', 'Method'],
+      relations: ['IndividualBill', 'UserId', 'Method', 'paymentInfos'],
     });
   }
 
   findOne(id: number) {
     const payment = this.paymentRepo.findOne({
       where: { id: id },
-      relations: ['IndividualBill', 'UserId', 'Method'],
+      relations: ['IndividualBill', 'UserId', 'Method', 'paymentInfos'],
     });
     if (!payment) {
       throw new NotFoundException(`Payment #${id} not found`);
