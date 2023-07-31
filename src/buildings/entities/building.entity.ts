@@ -1,5 +1,7 @@
+import { BuildingBill } from 'src/payments/entities/BuildingBill.entity';
 import { Contractor } from 'src/payments/entities/Contractor.entity';
 import { Supplier } from 'src/payments/entities/Supplier.entity';
+import { User } from 'src/users/entities/user.entity';
 import {
   Entity,
   Column,
@@ -8,6 +10,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
+import { Apartment } from './apartment.entity';
 
 @Entity()
 export class Building {
@@ -35,11 +38,20 @@ export class Building {
   @Column({ type: 'int' })
   status: number;
 
-  @OneToMany(() => Building, (building) => building.id)
+  @OneToMany(() => Supplier, (supplier) => supplier.id)
   suppliers: Supplier[];
 
   @OneToMany(() => Contractor, (contractor) => contractor.id)
   contractors: Contractor[];
+
+  @OneToMany(() => User, (user) => user.id)
+  admins: User[];
+
+  @OneToMany(() => BuildingBill, (buildingBill) => buildingBill.id)
+  buildingBills: BuildingBill[];
+
+  @OneToMany(() => Apartment, (apartment) => apartment.id)
+  apartments: Apartment[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

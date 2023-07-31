@@ -34,7 +34,7 @@ export class User {
   @Column({ type: 'int' })
   status: number;
 
-  @ManyToOne(() => Building, { nullable: true })
+  @ManyToOne(() => Building, (building) => building.id, { nullable: true })
   building: Building;
 
   @OneToMany(() => Apartment, (apartment) => apartment.userId)

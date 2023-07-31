@@ -17,7 +17,7 @@ export class Apartment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Building)
+  @ManyToOne(() => Building, (building) => building.id)
   buildingId: Building;
 
   @Column({ type: 'varchar', length: 10 })

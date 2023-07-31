@@ -14,14 +14,26 @@ export class BuildingsService {
 
   async findAll() {
     return await this.buildingRepo.find({
-      relations: ['suppliers', 'contractors'],
+      relations: [
+        'suppliers',
+        'contractors',
+        'buildingBills',
+        'admins',
+        'apartments',
+      ],
     });
   }
 
   async findOne(id: number) {
     const building = await this.buildingRepo.findOne({
       where: { id: id },
-      relations: ['suppliers', 'contractors'],
+      relations: [
+        'suppliers',
+        'contractors',
+        'buildingBills',
+        'admins',
+        'apartments',
+      ],
     });
     if (!building) {
       throw new NotFoundException(`Building #${id} not found`);
