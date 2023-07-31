@@ -21,30 +21,16 @@ export class PaymentMethodDetailsService {
   ) {}
 
   findAll() {
-    return this.PaymentMethodDetailsRepo.find();
+    return this.PaymentMethodDetailsRepo.find({ relations: ['MethodId'] });
   }
 
   async findOne(id: number) {
-    const PaymentMethodDetails = await this.PaymentMethodDetailsRepo.findOneBy({
-      id: id,
+    const PaymentMethodDetails = await this.PaymentMethodDetailsRepo.findOne({
+      where: { id: id },
+      relations: ['MethodId'],
     });
-    if (PaymentMethodDetails === null) {
+    if (!PaymentMethodDetails) {
       throw new NotFoundException(`PaymentMethodDetails #${id} not found`);
-    }
-    return PaymentMethodDetails;
-  }
-
-  findByPaymentMethodId(paymentMethodId: number) {
-    const PaymentMethodDetails =
-      this.PaymentMethodDetailsRepo.createQueryBuilder('paymentMethodDetails')
-        .where('paymentMethodDetails.MethodId = :paymentMethodId', {
-          paymentMethodId,
-        })
-        .getMany();
-    if (PaymentMethodDetails === null) {
-      throw new NotFoundException(
-        `PaymentMethodDetails #${paymentMethodId} not found`,
-      );
     }
     return PaymentMethodDetails;
   }

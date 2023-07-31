@@ -30,11 +30,6 @@ export class PaymentMethodDetailsController {
     return this.paymentMethodDetails.findOne(id);
   }
 
-  @Get('payment-method/:id')
-  findByPaymentMethodId(@Param('id', ParseIntPipe) id: number) {
-    return this.paymentMethodDetails.findByPaymentMethodId(id);
-  }
-
   @Post()
   create(@Body() payload: PaymentMethodDetailsDto) {
     return this.paymentMethodDetails.create(payload);
