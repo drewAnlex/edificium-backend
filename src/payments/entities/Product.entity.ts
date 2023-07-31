@@ -14,7 +14,7 @@ export class Product {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => BuildingBill)
+  @ManyToOne(() => BuildingBill, (bill) => bill.products)
   BuildingBillsID: BuildingBill;
 
   @Column({ type: 'varchar', length: 32 })

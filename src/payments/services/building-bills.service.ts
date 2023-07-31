@@ -20,11 +20,16 @@ export class BuildingBillsService {
   ) {}
 
   findAll() {
-    return this.billRepo.find();
+    return this.billRepo.find({
+      relations: ['buildingId', 'userId', 'services', 'products'],
+    });
   }
 
   async findOne(id: number) {
-    const bill = await this.billRepo.findOneBy({ id: id });
+    const bill = await this.billRepo.findOne({
+      where: { id: id },
+      relations: ['buildingId', 'userId', 'services', 'products'],
+    });
     if (!bill) {
       throw new NotFoundException(`Building Bill #${id} not found`);
     }

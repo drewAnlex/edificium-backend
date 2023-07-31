@@ -14,7 +14,7 @@ export class Service {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => BuildingBill)
+  @ManyToOne(() => BuildingBill, (bill) => bill.services)
   buildingBillId: BuildingBill;
 
   @Column({ type: 'varchar', length: 32 })
