@@ -21,12 +21,17 @@ export class PaymentMethodListService {
   ) {}
 
   findAll() {
-    return this.paymentMethodListRepo.find();
+    return this.paymentMethodListRepo.find({
+      relations: ['MethodId', 'BuildingId'],
+    });
   }
 
   findOne(id: number) {
-    const paymentMethodList = this.paymentMethodListRepo.findOneBy({ id: id });
-    if (paymentMethodList === null) {
+    const paymentMethodList = this.paymentMethodListRepo.findOne({
+      where: { id: id },
+      relations: ['MethodId', 'BuildingId'],
+    });
+    if (!paymentMethodList) {
       throw new NotFoundException(`Payment Method List #${id} not found`);
     }
     return paymentMethodList;
