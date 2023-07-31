@@ -5,8 +5,10 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { Service } from './Service.entity';
+import { Building } from 'src/buildings/entities/building.entity';
 
 @Entity()
 export class Contractor {
@@ -30,6 +32,9 @@ export class Contractor {
 
   @OneToMany(() => Service, (service) => service.contractorId)
   services: Service[];
+
+  @ManyToOne(() => Building, (building) => building.contractors)
+  buildings: Building[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

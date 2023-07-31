@@ -1,3 +1,4 @@
+import { Contractor } from 'src/payments/entities/Contractor.entity';
 import { Supplier } from 'src/payments/entities/Supplier.entity';
 import {
   Entity,
@@ -36,6 +37,9 @@ export class Building {
 
   @OneToMany(() => Building, (building) => building.id)
   suppliers: Supplier[];
+
+  @OneToMany(() => Contractor, (contractor) => contractor.id)
+  contractors: Contractor[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
