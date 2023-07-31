@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Building } from 'src/buildings/entities/building.entity';
+import { Payment } from 'src/payments/entities/Payment.entity';
 
 @Entity()
 export class User {
@@ -39,6 +40,9 @@ export class User {
 
   @OneToMany(() => Apartment, (apartment) => apartment.userId)
   apartments: Apartment[];
+
+  @OneToMany(() => Payment, (payment) => payment.UserId)
+  payments: Payment[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

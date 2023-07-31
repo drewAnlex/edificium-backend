@@ -21,7 +21,7 @@ export class Payment {
   @OneToOne(() => IndividualBill, (individualBill) => individualBill.payment)
   IndividualBill: IndividualBill;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.payments)
   UserId: User;
 
   @Column({ type: 'int' })
