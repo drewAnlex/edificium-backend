@@ -1,69 +1,81 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { BuildingBill } from '../entities/BuildingBill.entity';
 import {
   CreateBuildingBillDTO,
   UpdateBuildingBillDTO,
 } from '../dtos/BuildingBill.dto';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 @Injectable()
 export class BuildingBillsService {
-  private buildingBills: BuildingBill[] = [
-    {
-      Id: 1,
-      buildingId: 1,
-      userId: 1,
-      name: 'Bill 1',
-      description: 'Bill 1 description',
-      balance: -100,
-      total: 100,
-    },
-  ];
+  constructor(
+    @InjectRepository(BuildingBill) private billRepo: Repository<BuildingBill>,
+  ) {}
 
   findAll() {
-    return this.buildingBills;
+    return this.billRepo.find({
+      relations: [
+        'buildingId',
+        'userId',
+        'services',
+        'products',
+        'individualBills',
+      ],
+    });
   }
 
-  findOne(id: number) {
-    return this.buildingBills.find((buildingBill) => buildingBill.Id === id);
-  }
-
-  create(payload: CreateBuildingBillDTO) {
-    const newBuildingBill = {
-      Id: this.buildingBills.length + 1,
-      ...payload,
-    };
-
-    this.buildingBills.push(newBuildingBill);
-
-    return newBuildingBill;
-  }
-
-  update(id: number, payload: UpdateBuildingBillDTO) {
-    if (!this.findOne(id)) {
+  async findOne(id: number) {
+    const bill = await this.billRepo.findOne({
+      where: { id: id },
+      relations: [
+        'buildingId',
+        'userId',
+        'services',
+        'products',
+        'individualBills',
+      ],
+    });
+    if (!bill) {
       throw new NotFoundException(`Building Bill #${id} not found`);
     }
+    return bill;
+  }
 
-    const index = this.buildingBills.findIndex(
-      (buildingBill) => buildingBill.Id === id,
-    );
-    this.buildingBills[index] = {
-      ...this.buildingBills[index],
-      ...payload,
-    };
+  async create(payload: CreateBuildingBillDTO) {
+    const newBill = this.billRepo.create(payload);
+    try {
+      await this.billRepo.save(newBill);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred: ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return newBill;
+  }
 
-    return this.buildingBills[index];
+  async update(id: number, payload: UpdateBuildingBillDTO) {
+    const bill = await this.findOne(id);
+    try {
+      await this.billRepo.merge(bill, payload);
+      await this.billRepo.save(bill);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred: ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return bill;
   }
 
   delete(id: number) {
-    if (!this.findOne(id)) {
-      throw new NotFoundException(`Building Bill #${id} not found`);
-    }
-
-    // use splice to remove the buildingBill from the array
-    const index = this.buildingBills.findIndex(
-      (buildingBill) => buildingBill.Id === id,
-    );
-    this.buildingBills.splice(index, 1);
-    return true;
+    return this.billRepo.delete(id);
   }
 }

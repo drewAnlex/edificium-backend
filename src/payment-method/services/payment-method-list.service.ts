@@ -1,66 +1,70 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PaymentMethodList } from '../entities/payment-method-list.entity';
 import {
   PaymentMethodListDto,
   PartialPaymentMethodListDto,
 } from '../dtos/payment-method-list.dto';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 @Injectable()
 export class PaymentMethodListService {
-  private paymentMethodList: PaymentMethodList[] = [
-    {
-      id: 1,
-      MethodId: 1,
-      BuildingId: 1,
-      Status: 1,
-    },
-    {
-      id: 2,
-      MethodId: 2,
-      BuildingId: 2,
-      Status: 2,
-    },
-  ];
+  constructor(
+    @InjectRepository(PaymentMethodList)
+    private paymentMethodListRepo: Repository<PaymentMethodList>,
+  ) {}
 
   findAll() {
-    return this.paymentMethodList;
+    return this.paymentMethodListRepo.find({
+      relations: ['MethodId', 'BuildingId'],
+    });
   }
 
   findOne(id: number) {
-    const paymentMethodList = this.paymentMethodList.find(
-      (item) => item.id === id,
-    );
+    const paymentMethodList = this.paymentMethodListRepo.findOne({
+      where: { id: id },
+      relations: ['MethodId', 'BuildingId'],
+    });
     if (!paymentMethodList) {
       throw new NotFoundException(`Payment Method List #${id} not found`);
     }
     return paymentMethodList;
   }
 
-  create(data: PaymentMethodListDto) {
-    const newPaymentMethodList = {
-      id: this.paymentMethodList.length + 1,
-      ...data,
-    };
-    this.paymentMethodList.push(newPaymentMethodList);
+  async create(data: PaymentMethodListDto) {
+    const newPaymentMethodList = this.paymentMethodListRepo.create(data);
+    try {
+      await this.paymentMethodListRepo.save(newPaymentMethodList);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred while trying to create the PaymentMethodDetails: ${error}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
     return newPaymentMethodList;
   }
 
-  update(id: number, changes: PartialPaymentMethodListDto) {
-    const paymentMethodList = this.findOne(id);
-    const index = this.paymentMethodList.findIndex((item) => item.id === id);
-    this.paymentMethodList[index] = {
-      ...paymentMethodList,
-      ...changes,
-    };
-    return this.paymentMethodList[index];
+  async update(id: number, changes: PartialPaymentMethodListDto) {
+    const paymentMethodList = await this.findOne(id);
+    try {
+      await this.paymentMethodListRepo.merge(paymentMethodList, changes);
+      await this.paymentMethodListRepo.save(paymentMethodList);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred while trying to create the PaymentMethodDetails: ${error}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    return paymentMethodList;
   }
 
   remove(id: number) {
-    const index = this.paymentMethodList.findIndex((item) => item.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`Payment Method List #${id} not found`);
-    }
-    this.paymentMethodList.splice(index, 1);
-    return true;
+    return this.paymentMethodListRepo.delete(id);
   }
 }

@@ -11,7 +11,7 @@ export class AppController {
   }
 
   @Get('aedificium')
-  getAedificiumNumber(): number {
+  getAedificiumNumber() {
     return this.appService.getAedificiumNumber();
   }
 }

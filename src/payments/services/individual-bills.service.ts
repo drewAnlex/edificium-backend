@@ -1,56 +1,65 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { IndividualBill } from '../entities/IndividualBill.entity';
 import {
   IndividualBillDto,
   UpdateIndividualBillDto,
 } from '../dtos/IndividualBill.dto';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 @Injectable()
 export class IndividualBillsService {
-  private IndividualBill: IndividualBill[] = [
-    {
-      id: 1,
-      BuildingBillId: 1,
-      ApartmentId: 1,
-      Name: 'IndividualBill 1',
-      Description: 'Description 1',
-      Total: 100,
-      Balance: 100,
-      IsPaid: false,
-    },
-  ];
+  constructor(
+    @InjectRepository(IndividualBill)
+    private billRepo: Repository<IndividualBill>,
+  ) {}
 
   findAll() {
-    return this.IndividualBill;
+    return this.billRepo.find();
   }
 
-  findOne(id: number) {
-    const IndividualBill = this.IndividualBill.find((item) => item.id === id);
-    if (!IndividualBill) {
-      throw new NotFoundException(`IndividualBill #${id} not found`);
+  async findOne(id: number) {
+    const bill = await this.billRepo.findOneBy({ id: id });
+    if (!bill) {
+      throw new NotFoundException(`Bill #${id} not found`);
     }
-    return IndividualBill;
+    return bill;
   }
 
-  create(data: IndividualBillDto) {
-    const newIndividualBill = { id: this.IndividualBill.length + 1, ...data };
-    this.IndividualBill.push(newIndividualBill);
-    return newIndividualBill;
+  async create(payload: IndividualBillDto) {
+    const newBill = this.billRepo.create(payload);
+    try {
+      await this.billRepo.save(newBill);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred: ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return newBill;
   }
 
-  update(id: number, changes: UpdateIndividualBillDto) {
-    const IndividualBill = this.findOne(id);
-    const index = this.IndividualBill.findIndex((item) => item.id === id);
-    this.IndividualBill[index] = { ...IndividualBill, ...changes };
-    return this.IndividualBill[index];
+  async update(id: number, payload: UpdateIndividualBillDto) {
+    const bill = await this.findOne(id);
+    try {
+      await this.billRepo.merge(bill, payload);
+      await this.billRepo.save(bill);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred: ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return bill;
   }
 
   remove(id: number) {
-    const index = this.IndividualBill.findIndex((item) => item.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`IndividualBill #${id} not found`);
-    }
-    this.IndividualBill.splice(index, 1);
-    return true;
+    return this.billRepo.delete(id);
   }
 }

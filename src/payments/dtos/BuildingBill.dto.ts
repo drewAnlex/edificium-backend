@@ -1,14 +1,21 @@
 import { IsNotEmpty, IsNumber, IsPositive, IsString } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
+import { Service } from '../entities/Service.entity';
+import { User } from 'src/users/entities/User.entity';
+import { Building } from 'src/buildings/entities/building.entity';
 
 export class CreateBuildingBillDTO implements Readonly<CreateBuildingBillDTO> {
   @IsNotEmpty()
   @IsNumber()
-  buildingId: number;
+  buildingId: Building;
 
   @IsNotEmpty()
   @IsNumber()
-  userId: number;
+  userId: User;
+
+  @IsNotEmpty()
+  @IsNumber()
+  service: Service[];
 
   @IsNotEmpty()
   @IsString()

@@ -1,58 +1,60 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from '../dtos/Product.dto';
 import { Product } from '../entities/Product.entity';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 @Injectable()
 export class ProductsService {
-  private products: Product[] = [
-    {
-      Id: 1,
-      BuildingBillsID: 1,
-      name: 'Product 1',
-      description: 'Description 1',
-      price: 122,
-      quantity: 2,
-      suplierId: 1,
-      IsPaid: false,
-    },
-  ];
+  constructor(
+    @InjectRepository(Product) private productRepo: Repository<Product>,
+  ) {}
 
   findAll() {
-    return this.products;
+    return this.productRepo.find({
+      relations: ['supplierId', 'BuildingBillsID'],
+    });
   }
 
-  findOne(id: number) {
-    const product = this.products.find((item) => item.Id === id);
+  async findOne(id: number) {
+    const product = await this.productRepo.findOne({
+      where: { id: id },
+      relations: ['supplierId', 'BuildingBillsID'],
+    });
+    if (!product) {
+      throw new NotFoundException(`Product #${id} Not Found`);
+    }
     return product;
   }
 
-  create(payload: CreateProductDto) {
-    const newProduct = {
-      Id: this.products.length + 1,
-      ...payload,
-    };
-    this.products.push(newProduct);
+  async create(payload: CreateProductDto) {
+    const newProduct = this.productRepo.create(payload);
+    try {
+      await this.productRepo.save(newProduct);
+    } catch (error) {
+      throw new HttpException(`Error ${error}`, HttpStatus.BAD_REQUEST);
+    }
     return newProduct;
   }
 
-  update(id: number, payload: UpdateProductDto) {
-    if (!this.findOne(id)) {
-      throw new NotFoundException(`Product #${id} not found`);
+  async update(id: number, payload: UpdateProductDto) {
+    const product = await this.findOne(id);
+    try {
+      await this.productRepo.merge(product, payload);
+      await this.productRepo.save(product);
+    } catch (error) {
+      throw new HttpException(`Error ${error}`, HttpStatus.BAD_REQUEST);
     }
-    const index = this.products.findIndex((item) => item.Id === id);
-    this.products[index] = {
-      ...this.products[index],
-      ...payload,
-    };
-    return this.products[index];
+    return product;
   }
 
   remove(id: number) {
-    if (!this.findOne(id)) {
-      throw new NotFoundException(`Product #${id} not found`);
-    }
-    const index = this.products.findIndex((item) => item.Id === id);
-    this.products.splice(index, 1);
-    return true;
+    return this.productRepo.delete(id);
   }
 }

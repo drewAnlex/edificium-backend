@@ -1,9 +1,57 @@
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Building } from '../../buildings/entities/building.entity';
+import { User } from '../../users/entities/user.entity';
+import { Product } from './Product.entity';
+import { Service } from './Service.entity';
+import { IndividualBill } from './IndividualBill.entity';
+
+@Entity()
 export class BuildingBill {
-  Id: number;
-  buildingId: number;
-  userId: number;
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @ManyToOne(() => Building)
+  buildingId: Building;
+
+  @ManyToOne(() => User)
+  userId: User;
+
+  @OneToMany(() => Product, (product) => product.BuildingBillsID)
+  products: Product[];
+
+  @OneToMany(() => Service, (service) => service.buildingBillId)
+  services: Service[];
+
+  @OneToMany(
+    () => IndividualBill,
+    (individualBill) => individualBill.buildingBillId,
+    { cascade: true },
+  )
+  individualBills: IndividualBill[];
+
+  @Column({ type: 'varchar', length: 64 })
   name: string;
+
+  @Column({ type: 'text' })
   description: string;
+
+  @Column({ type: 'float' })
   balance: number;
+
+  @Column({ type: 'float' })
   total: number;
+
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 }

@@ -3,32 +3,38 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Building } from '../entities/building.entity';
 import { CreateBuildingDto, UpdateBuildingDto } from '../dtos/building.dto';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 @Injectable()
 export class BuildingsService {
-  private buildings: Building[] = [
-    {
-      id: 1,
-      name: 'Building name',
-      country: 'Country',
-      state: 'State',
-      city: 'City',
-      zone: 'Zone',
-      nApartments: 10,
-      apartments: [],
-      administrators: [{ id: 1, name: 'Administrator name' }],
-      coOwners: [],
-      bills: [],
-      news: [],
-      status: 3,
-    },
-  ];
+  constructor(
+    @InjectRepository(Building) private buildingRepo: Repository<Building>,
+  ) {}
 
-  findAll() {
-    return this.buildings;
+  async findAll() {
+    return await this.buildingRepo.find({
+      relations: [
+        'suppliers',
+        'contractors',
+        'buildingBills',
+        'admins',
+        'apartments',
+      ],
+    });
   }
 
-  findOne(id: number) {
-    const building = this.buildings.find((building) => building.id === id);
+  async findOne(id: number) {
+    const building = await this.buildingRepo.findOne({
+      where: { id: id },
+      relations: [
+        'suppliers',
+        'contractors',
+        'buildingBills',
+        'admins',
+        'apartments',
+      ],
+    });
     if (!building) {
       throw new NotFoundException(`Building #${id} not found`);
     }
@@ -36,37 +42,17 @@ export class BuildingsService {
   }
 
   create(payload: CreateBuildingDto) {
-    const newBuilding = {
-      id: this.buildings.length + 1,
-      ...payload,
-      apartments: [],
-      administrators: [],
-      coOwners: [],
-      bills: [],
-      news: [],
-    };
-    this.buildings.push(newBuilding);
-    return newBuilding;
+    const newBuilding = this.buildingRepo.create(payload);
+    return this.buildingRepo.save(newBuilding);
   }
 
-  update(id: number, payload: UpdateBuildingDto) {
-    if (!this.findOne(id)) {
-      throw new NotFoundException(`Building #${id} not found`);
-    }
-    const index = this.buildings.findIndex((building) => building.id === id);
-    this.buildings[index] = {
-      ...this.buildings[index],
-      ...payload,
-    };
-    return this.buildings[index];
+  async update(id: number, payload: UpdateBuildingDto) {
+    const building = await this.findOne(id);
+    await this.buildingRepo.merge(building, payload);
+    return this.buildingRepo.save(building);
   }
 
   remove(id: number) {
-    if (!this.findOne(id)) {
-      throw new NotFoundException(`Building #${id} not found`);
-    }
-    const index = this.buildings.findIndex((building) => building.id === id);
-    this.buildings.splice(index, 1);
-    return true;
+    return this.buildingRepo.delete(id);
   }
 }

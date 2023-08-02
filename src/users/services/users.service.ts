@@ -1,56 +1,65 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from '../entities/User.entity';
 import { CreateUserDto, UpdateUserDto } from '../dtos/users.dto';
 
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 @Injectable()
 export class UsersService {
-  private users: User[] = [
-    {
-      id: 1,
-      name: 'User name',
-      email: 'User email',
-      phone: 'User phone',
-      password: 'User password',
-      role: 'User role',
-      status: 1,
-    },
-  ];
+  constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
 
   findAll() {
-    return this.users;
+    return this.userRepo.find({
+      relations: ['role', 'building', 'apartments', 'payments'],
+    });
   }
 
-  findOne(id: number) {
-    return this.users.find((user) => user.id === id);
+  async findOne(id: number) {
+    const user = await this.userRepo.findOne({
+      where: { id: id },
+      relations: ['role', 'building', 'apartments', 'payments'],
+    });
+    if (!user) {
+      throw new NotFoundException(`User #${id} not found`);
+    }
+    return user;
   }
 
-  create(payload: CreateUserDto) {
-    const newUser = {
-      id: this.users.length + 1,
-      ...payload,
-    };
-    this.users.push(newUser);
+  async create(payload: CreateUserDto) {
+    const newUser = this.userRepo.create(payload);
+    try {
+      await this.userRepo.save(newUser);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred while trying to create the PaymentMethodDetails: ${error}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
     return newUser;
   }
 
-  update(id: number, payload: UpdateUserDto) {
-    if (!this.findOne(id)) {
-      throw new NotFoundException(`User #${id} not found`);
+  async update(id: number, payload: UpdateUserDto) {
+    const user = await this.findOne(id);
+    try {
+      await this.userRepo.merge(user, payload);
+      await this.userRepo.save(user);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred while trying to create the PaymentMethodDetails: ${error}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-    const userIndex = this.users.findIndex((user) => user.id === id);
-    this.users[userIndex] = {
-      ...this.users[userIndex],
-      ...payload,
-    };
-    return this.users[userIndex];
+
+    return user;
   }
 
   remove(id: number) {
-    if (!this.findOne(id)) {
-      throw new NotFoundException(`User #${id} not found`);
-    }
-    const index = this.users.findIndex((user) => user.id === id);
-    this.users.splice(index, 1);
-    return true;
+    return this.userRepo.delete(id);
   }
 }

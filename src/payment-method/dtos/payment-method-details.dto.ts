@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsString, IsNumber, IsPositive } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
+import { PaymentMethod } from '../entities/PaymentMethod.entity';
 
 export class PaymentMethodDetailsDto
   implements Readonly<PaymentMethodDetailsDto>
@@ -7,7 +8,7 @@ export class PaymentMethodDetailsDto
   @IsNotEmpty()
   @IsNumber()
   @IsPositive()
-  MethodId: number;
+  MethodId: PaymentMethod;
 
   @IsNotEmpty()
   @IsString()
