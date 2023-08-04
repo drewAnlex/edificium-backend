@@ -1,7 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { Building } from '../entities/building.entity';
-import { CreateBuildingDto, UpdateBuildingDto } from '../dtos/building.dto';
+import {
+  CreateBuildingDto,
+  FilterBuildingsDto,
+  UpdateBuildingDto,
+} from '../dtos/building.dto';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,7 +16,21 @@ export class BuildingsService {
     @InjectRepository(Building) private buildingRepo: Repository<Building>,
   ) {}
 
-  async findAll() {
+  async findAll(params?: FilterBuildingsDto) {
+    if (params) {
+      const { limit, offset } = params;
+      return await this.buildingRepo.find({
+        relations: [
+          'suppliers',
+          'contractors',
+          'buildingBills',
+          'admins',
+          'apartments',
+        ],
+        skip: offset,
+        take: limit,
+      });
+    }
     return await this.buildingRepo.find({
       relations: [
         'suppliers',

@@ -1,34 +1,51 @@
-import { IsString, IsNumber, IsNotEmpty, IsPositive } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsNotEmpty,
+  IsPositive,
+  IsOptional,
+  Min,
+} from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 
-export class CreateBuildingDto {
+export class CreateBuildingDto implements Readonly<CreateBuildingDto> {
   @IsNotEmpty()
   @IsString()
-  readonly name: string;
+  name: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly country: string;
+  country: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly state: string;
+  state: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly city: string;
+  city: string;
 
   @IsNotEmpty()
   @IsString()
-  readonly zone: string;
+  zone: string;
 
   @IsNotEmpty()
   @IsNumber()
   @IsPositive()
-  readonly nApartments: number;
+  nApartments: number;
 
   @IsNotEmpty()
   @IsNumber()
-  readonly status: number;
+  status: number;
 }
 export class UpdateBuildingDto extends PartialType(CreateBuildingDto) {}
+
+export class FilterBuildingsDto {
+  @IsOptional()
+  @IsPositive()
+  limit: number;
+
+  @IsOptional()
+  @Min(0)
+  offset: number;
+}

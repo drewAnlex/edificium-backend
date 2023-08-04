@@ -10,7 +10,11 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { BuildingsService } from '../services/buildings.service';
-import { CreateBuildingDto, UpdateBuildingDto } from '../dtos/building.dto';
+import {
+  CreateBuildingDto,
+  FilterBuildingsDto,
+  UpdateBuildingDto,
+} from '../dtos/building.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('buildings')
@@ -19,17 +23,8 @@ export class BuildingsController {
   constructor(private buildingsService: BuildingsService) {}
 
   @Get()
-  getBuildings(
-    @Query('limit') limit = 10,
-    @Query('offset') offset = 0,
-    @Query('name') name: string,
-    @Query('country') country: string,
-    @Query('state') state: string,
-    @Query('city') city: string,
-    @Query('zone') zone: string,
-    @Query('nApartments') nApartments = 100,
-  ) {
-    return this.buildingsService.findAll();
+  getBuildings(@Query() params: FilterBuildingsDto) {
+    return this.buildingsService.findAll(params);
   }
 
   @Get(':id')

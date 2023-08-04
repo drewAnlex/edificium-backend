@@ -38,19 +38,19 @@ export class Building {
   @Column({ type: 'int' })
   status: number;
 
-  @OneToMany(() => Supplier, (supplier) => supplier.id)
+  @OneToMany(() => Supplier, (supplier) => supplier.buildings)
   suppliers: Supplier[];
 
-  @OneToMany(() => Contractor, (contractor) => contractor.id)
+  @OneToMany(() => Contractor, (contractor) => contractor.buildings)
   contractors: Contractor[];
 
-  @OneToMany(() => User, (user) => user.id)
+  @OneToMany(() => User, (user) => user.building)
   admins: User[];
 
-  @OneToMany(() => BuildingBill, (buildingBill) => buildingBill.id)
+  @OneToMany(() => BuildingBill, (buildingBill) => buildingBill.buildingId)
   buildingBills: BuildingBill[];
 
-  @OneToMany(() => Apartment, (apartment) => apartment.id)
+  @OneToMany(() => Apartment, (apartment) => apartment.buildingId)
   apartments: Apartment[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
