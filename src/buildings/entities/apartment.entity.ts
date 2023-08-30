@@ -17,6 +17,9 @@ export class Apartment {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'varchar', length: 64 })
+  uuid: string;
+
   @ManyToOne(() => Building, (building) => building.id)
   buildingId: Building;
 
@@ -26,7 +29,7 @@ export class Apartment {
   @Column({ type: 'int' })
   floor: number;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.id, { nullable: true })
   userId: User;
 
   @OneToMany(

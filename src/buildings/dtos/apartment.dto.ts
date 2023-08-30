@@ -1,4 +1,10 @@
-import { IsString, IsNumber, IsNotEmpty, IsPositive } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsNotEmpty,
+  IsPositive,
+  IsOptional,
+} from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 import { Building } from '../entities/building.entity';
 import { User } from 'src/users/entities/User.entity';
@@ -31,7 +37,7 @@ export class CreateAparmentDTO {
   @IsNumber()
   readonly buildingId: Building;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   readonly userId: User;
 }

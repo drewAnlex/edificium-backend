@@ -44,4 +44,12 @@ export class ApartmentController {
   deleteAparment(@Param('id', ParseIntPipe) id: number) {
     return this.apartmentsService.remove(id);
   }
+
+  @Put('/assign/:uuid/:userId')
+  assignApartmentToUser(
+    @Param('uuid') uuid: string,
+    @Param('userId', ParseIntPipe) userId: number,
+  ) {
+    return this.apartmentsService.setApartmentToUser(uuid, userId);
+  }
 }

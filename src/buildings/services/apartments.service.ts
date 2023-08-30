@@ -4,16 +4,19 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
 import { CreateAparmentDTO, UpdateAparmentDTO } from '../dtos/apartment.dto';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Apartment } from '../entities/apartment.entity';
+import { UsersService } from 'src/users/services/users.service';
 
 @Injectable()
 export class ApartmentsService {
   constructor(
     @InjectRepository(Apartment) private apartmentRepo: Repository<Apartment>,
+    private userService: UsersService,
   ) {}
 
   async findAll() {
@@ -35,6 +38,7 @@ export class ApartmentsService {
 
   async create(payload: CreateAparmentDTO) {
     const newApartment = this.apartmentRepo.create(payload);
+    newApartment.uuid = uuidv4();
     try {
       await this.apartmentRepo.save(newApartment);
     } catch (error) {
@@ -59,5 +63,19 @@ export class ApartmentsService {
 
   remove(id: number) {
     return this.apartmentRepo.delete(id);
+  }
+
+  async setApartmentToUser(uuid: string, userId: number) {
+    const apartment = await this.apartmentRepo.findOne({
+      where: { uuid },
+      relations: ['buildingId', 'userId', 'individualBills'],
+    });
+    if (!apartment) {
+      throw new NotFoundException(`Apartment #${uuid} not found`);
+    }
+    const user = await this.userService.findOne(userId);
+    apartment.userId = user;
+    await this.apartmentRepo.save(apartment);
+    return { message: 'User assigned to apartment' };
   }
 }
