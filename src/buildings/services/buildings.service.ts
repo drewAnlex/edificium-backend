@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Building } from '../entities/building.entity';
 import {
@@ -9,11 +10,13 @@ import {
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UsersService } from 'src/users/services/users.service';
 
 @Injectable()
 export class BuildingsService {
   constructor(
     @InjectRepository(Building) private buildingRepo: Repository<Building>,
+    private userService: UsersService,
   ) {}
 
   async findAll(params?: FilterBuildingsDto) {
@@ -61,6 +64,7 @@ export class BuildingsService {
 
   create(payload: CreateBuildingDto) {
     const newBuilding = this.buildingRepo.create(payload);
+    newBuilding.uuid = uuidv4();
     return this.buildingRepo.save(newBuilding);
   }
 
@@ -72,5 +76,14 @@ export class BuildingsService {
 
   remove(id: number) {
     return this.buildingRepo.delete(id);
+  }
+
+  async setBuildingAdmin(uuid: string, adminId: number) {
+    const building = await this.buildingRepo.findOne({ where: { uuid } });
+    if (!building) throw new NotFoundException(`Building #${uuid} not found`);
+    const admin = await this.userService.findOne(adminId);
+    admin.building = building;
+    await this.userService.update(adminId, admin);
+    return { message: 'Building admin assigned' };
   }
 }

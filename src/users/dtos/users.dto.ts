@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsPositive,
   IsEmail,
+  IsOptional,
 } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 import { Role } from '../entities/role.entity';
@@ -28,6 +29,7 @@ export class CreateUserDto {
   readonly password: string;
 
   @IsNotEmpty()
+  @IsOptional()
   readonly role: Role;
 
   @IsNotEmpty()
@@ -35,6 +37,7 @@ export class CreateUserDto {
   @IsPositive()
   readonly status: number;
 
+  @IsOptional()
   @IsNumber()
   @IsPositive()
   readonly building: Building;

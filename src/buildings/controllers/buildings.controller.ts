@@ -49,4 +49,12 @@ export class BuildingsController {
   deleteBuilding(@Param('id', ParseIntPipe) id: number) {
     return this.buildingsService.remove(id);
   }
+
+  @Put('assign/:uuid/:adminId')
+  assignBuilding(
+    @Param('uuid') uuid: string,
+    @Param('adminId', ParseIntPipe) adminId: number,
+  ) {
+    return this.buildingsService.setBuildingAdmin(uuid, adminId);
+  }
 }

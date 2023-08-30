@@ -17,6 +17,9 @@ export class Building {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'varchar', length: 64, nullable: false })
+  uuid: string;
+
   @Column({ type: 'varchar', length: 32, nullable: false })
   name: string;
 
