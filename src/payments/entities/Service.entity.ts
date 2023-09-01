@@ -35,7 +35,7 @@ export class Service {
   @Column({ type: 'date' })
   endDate: Date;
 
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', default: false })
   isPaid: boolean;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

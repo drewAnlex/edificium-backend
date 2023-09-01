@@ -32,7 +32,7 @@ export class Product {
   @ManyToOne(() => Supplier, (supplier) => supplier.products)
   suplierId: Supplier;
 
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', default: false })
   IsPaid: boolean;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
