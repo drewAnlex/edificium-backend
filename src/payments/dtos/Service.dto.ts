@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsNumber,
-  IsNotEmpty,
-  IsDateString,
-  IsBoolean,
-} from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, IsDateString } from 'class-validator';
 
 import { PartialType } from '@nestjs/swagger';
 import { Contractor } from '../entities/Contractor.entity';
@@ -38,10 +32,6 @@ export class CreateServiceDTO implements Readonly<CreateServiceDTO> {
   @IsNotEmpty()
   @IsDateString()
   endDate: Date;
-
-  @IsNotEmpty()
-  @IsBoolean()
-  isPaid: boolean;
 }
 
 export class UpdateServiceDTO extends PartialType(CreateServiceDTO) {}
