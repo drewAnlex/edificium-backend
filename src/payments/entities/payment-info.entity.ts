@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { PaymentMethod } from 'src/payment-method/entities/PaymentMethod.entity';
+import { PaymentMethod } from '../../payment-method/entities/PaymentMethod.entity';
 import { Payment } from './Payment.entity';
 
 @Entity()

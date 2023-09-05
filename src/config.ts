@@ -8,6 +8,7 @@ export default registerAs('config', () => {
       password: process.env.POSTGRES_PASSWORD,
       host: process.env.DATABASE_HOST,
       port: parseInt(process.env.POSTGRES_PORT, 10),
+      url: process.env.DATABASE_URL,
     },
     apiKey: process.env.API_KEY,
     misc: {

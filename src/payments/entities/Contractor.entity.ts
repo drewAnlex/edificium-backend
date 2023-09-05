@@ -8,7 +8,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { Service } from './Service.entity';
-import { Building } from 'src/buildings/entities/building.entity';
+import { Building } from '../../buildings/entities/building.entity';
 
 @Entity()
 export class Contractor {

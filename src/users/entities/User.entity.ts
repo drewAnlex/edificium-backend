@@ -1,4 +1,4 @@
-import { Apartment } from 'src/buildings/entities/apartment.entity';
+import { Apartment } from '../../buildings/entities/apartment.entity';
 import { Role } from './role.entity';
 import {
   Column,
@@ -9,8 +9,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Building } from 'src/buildings/entities/building.entity';
-import { Payment } from 'src/payments/entities/Payment.entity';
+import { Building } from '../../buildings/entities/building.entity';
+import { Payment } from '../../payments/entities/Payment.entity';
 
 @Entity()
 export class User {

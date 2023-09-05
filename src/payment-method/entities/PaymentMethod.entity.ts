@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Payment } from '../../payments/entities/Payment.entity';
-import { PaymentInfo } from 'src/payments/entities/payment-info.entity';
+import { PaymentInfo } from '../../payments/entities/payment-info.entity';
 import { PaymentMethodDetails } from './payment-method-details.entity';
 
 @Entity()

@@ -10,7 +10,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { IndividualBill } from 'src/payments/entities/IndividualBill.entity';
+import { IndividualBill } from '../../payments/entities/IndividualBill.entity';
 
 @Entity()
 export class Apartment {

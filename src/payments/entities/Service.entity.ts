@@ -38,6 +38,9 @@ export class Service {
   @Column({ type: 'boolean', default: false })
   isPaid: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  monthly: boolean;
+
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 

@@ -33,7 +33,6 @@ export class BuildingBill {
   @OneToMany(
     () => IndividualBill,
     (individualBill) => individualBill.buildingBillId,
-    { cascade: true },
   )
   individualBills: IndividualBill[];
 
