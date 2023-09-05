@@ -4,6 +4,7 @@
 /dist
 /node_modules
 /src/database/data-source.ts
+data-source.ts
 # Logs
 logs
 *.log
