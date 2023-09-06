@@ -42,10 +42,10 @@ export class BuildingBill {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0 })
   balance: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0 })
   total: number;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
