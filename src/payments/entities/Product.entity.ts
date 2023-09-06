@@ -30,7 +30,7 @@ export class Product {
   quantity: number;
 
   @ManyToOne(() => Supplier, (supplier) => supplier.products)
-  suplierId: Supplier;
+  supplierId: Supplier;
 
   @Column({ type: 'boolean', default: false })
   IsPaid: boolean;

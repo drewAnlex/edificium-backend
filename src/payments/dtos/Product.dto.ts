@@ -26,7 +26,7 @@ export class CreateProductDto implements Readonly<CreateProductDto> {
 
   @IsNotEmpty()
   @IsNumber()
-  suplierId: Supplier;
+  supplierId: Supplier;
 }
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {}

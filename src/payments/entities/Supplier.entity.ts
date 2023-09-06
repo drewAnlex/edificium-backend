@@ -30,7 +30,7 @@ export class Supplier {
   @Column({ type: 'float' })
   balance: number;
 
-  @OneToMany(() => Product, (product) => product.suplierId)
+  @OneToMany(() => Product, (product) => product.supplierId)
   products: Product[];
 
   @ManyToOne(() => Building, (building) => building.suppliers)
