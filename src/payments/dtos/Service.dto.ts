@@ -27,11 +27,11 @@ export class CreateServiceDTO implements Readonly<CreateServiceDTO> {
 
   @IsNotEmpty()
   @IsDateString()
-  startDate: Date;
+  startDate: string;
 
   @IsNotEmpty()
   @IsDateString()
-  endDate: Date;
+  endDate: string;
 }
 
 export class UpdateServiceDTO extends PartialType(CreateServiceDTO) {}
