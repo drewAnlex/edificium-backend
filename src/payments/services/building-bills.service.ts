@@ -21,13 +21,7 @@ export class BuildingBillsService {
 
   findAll() {
     return this.billRepo.find({
-      relations: [
-        'buildingId',
-        'userId',
-        'services',
-        'products',
-        'individualBills',
-      ],
+      relations: ['buildingId'],
     });
   }
 
