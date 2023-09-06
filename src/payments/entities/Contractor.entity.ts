@@ -31,7 +31,7 @@ export class Contractor {
   services: Service[];
 
   @ManyToOne(() => Building, (building) => building.contractors)
-  buildings: Building[];
+  building: Building;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
