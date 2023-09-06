@@ -9,11 +9,13 @@ import { Product } from '../entities/Product.entity';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { BuildingBillsService } from './building-bills.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product) private productRepo: Repository<Product>,
+    private bbService: BuildingBillsService,
   ) {}
 
   findAll() {
@@ -35,8 +37,13 @@ export class ProductsService {
 
   async create(payload: CreateProductDto) {
     const newProduct = this.productRepo.create(payload);
+    const buildingBill = await this.bbService.findOne(
+      payload.BuildingBillsID.id,
+    );
+    buildingBill.total += payload.price * payload.quantity;
     try {
       await this.productRepo.save(newProduct);
+      await this.bbService.update(buildingBill.id, buildingBill);
     } catch (error) {
       throw new HttpException(`Error ${error}`, HttpStatus.BAD_REQUEST);
     }
