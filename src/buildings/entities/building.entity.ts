@@ -44,7 +44,7 @@ export class Building {
   @OneToMany(() => Supplier, (supplier) => supplier.buildings)
   suppliers: Supplier[];
 
-  @OneToMany(() => Contractor, (contractor) => contractor.buildings)
+  @OneToMany(() => Contractor, (contractor) => contractor.building)
   contractors: Contractor[];
 
   @OneToMany(() => User, (user) => user.building)
