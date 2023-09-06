@@ -27,9 +27,6 @@ export class Supplier {
   @Column({ type: 'text' })
   address: string;
 
-  @Column({ type: 'float' })
-  balance: number;
-
   @OneToMany(() => Product, (product) => product.supplierId)
   products: Product[];
 

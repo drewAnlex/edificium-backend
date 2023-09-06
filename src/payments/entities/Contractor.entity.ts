@@ -27,9 +27,6 @@ export class Contractor {
   @Column({ type: 'text' })
   address: string;
 
-  @Column({ type: 'float' })
-  balance: number;
-
   @OneToMany(() => Service, (service) => service.contractorId)
   services: Service[];
 
