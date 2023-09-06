@@ -26,6 +26,7 @@ import { SupplierService } from './services/supplier.service';
 import { SupplierController } from './controllers/supplier.controller';
 import { Payment } from './entities/Payment.entity';
 import { PaymentInfo } from './entities/payment-info.entity';
+import { BuildingsModule } from 'src/buildings/buildings.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { PaymentInfo } from './entities/payment-info.entity';
       Product,
       Supplier,
     ]),
+    BuildingsModule,
   ],
   providers: [
     ServicesService,

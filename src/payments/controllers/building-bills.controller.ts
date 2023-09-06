@@ -32,6 +32,11 @@ export class BuildingBillsController {
     return this.buildingBillService.findOne(id);
   }
 
+  @Get('uuid/:uuid')
+  getBillByUuid(@Param('uuid') uuid: string) {
+    return this.buildingBillService.findOneByUuid(uuid);
+  }
+
   @Post()
   create(@Body() payload: CreateBuildingBillDTO) {
     return this.buildingBillService.create(payload);
@@ -48,5 +53,10 @@ export class BuildingBillsController {
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number) {
     return this.buildingBillService.delete(id);
+  }
+
+  @Get('published/:uuid')
+  setPublished(@Param('uuid') uuid: string) {
+    return this.buildingBillService.setToPublished(uuid);
   }
 }

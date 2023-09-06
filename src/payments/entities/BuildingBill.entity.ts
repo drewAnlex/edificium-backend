@@ -24,6 +24,9 @@ export class BuildingBill {
   @ManyToOne(() => User)
   userId: User;
 
+  @Column({ type: 'varchar', length: 64 })
+  uuid: string;
+
   @OneToMany(() => Product, (product) => product.BuildingBillsID)
   products: Product[];
 
@@ -47,6 +50,12 @@ export class BuildingBill {
 
   @Column({ type: 'float', default: 0 })
   total: number;
+
+  @Column({ type: 'boolean', default: false })
+  isPublished: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  isPaid: boolean;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

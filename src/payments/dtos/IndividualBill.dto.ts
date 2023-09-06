@@ -4,6 +4,7 @@ import {
   IsString,
   IsBoolean,
   IsPositive,
+  IsOptional,
 } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 import { Apartment } from 'src/buildings/entities/apartment.entity';
@@ -31,11 +32,11 @@ export class IndividualBillDto implements Readonly<IndividualBillDto> {
   @IsPositive()
   Total: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   Balance: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   IsPaid: boolean;
 }
