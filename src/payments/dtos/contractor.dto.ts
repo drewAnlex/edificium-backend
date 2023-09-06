@@ -21,10 +21,6 @@ export class CreateContractorDTO implements Readonly<CreateContractorDTO> {
 
   @IsNotEmpty()
   @IsNumber()
-  balance: number;
-
-  @IsNotEmpty()
-  @IsNumber()
   buildings: Building[];
 }
 
