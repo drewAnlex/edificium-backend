@@ -45,10 +45,10 @@ export class BuildingBill {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'float', default: 0 })
+  @Column({ type: 'decimal', precision: 8, scale: 2, default: 0 })
   balance: number;
 
-  @Column({ type: 'float', default: 0 })
+  @Column({ type: 'decimal', precision: 8, scale: 2, default: 0 })
   total: number;
 
   @Column({ type: 'boolean', default: false })

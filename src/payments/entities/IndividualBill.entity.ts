@@ -3,10 +3,9 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  OneToOne,
   CreateDateColumn,
   UpdateDateColumn,
-  JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { BuildingBill } from './BuildingBill.entity';
 import { Apartment } from '../../buildings/entities/Apartment.entity';
@@ -29,17 +28,16 @@ export class IndividualBill {
   @ManyToOne(() => Apartment, (apartment) => apartment.individualBills)
   apartmentId: Apartment;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'decimal', precision: 8, scale: 2 })
   Total: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'decimal', precision: 8, scale: 2 })
   Balance: number;
 
   @Column({ type: 'boolean' })
   IsPaid: boolean;
 
-  @OneToOne(() => Payment, (payment) => payment.IndividualBill)
-  @JoinColumn()
+  @OneToMany(() => Payment, (payment) => payment.IndividualBill)
   payment: Payment;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

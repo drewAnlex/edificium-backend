@@ -2,7 +2,6 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
   ManyToOne,
   OneToMany,
   CreateDateColumn,
@@ -18,7 +17,7 @@ export class Payment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => IndividualBill, (individualBill) => individualBill.payment)
+  @ManyToOne(() => IndividualBill, (individualBill) => individualBill.payment)
   IndividualBill: IndividualBill;
 
   @ManyToOne(() => User, (user) => user.payments)
@@ -30,7 +29,7 @@ export class Payment {
   @Column({ type: 'varchar', length: 32 })
   PayCode: string;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'decimal', precision: 8, scale: 2 })
   Amount: number;
 
   @ManyToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.payments)
