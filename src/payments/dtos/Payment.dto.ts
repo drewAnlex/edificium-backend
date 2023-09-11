@@ -28,7 +28,7 @@ export class PaymentDTO implements Readonly<PaymentDTO> {
 
   @IsNotEmpty()
   @IsNumber()
-  MethodId: PaymentMethod;
+  Method: PaymentMethod;
 }
 
 export class PaymentUpdateDTO extends PartialType(PaymentDTO) {}
