@@ -44,4 +44,12 @@ export class PaymentsController {
   deletePayment(@Param('id', ParseIntPipe) id: number) {
     return this.paymentService.remove(id);
   }
+
+  @Put(':id/status')
+  updatePaymentStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('Status') status: number,
+  ) {
+    return this.paymentService.updateStatus(id, status);
+  }
 }

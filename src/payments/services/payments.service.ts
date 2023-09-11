@@ -4,11 +4,13 @@ import { PaymentDTO, PaymentUpdateDTO } from '../dtos/Payment.dto';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { IndividualBillsService } from './individual-bills.service';
 
 @Injectable()
 export class PaymentsService {
   constructor(
     @InjectRepository(Payment) private paymentRepo: Repository<Payment>,
+    private ibService: IndividualBillsService,
   ) {}
 
   findAll() {
@@ -17,8 +19,8 @@ export class PaymentsService {
     });
   }
 
-  findOne(id: number) {
-    const payment = this.paymentRepo.findOne({
+  async findOne(id: number) {
+    const payment = await this.paymentRepo.findOne({
       where: { id: id },
       relations: ['IndividualBill', 'UserId', 'Method', 'paymentInfos'],
     });
@@ -35,6 +37,7 @@ export class PaymentsService {
     } catch (error) {
       throw new HttpException(`Error ${error}`, 400);
     }
+    return newPayment;
   }
 
   async update(id: number, changes: PaymentUpdateDTO) {
@@ -50,5 +53,25 @@ export class PaymentsService {
 
   remove(id: number) {
     return this.paymentRepo.delete(id);
+  }
+
+  async updateStatus(id: number, status: number) {
+    const payment = await this.findOne(id);
+    const bill = await this.ibService.findOne(payment.IndividualBill.id);
+    const balance: string = bill.Balance.toString();
+    const amount: string = payment.Amount.toString();
+    const newBalance: number = parseFloat(amount) + parseFloat(balance);
+    if (newBalance == bill.Total) bill.IsPaid = true;
+    await this.paymentRepo.merge(payment, { Status: status });
+    await this.paymentRepo.save(payment);
+    try {
+      await this.ibService.update(bill.id, {
+        Balance: newBalance,
+        IsPaid: bill.IsPaid,
+      });
+    } catch (error) {
+      throw new HttpException(`Error ${error}`, 400);
+    }
+    return payment;
   }
 }
