@@ -37,7 +37,7 @@ export class UsersService {
       await this.userRepo.save(newUser);
     } catch (error) {
       throw new HttpException(
-        `An error occurred while trying to create the PaymentMethodDetails: ${error}`,
+        `An error occurred while trying to create the User: ${error}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -51,7 +51,7 @@ export class UsersService {
       await this.userRepo.save(user);
     } catch (error) {
       throw new HttpException(
-        `An error occurred while trying to create the PaymentMethodDetails: ${error}`,
+        `An error occurred while trying to create the User: ${error}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

@@ -32,7 +32,7 @@ export class User {
   @Column({ type: 'varchar', length: 32 })
   phone: string;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', default: 1 })
   status: number;
 
   @ManyToOne(() => Building, (building) => building.id, { nullable: true })
