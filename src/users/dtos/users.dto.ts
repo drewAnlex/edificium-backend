@@ -32,7 +32,7 @@ export class CreateUserDto {
   @IsOptional()
   readonly role: Role;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   @IsPositive()
   readonly status: number;

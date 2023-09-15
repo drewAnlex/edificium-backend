@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { Building } from '../../buildings/entities/building.entity';
 import { Payment } from '../../payments/entities/Payment.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -23,6 +24,7 @@ export class User {
   @Column({ type: 'varchar', length: 32, unique: true })
   email: string;
 
+  @Exclude()
   @Column({ type: 'varchar', length: 255 })
   password: string;
 
