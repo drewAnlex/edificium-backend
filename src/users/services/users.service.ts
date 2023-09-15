@@ -32,6 +32,14 @@ export class UsersService {
     return user;
   }
 
+  async findByEmeil(email: string) {
+    const user = await this.userRepo.findOne({ where: { email: email } });
+    if (!user) {
+      throw new NotFoundException(`User #${email} not found`);
+    }
+    return user;
+  }
+
   async create(payload: CreateUserDto) {
     const newUser = this.userRepo.create(payload);
     const hashPassword = await bcrypt.hash(newUser.password, 10);
