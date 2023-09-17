@@ -9,6 +9,7 @@ import { CreateUserDto, UpdateUserDto } from '../dtos/users.dto';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -31,13 +32,26 @@ export class UsersService {
     return user;
   }
 
+  async findByEmail(email: string) {
+    const user = await this.userRepo.findOne({
+      where: { email: email },
+      relations: ['role', 'building', 'apartments'],
+    });
+    if (!user) {
+      throw new NotFoundException(`User #${email} not found`);
+    }
+    return user;
+  }
+
   async create(payload: CreateUserDto) {
     const newUser = this.userRepo.create(payload);
+    const hashPassword = await bcrypt.hash(newUser.password, 10);
+    newUser.password = hashPassword;
     try {
       await this.userRepo.save(newUser);
     } catch (error) {
       throw new HttpException(
-        `An error occurred while trying to create the PaymentMethodDetails: ${error}`,
+        `An error occurred while trying to create the User: ${error}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -51,7 +65,7 @@ export class UsersService {
       await this.userRepo.save(user);
     } catch (error) {
       throw new HttpException(
-        `An error occurred while trying to create the PaymentMethodDetails: ${error}`,
+        `An error occurred while trying to create the User: ${error}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

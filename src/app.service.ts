@@ -14,13 +14,6 @@ export class AppService {
   }
 
   getAedificiumNumber() {
-    return new Promise((resolve, reject) => {
-      this.clientPg.query('SELECT COUNT(*) FROM buildings', (err, res) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(res.rows[0].count);
-      });
-    });
+    return { aedificium: '1' };
   }
 }

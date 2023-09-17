@@ -11,6 +11,10 @@ export default registerAs('config', () => {
       url: process.env.DATABASE_URL,
     },
     apiKey: process.env.API_KEY,
+    jwt: {
+      secret: process.env.JWT_SECRET,
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    },
     misc: {
       welcomeMessage: process.env.WELCOME_MESSAGE,
     },
