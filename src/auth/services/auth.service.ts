@@ -26,8 +26,9 @@ export class AuthService {
   generateJWT(user: User) {
     const payload = {
       sub: user.id,
-      role: user.role,
+      role: user.role.Name,
       building: user.building ? user.building.id : null,
+      apartments: user.apartments ? user.apartments.map((a) => a.id) : null,
     };
     return {
       access_token: this.jwtService.sign(payload),
