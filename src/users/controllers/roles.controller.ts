@@ -7,12 +7,16 @@ import {
   Put,
   Delete,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { RolesService } from '../services/roles.service';
 import { CreateRoleDTO, UpdateRoleDTO } from '../dtos/roles.dto';
 import { ApiTags } from '@nestjs/swagger';
 
+import { AuthGuard } from '@nestjs/passport';
+
 @ApiTags('roles')
+@UseGuards(AuthGuard('jwt'))
 @Controller('roles')
 export class RolesController {
   constructor(private rolesService: RolesService) {}
