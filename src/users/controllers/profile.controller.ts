@@ -1,21 +1,16 @@
 import {
   Controller,
   Get,
-  Post,
   Delete,
   Put,
-  Param,
-  Query,
-  ParseIntPipe,
   Body,
   UseInterceptors,
   ClassSerializerInterceptor,
   UseGuards,
-  SetMetadata,
   Req,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
-import { CreateUserDto, UpdateUserDto } from '../dtos/users.dto';
+import { UpdateUserDto } from '../dtos/users.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
