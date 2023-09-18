@@ -22,7 +22,7 @@ import { PayloadToken } from 'src/auth/models/token.model';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('my-profile')
 @UseInterceptors(ClassSerializerInterceptor)
-export class UsersController {
+export class ProfileController {
   constructor(private usersService: UsersService) {}
 
   @Roles('Staff', 'Admin', 'User')
