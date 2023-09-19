@@ -11,6 +11,7 @@ import { Apartment } from './entities/apartment.entity';
 import { User } from 'src/users/entities/User.entity';
 import { UsersService } from 'src/users/services/users.service';
 import { MyApartmentsController } from './controllers/my-apartments.controller';
+import { MyBuildingsController } from './controllers/my-buildings.controller';
 
 @Module({
   imports: [UsersModule, TypeOrmModule.forFeature([Building, Apartment, User])],
@@ -18,6 +19,7 @@ import { MyApartmentsController } from './controllers/my-apartments.controller';
     BuildingsController,
     ApartmentController,
     MyApartmentsController,
+    MyBuildingsController,
   ],
   providers: [BuildingsService, ApartmentsService, UsersService],
   exports: [BuildingsService, ApartmentsService],

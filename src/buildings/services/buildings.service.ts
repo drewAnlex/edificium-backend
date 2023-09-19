@@ -45,6 +45,26 @@ export class BuildingsService {
     });
   }
 
+  async findMyBuildings(userId: number) {
+    const buildings = await this.buildingRepo.find({
+      where: { apartments: { userId: { id: userId } } },
+    });
+    if (!buildings) {
+      throw new NotFoundException(`Buildings not found`);
+    }
+    return buildings;
+  }
+
+  async findOneByOwner(id: number, userId: number) {
+    const building = await this.buildingRepo.findOne({
+      where: { id: id, apartments: { userId: { id: userId } } },
+    });
+    if (!building) {
+      throw new NotFoundException(`Building #${id} not found`);
+    }
+    return building;
+  }
+
   async findOne(id: number) {
     const building = await this.buildingRepo.findOne({
       where: { id: id },
