@@ -32,6 +32,35 @@ export class BuildingBillsService {
     });
   }
 
+  async findByOwner(buildingId: number, userId: number) {
+    const buildingBills = await this.billRepo.find({
+      where: {
+        buildingId: { id: buildingId, apartments: { userId: { id: userId } } },
+      },
+    });
+    if (!buildingBills) {
+      throw new NotFoundException(`Building Bill not found`);
+    }
+    return buildingBills;
+  }
+
+  async findOneByOwner(id: number, userId: number) {
+    const bill = await this.billRepo.findOne({
+      where: { id: id, buildingId: { apartments: { userId: { id: userId } } } },
+      relations: [
+        'buildingId',
+        'userId',
+        'services',
+        'products',
+        'individualBills',
+      ],
+    });
+    if (!bill) {
+      throw new NotFoundException(`Building Bill #${id} not found`);
+    }
+    return bill;
+  }
+
   async findOneByUuid(uuid: string) {
     const bill = await this.billRepo.findOne({
       where: { uuid: uuid },
@@ -60,9 +89,15 @@ export class BuildingBillsService {
     return bill;
   }
 
-  async create(payload: CreateBuildingBillDTO) {
+  async create(
+    payload: CreateBuildingBillDTO,
+    userId: number,
+    buildingId: number,
+  ) {
     const newBill = this.billRepo.create(payload);
     newBill.uuid = uuidv4();
+    newBill.userId.id = userId;
+    newBill.buildingId.id = buildingId;
     try {
       await this.billRepo.save(newBill);
     } catch (error) {
@@ -88,7 +123,36 @@ export class BuildingBillsService {
     return bill;
   }
 
+  async updateByAdmin(
+    id: number,
+    payload: UpdateBuildingBillDTO,
+    buildingId: number,
+  ) {
+    const buildingBill = await this.findOne(id);
+    if (buildingId != buildingBill.buildingId.id) {
+      throw new NotFoundException(`Building Bill #${id} not found`);
+    }
+    try {
+      await this.billRepo.merge(buildingBill, payload);
+      await this.billRepo.save(buildingBill);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred: ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return buildingBill;
+  }
+
   delete(id: number) {
+    return this.billRepo.delete(id);
+  }
+
+  async deleteByAdmin(id: number, userId: number) {
+    const bill = await this.findOne(id);
+    if (bill.userId.id != userId) {
+      throw new NotFoundException(`Building Bill #${id} not found`);
+    }
     return this.billRepo.delete(id);
   }
 
