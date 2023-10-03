@@ -24,9 +24,35 @@ export class ServicesService {
     });
   }
 
+  async findAllByBuildingBillId(uuid: string) {
+    const services = await this.serviceRepo.find({
+      where: {
+        buildingBillId: { uuid: uuid },
+      },
+    });
+    if (!services) {
+      throw new NotFoundException(`Services not found`);
+    }
+    return services;
+  }
+
   async findOne(id: number) {
     const service = await this.serviceRepo.findOne({
       where: { id: id },
+      relations: ['contractorId', 'buildingBillId'],
+    });
+    if (!service) {
+      throw new NotFoundException(`Service #${id} not found`);
+    }
+    return service;
+  }
+
+  async findOneByBuildingBillId(id: number, uuid: string) {
+    const service = await this.serviceRepo.findOne({
+      where: {
+        id: id,
+        buildingBillId: { uuid: uuid },
+      },
       relations: ['contractorId', 'buildingBillId'],
     });
     if (!service) {
