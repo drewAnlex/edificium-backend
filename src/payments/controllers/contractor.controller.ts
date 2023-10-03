@@ -38,23 +38,30 @@ export class ContractorController {
   }
 
   @Roles('Staff')
-  @Post()
-  create(@Body() payload: CreateContractorDTO) {
-    return this.contractorService.create(payload);
+  @Post(':id')
+  create(
+    @Param('id', ParseIntPipe) buildingId: number,
+    @Body() payload: CreateContractorDTO,
+  ) {
+    return this.contractorService.create(payload, buildingId);
   }
 
   @Roles('Staff')
-  @Put(':id')
+  @Put(':id/:buldingId')
   update(
     @Param('id', ParseIntPipe) id: number,
+    @Param('buldingId', ParseIntPipe) buildingId: number,
     @Body() payload: UpdateContractorDTO,
   ) {
-    return this.contractorService.update(id, payload);
+    return this.contractorService.update(id, payload, buildingId);
   }
 
   @Roles('Staff')
   @Delete(':id')
-  delete(@Param('id', ParseIntPipe) id: number) {
-    return this.contractorService.delete(id);
+  delete(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('buldingId', ParseIntPipe) buildingId: number,
+  ) {
+    return this.contractorService.delete(id, buildingId);
   }
 }

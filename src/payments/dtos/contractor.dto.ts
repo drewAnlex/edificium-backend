@@ -1,6 +1,5 @@
-import { IsNotEmpty, IsString, IsNumber, IsEmail } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
-import { Building } from 'src/buildings/entities/building.entity';
 
 export class CreateContractorDTO implements Readonly<CreateContractorDTO> {
   @IsNotEmpty()
@@ -18,10 +17,6 @@ export class CreateContractorDTO implements Readonly<CreateContractorDTO> {
   @IsNotEmpty()
   @IsString()
   address: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  buildings: Building[];
 }
 
 export class UpdateContractorDTO extends PartialType(CreateContractorDTO) {}

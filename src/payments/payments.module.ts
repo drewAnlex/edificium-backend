@@ -28,6 +28,7 @@ import { Payment } from './entities/Payment.entity';
 import { PaymentInfo } from './entities/payment-info.entity';
 import { BuildingsModule } from 'src/buildings/buildings.module';
 import { MyBuildingBillsController } from './controllers/my-building-bills.controller';
+import { MyContractorsController } from './controllers/my-contractors.controller';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { MyBuildingBillsController } from './controllers/my-building-bills.contr
     ContractorController,
     SupplierController,
     MyBuildingBillsController,
+    MyContractorsController,
   ],
 })
 export class PaymentsModule {}
