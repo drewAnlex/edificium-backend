@@ -3,6 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import * as cookieParser from 'cookie-parser';
 
 const port = process.env.PORT || 3000;
 
@@ -27,6 +28,7 @@ async function bootstrap() {
   // URL API
   SwaggerModule.setup('docs', app, document);
 
+  app.use(cookieParser());
   app.enableCors();
   await app.listen(port, '0.0.0.0');
 }
