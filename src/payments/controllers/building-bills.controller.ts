@@ -46,7 +46,7 @@ export class BuildingBillsController {
   }
 
   @Roles('Staff')
-  @Post()
+  @Post('userId/:userId/buildingId/:buildingId')
   create(
     @Body() payload: CreateBuildingBillDTO,
     @Param('userId', ParseIntPipe) userId: number,

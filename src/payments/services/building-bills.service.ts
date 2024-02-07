@@ -26,9 +26,23 @@ export class BuildingBillsService {
     private billService: IndividualBillsService,
   ) {}
 
+  getLatest(buildingId: number) {
+    return this.billRepo.findOne({
+      where: { isPublished: true, buildingId: { id: buildingId } },
+      order: { createdAt: 'DESC' },
+      relations: [
+        'products',
+        'services',
+        'individualBills',
+        'individualBills.apartmentId',
+        'individualBills.payment',
+      ],
+    });
+  }
+
   findAll() {
     return this.billRepo.find({
-      relations: ['buildingId'],
+      relations: ['buildingId', 'userId'],
     });
   }
 
@@ -94,19 +108,21 @@ export class BuildingBillsService {
     userId: number,
     buildingId: number,
   ) {
-    const newBill = this.billRepo.create(payload);
-    newBill.uuid = uuidv4();
-    newBill.userId.id = userId;
-    newBill.buildingId.id = buildingId;
     try {
+      const newBill = this.billRepo.create({
+        ...payload,
+        userId: { id: userId },
+        buildingId: { id: buildingId },
+        uuid: uuidv4(),
+      });
       await this.billRepo.save(newBill);
+      return newBill;
     } catch (error) {
       throw new HttpException(
         `An error occurred: ${error}`,
         HttpStatus.BAD_REQUEST,
       );
     }
-    return newBill;
   }
 
   async update(id: number, payload: UpdateBuildingBillDTO) {

@@ -5,12 +5,14 @@ import { PaymentDTO, PaymentUpdateDTO } from '../dtos/Payment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IndividualBillsService } from './individual-bills.service';
+import { BuildingBillsService } from './building-bills.service';
 
 @Injectable()
 export class PaymentsService {
   constructor(
     @InjectRepository(Payment) private paymentRepo: Repository<Payment>,
     private ibService: IndividualBillsService,
+    private bbService: BuildingBillsService,
   ) {}
 
   findAll() {
@@ -58,9 +60,12 @@ export class PaymentsService {
   async updateStatus(id: number, status: number) {
     const payment = await this.findOne(id);
     const bill = await this.ibService.findOne(payment.IndividualBill.id);
+    const buildingBill = await this.bbService.findOne(bill.buildingBillId.id);
     const balance: string = bill.Balance.toString();
+    const buildingBalance: string = buildingBill.balance.toString();
     const amount: string = payment.Amount.toString();
     const newBalance: number = parseFloat(amount) + parseFloat(balance);
+    const updatedBalance: number = parseFloat(buildingBalance) + newBalance;
     if (newBalance == bill.Total) bill.IsPaid = true;
     await this.paymentRepo.merge(payment, { Status: status });
     await this.paymentRepo.save(payment);
@@ -68,6 +73,9 @@ export class PaymentsService {
       await this.ibService.update(bill.id, {
         Balance: newBalance,
         IsPaid: bill.IsPaid,
+      });
+      await this.bbService.update(buildingBill.id, {
+        balance: updatedBalance,
       });
     } catch (error) {
       throw new HttpException(`Error ${error}`, 400);

@@ -24,7 +24,7 @@ export class BuildingBill {
   @ManyToOne(() => User)
   userId: User;
 
-  @Column({ type: 'varchar', length: 64 })
+  @Column({ type: 'varchar', length: 64, nullable: true })
   uuid: string;
 
   @OneToMany(() => Product, (product) => product.BuildingBillsID)

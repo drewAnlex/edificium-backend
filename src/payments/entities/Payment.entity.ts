@@ -23,7 +23,7 @@ export class Payment {
   @ManyToOne(() => User, (user) => user.payments)
   UserId: User;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', default: 0 })
   Status: number;
 
   @Column({ type: 'varchar', length: 32 })
