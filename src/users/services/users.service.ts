@@ -44,7 +44,10 @@ export class UsersService {
   }
 
   async create(payload: CreateUserDto) {
-    const newUser = this.userRepo.create(payload);
+    const newUser = this.userRepo.create({
+      ...payload,
+      role: { id: 1 },
+    });
     const hashPassword = await bcrypt.hash(newUser.password, 10);
     newUser.password = hashPassword;
     try {
