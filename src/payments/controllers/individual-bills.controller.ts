@@ -48,6 +48,15 @@ export class IndividualBillsController {
     );
   }
 
+  @Roles('Admin', 'User')
+  @Get('apartment/:apartmentId/:id')
+  findOneByIdAndApartment(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('apartmentId', ParseIntPipe) apartmentId: number,
+  ) {
+    return this.individualBillsService.findOneByIdAndApartment(id, apartmentId);
+  }
+
   @Roles('Staff')
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
