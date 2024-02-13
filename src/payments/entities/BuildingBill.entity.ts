@@ -18,10 +18,14 @@ export class BuildingBill {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Building)
+  @ManyToOne(() => Building, (building) => building.buildingBills, {
+    onDelete: 'CASCADE',
+  })
   buildingId: Building;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, {
+    nullable: true,
+  })
   userId: User;
 
   @Column({ type: 'varchar', length: 64, nullable: true })

@@ -14,7 +14,9 @@ export class Product {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => BuildingBill, (bill) => bill.products)
+  @ManyToOne(() => BuildingBill, (bill) => bill.products, {
+    onDelete: 'CASCADE',
+  })
   BuildingBillsID: BuildingBill;
 
   @Column({ type: 'varchar', length: 32 })
@@ -29,7 +31,9 @@ export class Product {
   @Column({ type: 'int' })
   quantity: number;
 
-  @ManyToOne(() => Supplier, (supplier) => supplier.products)
+  @ManyToOne(() => Supplier, (supplier) => supplier.products, {
+    nullable: true,
+  })
   supplierId: Supplier;
 
   @Column({ type: 'boolean', default: false })

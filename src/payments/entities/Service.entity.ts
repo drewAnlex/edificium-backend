@@ -14,7 +14,9 @@ export class Service {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => BuildingBill, (bill) => bill.services)
+  @ManyToOne(() => BuildingBill, (bill) => bill.services, {
+    onDelete: 'CASCADE',
+  })
   buildingBillId: BuildingBill;
 
   @Column({ type: 'varchar', length: 32 })
@@ -23,7 +25,9 @@ export class Service {
   @Column({ type: 'text' })
   description: string;
 
-  @ManyToOne(() => Contractor, (contractor) => contractor.services)
+  @ManyToOne(() => Contractor, (contractor) => contractor.services, {
+    nullable: true,
+  })
   contractorId: Contractor;
 
   @Column({ type: 'float' })

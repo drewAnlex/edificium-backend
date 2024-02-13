@@ -17,10 +17,14 @@ export class Payment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => IndividualBill, (individualBill) => individualBill.payment)
+  @ManyToOne(() => IndividualBill, (individualBill) => individualBill.payment, {
+    onDelete: 'CASCADE',
+  })
   IndividualBill: IndividualBill;
 
-  @ManyToOne(() => User, (user) => user.payments)
+  @ManyToOne(() => User, (user) => user.payments, {
+    nullable: true,
+  })
   UserId: User;
 
   @Column({ type: 'int', default: 0 })
@@ -32,7 +36,9 @@ export class Payment {
   @Column({ type: 'decimal', precision: 8, scale: 2 })
   Amount: number;
 
-  @ManyToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.payments)
+  @ManyToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.payments, {
+    nullable: true,
+  })
   Method: PaymentMethod;
 
   @OneToMany(() => PaymentInfo, (paymentInfo) => paymentInfo.payment)
