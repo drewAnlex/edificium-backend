@@ -1,4 +1,10 @@
-import { IsString, IsNumber, IsNotEmpty, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsNotEmpty,
+  IsDateString,
+  IsOptional,
+} from 'class-validator';
 
 import { PartialType } from '@nestjs/swagger';
 import { Contractor } from '../entities/Contractor.entity';
@@ -9,11 +15,11 @@ export class CreateServiceDTO implements Readonly<CreateServiceDTO> {
   @IsString()
   name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   description: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   contractorId: Contractor;
 
@@ -25,11 +31,11 @@ export class CreateServiceDTO implements Readonly<CreateServiceDTO> {
   @IsNumber()
   price: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsDateString()
   startDate: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsDateString()
   endDate: string;
 }

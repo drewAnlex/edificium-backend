@@ -50,6 +50,7 @@ export class BuildingBillsService {
     const buildingBills = await this.billRepo.find({
       where: {
         buildingId: { id: buildingId, apartments: { userId: { id: userId } } },
+        isPublished: true,
       },
     });
     if (!buildingBills) {

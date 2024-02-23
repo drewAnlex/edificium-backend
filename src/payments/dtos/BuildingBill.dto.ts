@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 
 export class CreateBuildingBillDTO implements Readonly<CreateBuildingBillDTO> {
@@ -13,6 +19,14 @@ export class CreateBuildingBillDTO implements Readonly<CreateBuildingBillDTO> {
   @IsNumber()
   @IsOptional()
   balance: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isPublished: any;
+
+  @IsOptional()
+  @IsNumber()
+  total: number;
 }
 
 export class UpdateBuildingBillDTO extends PartialType(CreateBuildingBillDTO) {}

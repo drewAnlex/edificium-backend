@@ -22,7 +22,7 @@ export class Service {
   @Column({ type: 'varchar', length: 32 })
   name: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   description: string;
 
   @ManyToOne(() => Contractor, (contractor) => contractor.services, {
@@ -33,10 +33,10 @@ export class Service {
   @Column({ type: 'float' })
   price: number;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
   startDate: Date;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
   endDate: Date;
 
   @Column({ type: 'boolean', default: false })

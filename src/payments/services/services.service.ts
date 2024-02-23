@@ -63,11 +63,8 @@ export class ServicesService {
 
   async create(payload: CreateServiceDTO) {
     const newService = this.serviceRepo.create(payload);
-    const bill = await this.bbService.findOne(payload.buildingBillId.id);
-    bill.total += payload.price;
     try {
       await this.serviceRepo.save(newService);
-      await this.bbService.update(bill.id, bill);
     } catch (error) {
       throw new HttpException(`Error ${error}`, HttpStatus.BAD_REQUEST);
     }

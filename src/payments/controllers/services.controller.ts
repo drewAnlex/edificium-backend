@@ -34,7 +34,7 @@ export class ServicesController {
     return this.servicesService.findOne(id);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin')
   @Post()
   create(@Body() payload: CreateServiceDTO) {
     return this.servicesService.create(payload);
