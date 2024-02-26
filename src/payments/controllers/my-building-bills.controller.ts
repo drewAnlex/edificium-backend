@@ -77,7 +77,7 @@ export class MyBuildingBillsController {
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
     const user = req.user as any;
-    return this.buildingBillService.deleteByAdmin(id, user.building);
+    return this.buildingBillService.deleteByAdmin(id, user.userId);
   }
 
   @Roles('Admin')
