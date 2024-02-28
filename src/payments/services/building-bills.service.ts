@@ -40,6 +40,17 @@ export class BuildingBillsService {
     });
   }
 
+  async isNotPublished(buildingId: number) {
+    const bills = await this.billRepo.find({
+      where: { isPublished: false, buildingId: { id: buildingId } },
+      relations: ['buildingId'],
+    });
+    if (!bills) {
+      throw new NotFoundException(`Building Bill not found`);
+    }
+    return bills;
+  }
+
   findAll() {
     return this.billRepo.find({
       relations: ['buildingId', 'userId'],
