@@ -8,6 +8,7 @@ import {
   Body,
   ParseIntPipe,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { PaymentDTO, PaymentUpdateDTO } from '../dtos/Payment.dto';
 import { PaymentsService } from '../services/payments.service';
@@ -15,6 +16,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Request } from 'express';
 
 @ApiTags('payments')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -26,6 +28,20 @@ export class PaymentsController {
   @Get()
   getPayments() {
     return this.paymentService.findAll();
+  }
+
+  @Roles('User', 'Admin', 'Staff')
+  @Get('user')
+  getUserPayments(@Req() req: Request) {
+    const user = req.user as any;
+    return this.paymentService.findUserPayments(user.userId);
+  }
+
+  @Roles('Admin')
+  @Get('building')
+  getBuildingPayments(@Req() req: Request) {
+    const user = req.user as any;
+    return this.paymentService.findBuildingPayments(user.building);
   }
 
   @Roles('Staff')
@@ -55,7 +71,7 @@ export class PaymentsController {
     return this.paymentService.remove(id);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin')
   @Put(':id/status')
   updatePaymentStatus(
     @Param('id', ParseIntPipe) id: number,

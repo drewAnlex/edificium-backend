@@ -21,6 +21,37 @@ export class PaymentsService {
     });
   }
 
+  async findUserPayments(userId: number) {
+    return await this.paymentRepo.find({
+      where: {
+        UserId: {
+          id: userId,
+        },
+      },
+      relations: ['IndividualBill', 'Method', 'paymentInfos'],
+    });
+  }
+
+  async findBuildingPayments(buildingId: number) {
+    return await this.paymentRepo.find({
+      where: {
+        IndividualBill: {
+          apartmentId: {
+            buildingId: {
+              id: buildingId,
+            },
+          },
+        },
+      },
+      relations: [
+        'IndividualBill',
+        'IndividualBill.apartmentId',
+        'Method',
+        'paymentInfos',
+      ],
+    });
+  }
+
   async findOne(id: number) {
     const payment = await this.paymentRepo.findOne({
       where: { id: id },
