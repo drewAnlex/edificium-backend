@@ -16,9 +16,7 @@ export class PaymentMethodsService {
   ) {}
 
   findAll() {
-    return this.PaymentMethodRepo.find({
-      relations: ['paymentInfos', 'paymentDetails', 'payments'],
-    });
+    return this.PaymentMethodRepo.find({});
   }
 
   async findOne(id: number) {
