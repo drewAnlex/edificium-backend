@@ -14,25 +14,29 @@ export class Service {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => BuildingBill, (bill) => bill.services)
+  @ManyToOne(() => BuildingBill, (bill) => bill.services, {
+    onDelete: 'CASCADE',
+  })
   buildingBillId: BuildingBill;
 
   @Column({ type: 'varchar', length: 32 })
   name: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   description: string;
 
-  @ManyToOne(() => Contractor, (contractor) => contractor.services)
+  @ManyToOne(() => Contractor, (contractor) => contractor.services, {
+    nullable: true,
+  })
   contractorId: Contractor;
 
   @Column({ type: 'float' })
   price: number;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
   startDate: Date;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', nullable: true })
   endDate: Date;
 
   @Column({ type: 'boolean', default: false })

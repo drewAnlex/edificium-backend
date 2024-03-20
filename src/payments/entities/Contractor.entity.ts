@@ -30,7 +30,9 @@ export class Contractor {
   @OneToMany(() => Service, (service) => service.contractorId)
   services: Service[];
 
-  @ManyToOne(() => Building, (building) => building.contractors)
+  @ManyToOne(() => Building, (building) => building.contractors, {
+    onDelete: 'CASCADE',
+  })
   building: Building;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

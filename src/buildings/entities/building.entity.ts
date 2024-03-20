@@ -38,8 +38,8 @@ export class Building {
   @Column({ type: 'int' })
   nApartments: number;
 
-  @Column({ type: 'int' })
-  status: number;
+  @Column({ type: 'varchar', length: 32, nullable: false })
+  status: string;
 
   @OneToMany(() => Supplier, (supplier) => supplier.buildings)
   suppliers: Supplier[];

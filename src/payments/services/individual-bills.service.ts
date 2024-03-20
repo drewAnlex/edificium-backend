@@ -24,8 +24,40 @@ export class IndividualBillsService {
     return this.billRepo.find();
   }
 
+  async findByApartment(apartmentId: number, ownerId: number) {
+    const bills = await this.billRepo.find({
+      where: { apartmentId: { id: apartmentId, userId: { id: ownerId } } },
+      relations: ['buildingBillId'],
+    });
+    if (!bills) {
+      throw new NotFoundException(
+        `Bills for apartment #${apartmentId} not found`,
+      );
+    }
+    return bills;
+  }
+
+  async findOneByIdAndApartment(id: number, apartmentId: number) {
+    const bill = await this.billRepo.findOne({
+      where: { id: id, apartmentId: { id: apartmentId } },
+      relations: [
+        'buildingBillId',
+        'buildingBillId.services',
+        'buildingBillId.products',
+        'apartmentId',
+      ],
+    });
+    if (!bill) {
+      throw new NotFoundException(`Bill #${id} not found`);
+    }
+    return bill;
+  }
+
   async findOne(id: number) {
-    const bill = await this.billRepo.findOneBy({ id: id });
+    const bill = await this.billRepo.findOne({
+      where: { id: id },
+      relations: ['buildingBillId'],
+    });
     if (!bill) {
       throw new NotFoundException(`Bill #${id} not found`);
     }

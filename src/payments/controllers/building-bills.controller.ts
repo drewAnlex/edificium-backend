@@ -46,9 +46,13 @@ export class BuildingBillsController {
   }
 
   @Roles('Staff')
-  @Post()
-  create(@Body() payload: CreateBuildingBillDTO) {
-    return this.buildingBillService.create(payload);
+  @Post('userId/:userId/buildingId/:buildingId')
+  create(
+    @Body() payload: CreateBuildingBillDTO,
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('buildingId', ParseIntPipe) buildingId: number,
+  ) {
+    return this.buildingBillService.create(payload, userId, buildingId);
   }
 
   @Roles('Staff')

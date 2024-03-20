@@ -36,6 +36,28 @@ export class ApartmentsService {
     return apartment;
   }
 
+  async getApartmentsByOwner(id: number) {
+    const apartments = await this.apartmentRepo.find({
+      where: { userId: { id } },
+      relations: ['buildingId', 'userId', 'individualBills'],
+    });
+    if (!apartments) {
+      throw new NotFoundException(`Apartments not found`);
+    }
+    return apartments;
+  }
+
+  async findOneByOwner(id: number, userId: number) {
+    const apartment = await this.apartmentRepo.findOne({
+      where: { id, userId: { id: userId } },
+      relations: ['buildingId', 'userId', 'individualBills'],
+    });
+    if (!apartment) {
+      throw new NotFoundException(`Apartment #${id} not found`);
+    }
+    return apartment;
+  }
+
   async create(payload: CreateAparmentDTO) {
     const newApartment = this.apartmentRepo.create(payload);
     newApartment.uuid = uuidv4();

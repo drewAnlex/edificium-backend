@@ -1,4 +1,5 @@
 *.env
+ngrok.exe
 /db
 # compiled output
 /dist

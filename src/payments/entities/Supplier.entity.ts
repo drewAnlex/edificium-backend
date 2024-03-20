@@ -30,7 +30,9 @@ export class Supplier {
   @OneToMany(() => Product, (product) => product.supplierId)
   products: Product[];
 
-  @ManyToOne(() => Building, (building) => building.suppliers)
+  @ManyToOne(() => Building, (building) => building.suppliers, {
+    onDelete: 'CASCADE',
+  })
   buildings: Building[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

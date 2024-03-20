@@ -26,10 +26,65 @@ export class BuildingBillsService {
     private billService: IndividualBillsService,
   ) {}
 
-  findAll() {
-    return this.billRepo.find({
+  getLatest(buildingId: number) {
+    return this.billRepo.findOne({
+      where: { isPublished: true, buildingId: { id: buildingId } },
+      order: { createdAt: 'DESC' },
+      relations: [
+        'products',
+        'services',
+        'individualBills',
+        'individualBills.apartmentId',
+        'individualBills.payment',
+      ],
+    });
+  }
+
+  async isNotPublished(buildingId: number) {
+    const bills = await this.billRepo.find({
+      where: { isPublished: false, buildingId: { id: buildingId } },
       relations: ['buildingId'],
     });
+    if (!bills) {
+      throw new NotFoundException(`Building Bill not found`);
+    }
+    return bills;
+  }
+
+  findAll() {
+    return this.billRepo.find({
+      relations: ['buildingId', 'userId'],
+    });
+  }
+
+  async findByOwner(buildingId: number, userId: number) {
+    const buildingBills = await this.billRepo.find({
+      where: {
+        buildingId: { id: buildingId, apartments: { userId: { id: userId } } },
+        isPublished: true,
+      },
+    });
+    if (!buildingBills) {
+      throw new NotFoundException(`Building Bill not found`);
+    }
+    return buildingBills;
+  }
+
+  async findOneByOwner(id: number, userId: number) {
+    const bill = await this.billRepo.findOne({
+      where: { id: id, buildingId: { apartments: { userId: { id: userId } } } },
+      relations: [
+        'buildingId',
+        'userId',
+        'services',
+        'products',
+        'individualBills',
+      ],
+    });
+    if (!bill) {
+      throw new NotFoundException(`Building Bill #${id} not found`);
+    }
+    return bill;
   }
 
   async findOneByUuid(uuid: string) {
@@ -60,18 +115,26 @@ export class BuildingBillsService {
     return bill;
   }
 
-  async create(payload: CreateBuildingBillDTO) {
-    const newBill = this.billRepo.create(payload);
-    newBill.uuid = uuidv4();
+  async create(
+    payload: CreateBuildingBillDTO,
+    userId: number,
+    buildingId: number,
+  ) {
     try {
+      const newBill = this.billRepo.create({
+        ...payload,
+        userId: { id: userId },
+        buildingId: { id: buildingId },
+        uuid: uuidv4(),
+      });
       await this.billRepo.save(newBill);
+      return newBill;
     } catch (error) {
       throw new HttpException(
         `An error occurred: ${error}`,
         HttpStatus.BAD_REQUEST,
       );
     }
-    return newBill;
   }
 
   async update(id: number, payload: UpdateBuildingBillDTO) {
@@ -88,7 +151,36 @@ export class BuildingBillsService {
     return bill;
   }
 
+  async updateByAdmin(
+    id: number,
+    payload: UpdateBuildingBillDTO,
+    buildingId: number,
+  ) {
+    const buildingBill = await this.findOne(id);
+    if (buildingId != buildingBill.buildingId.id) {
+      throw new NotFoundException(`Building Bill #${id} not found`);
+    }
+    try {
+      await this.billRepo.merge(buildingBill, payload);
+      await this.billRepo.save(buildingBill);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred: ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return buildingBill;
+  }
+
   delete(id: number) {
+    return this.billRepo.delete(id);
+  }
+
+  async deleteByAdmin(id: number, userId: number) {
+    const bill = await this.findOne(id);
+    if (bill.userId.id != userId) {
+      throw new NotFoundException(`Building Bill #${id} not found`);
+    }
     return this.billRepo.delete(id);
   }
 
