@@ -25,7 +25,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 export class PaymentMethodsController {
   constructor(private paymentMethodsService: PaymentMethodsService) {}
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin', 'User')
   @Get()
   getMany() {
     return this.paymentMethodsService.findAll();
