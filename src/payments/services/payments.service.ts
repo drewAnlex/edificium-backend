@@ -35,6 +35,7 @@ export class PaymentsService {
   async findBuildingPayments(buildingId: number) {
     return await this.paymentRepo.find({
       where: {
+        Status: 0,
         IndividualBill: {
           apartmentId: {
             buildingId: {
