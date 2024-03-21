@@ -1,4 +1,6 @@
 *.env
+ngrok.exe
+docker-compose.yaml
 /db
 # compiled output
 /dist
