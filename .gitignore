@@ -1,4 +1,5 @@
 *.env
+docker-compose.yaml
 ngrok.exe
 /db
 # compiled output
