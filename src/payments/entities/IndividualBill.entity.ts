@@ -22,10 +22,18 @@ export class IndividualBill {
   @Column({ type: 'varchar', length: 128 })
   Description: string;
 
-  @ManyToOne(() => BuildingBill, (buildingBill) => buildingBill.individualBills)
+  @ManyToOne(
+    () => BuildingBill,
+    (buildingBill) => buildingBill.individualBills,
+    {
+      onDelete: 'CASCADE',
+    },
+  )
   buildingBillId: BuildingBill;
 
-  @ManyToOne(() => Apartment, (apartment) => apartment.individualBills)
+  @ManyToOne(() => Apartment, (apartment) => apartment.individualBills, {
+    onDelete: 'CASCADE',
+  })
   apartmentId: Apartment;
 
   @Column({ type: 'decimal', precision: 8, scale: 2 })

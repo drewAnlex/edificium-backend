@@ -18,29 +18,29 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @ApiTags('services')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('services')
-export class ServicesController {
+@Controller('my-services')
+export class MyServicesController {
   constructor(private servicesService: ServicesService) {}
 
-  @Roles('Staff')
-  @Get()
-  findAll() {
-    return this.servicesService.findAll();
+  @Roles('Admin', 'User')
+  @Get(':uuid')
+  findAll(@Param('uuid') uuid: string) {
+    return this.servicesService.findAllByBuildingBillId(uuid);
   }
 
-  @Roles('Staff')
-  @Get(':id')
-  get(@Param('id', ParseIntPipe) id: number) {
-    return this.servicesService.findOne(id);
+  @Roles('Admin', 'User')
+  @Get(':uuid/:id')
+  get(@Param('id', ParseIntPipe) id: number, @Param('uuid') uuid: string) {
+    return this.servicesService.findOneByBuildingBillId(id, uuid);
   }
 
-  @Roles('Staff', 'Admin')
+  @Roles('Admin')
   @Post()
   create(@Body() payload: CreateServiceDTO) {
     return this.servicesService.create(payload);
   }
 
-  @Roles('Staff')
+  @Roles('Admin')
   @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -49,7 +49,7 @@ export class ServicesController {
     return this.servicesService.update(id, payload);
   }
 
-  @Roles('Staff')
+  @Roles('Admin')
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.servicesService.remove(id);

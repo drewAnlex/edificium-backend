@@ -37,13 +37,8 @@ export class ProductsService {
 
   async create(payload: CreateProductDto) {
     const newProduct = this.productRepo.create(payload);
-    const buildingBill = await this.bbService.findOne(
-      payload.BuildingBillsID.id,
-    );
-    buildingBill.total += payload.price * payload.quantity;
     try {
       await this.productRepo.save(newProduct);
-      await this.bbService.update(buildingBill.id, buildingBill);
     } catch (error) {
       throw new HttpException(`Error ${error}`, HttpStatus.BAD_REQUEST);
     }

@@ -1,6 +1,5 @@
 import {
   IsString,
-  IsNumber,
   IsNotEmpty,
   IsPositive,
   IsOptional,
@@ -28,15 +27,6 @@ export class CreateBuildingDto implements Readonly<CreateBuildingDto> {
   @IsNotEmpty()
   @IsString()
   zone: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  @IsPositive()
-  nApartments: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  status: number;
 }
 export class UpdateBuildingDto extends PartialType(CreateBuildingDto) {}
 

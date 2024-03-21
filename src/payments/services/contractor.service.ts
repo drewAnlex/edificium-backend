@@ -24,6 +24,24 @@ export class ContractorService {
     return this.contractorRepo.find({ relations: ['services', 'buildings'] });
   }
 
+  async findAllByBuilding(buildingId: number) {
+    const contractors = await this.contractorRepo.find({
+      where: { building: { id: buildingId } },
+    });
+    if (!contractors) {
+      throw new NotFoundException(`Contractor not found`);
+    }
+    return contractors;
+  }
+
+  async findOneByBuilding(contractorId: number, buildingId: number) {
+    const contractor = await this.findOne(contractorId);
+    if (contractor.building.id != buildingId) {
+      throw new NotFoundException(`Contractor Not Found`);
+    }
+    return contractor;
+  }
+
   async findOne(id: number) {
     const contractor = await this.contractorRepo.findOne({
       where: { id: id },
@@ -35,8 +53,9 @@ export class ContractorService {
     return contractor;
   }
 
-  async create(payload: CreateContractorDTO) {
+  async create(payload: CreateContractorDTO, buildingId: number) {
     const newContractor = this.contractorRepo.create(payload);
+    newContractor.building.id = buildingId;
     try {
       await this.contractorRepo.save(newContractor);
     } catch (error) {
@@ -45,8 +64,8 @@ export class ContractorService {
     return newContractor;
   }
 
-  async update(id: number, payload: UpdateContractorDTO) {
-    const contractor = await this.findOne(id);
+  async update(id: number, payload: UpdateContractorDTO, buildingId: number) {
+    const contractor = await this.findOneByBuilding(id, buildingId);
     try {
       await this.contractorRepo.merge(contractor, payload);
       await this.contractorRepo.save(contractor);
@@ -56,7 +75,8 @@ export class ContractorService {
     return contractor;
   }
 
-  delete(id: number) {
+  async delete(id: number, buildingId: number) {
+    await this.findOneByBuilding(id, buildingId);
     return this.contractorRepo.delete(id);
   }
 }

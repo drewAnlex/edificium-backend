@@ -14,10 +14,18 @@ export class PaymentInfo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.paymentInfos)
+  @ManyToOne(
+    () => PaymentMethod,
+    (paymentMethod) => paymentMethod.paymentInfos,
+    {
+      nullable: true,
+    },
+  )
   methodId: PaymentMethod;
 
-  @ManyToOne(() => Payment, (payment) => payment.paymentInfos)
+  @ManyToOne(() => Payment, (payment) => payment.paymentInfos, {
+    onDelete: 'CASCADE',
+  })
   payment: Payment;
 
   @Column({ type: 'varchar', length: 32 })

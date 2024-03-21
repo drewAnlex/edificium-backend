@@ -8,6 +8,7 @@ import {
   Body,
   Param,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { IndividualBillsService } from '../services/individual-bills.service';
 import {
@@ -18,6 +19,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Request } from 'express';
 
 @ApiTags('individual-bills')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -31,6 +33,28 @@ export class IndividualBillsController {
   @Get()
   findAll() {
     return this.individualBillsService.findAll();
+  }
+
+  @Roles('Admin', 'User')
+  @Get('apartment/:apartmentId')
+  findByApartment(
+    @Param('apartmentId', ParseIntPipe) apartmentId: number,
+    @Req() req: Request,
+  ) {
+    const user = req.user as any;
+    return this.individualBillsService.findByApartment(
+      apartmentId,
+      user.userId,
+    );
+  }
+
+  @Roles('Admin', 'User')
+  @Get('apartment/:apartmentId/:id')
+  findOneByIdAndApartment(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('apartmentId', ParseIntPipe) apartmentId: number,
+  ) {
+    return this.individualBillsService.findOneByIdAndApartment(id, apartmentId);
   }
 
   @Roles('Staff')

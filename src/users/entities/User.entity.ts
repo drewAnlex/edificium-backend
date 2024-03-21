@@ -31,7 +31,7 @@ export class User {
   @ManyToOne(() => Role)
   role: Role;
 
-  @Column({ type: 'varchar', length: 32 })
+  @Column({ type: 'varchar', length: 32, nullable: true })
   phone: string;
 
   @Column({ type: 'int', default: 1 })

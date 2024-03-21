@@ -34,7 +34,7 @@ export class ProductsController {
     return this.productsService.findOne(id);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin')
   @Post()
   create(@Body() payload: CreateProductDto) {
     return this.productsService.create(payload);
