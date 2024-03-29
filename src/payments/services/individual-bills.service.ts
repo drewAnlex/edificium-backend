@@ -105,7 +105,9 @@ export class IndividualBillsService {
     });
     let debt = 0;
     bills.forEach((bill) => {
-      debt = debt + bill.Total - bill.Balance;
+      const total = parseInt(bill.Total.toString());
+      const balance = parseInt(bill.Balance.toString());
+      debt = debt + total - balance;
     });
     return debt;
   }
