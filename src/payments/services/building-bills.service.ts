@@ -217,4 +217,15 @@ export class BuildingBillsService {
     }
     return bill;
   }
+
+  async buildingDebt(buildingId: number) {
+    const buildingBills = await this.billRepo.find({
+      where: { buildingId: { id: buildingId }, isPaid: false },
+    });
+    let debt = 0;
+    buildingBills.forEach((bill) => {
+      debt = debt + bill.total - bill.balance;
+    });
+    return debt;
+  }
 }

@@ -29,6 +29,12 @@ import { Request } from 'express';
 export class MyBuildingBillsController {
   constructor(private buildingBillService: BuildingBillsService) {}
 
+  @Roles('Admin', 'User', 'Staff')
+  @Get('debt/:id')
+  getDebt(@Param('id', ParseIntPipe) id: number) {
+    return this.buildingBillService.buildingDebt(id);
+  }
+
   @Roles('Admin')
   @Get('unpublished')
   getUnpublished(@Req() req: Request) {
