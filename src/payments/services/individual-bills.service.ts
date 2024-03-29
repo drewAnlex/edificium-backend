@@ -94,4 +94,19 @@ export class IndividualBillsService {
   remove(id: number) {
     return this.billRepo.delete(id);
   }
+
+  async individualDebt(userId: number, buildingId: number) {
+    const bills = await this.billRepo.find({
+      where: {
+        buildingBillId: { buildingId: { id: buildingId } },
+        apartmentId: { userId: { id: userId } },
+        IsPaid: false,
+      },
+    });
+    let debt = 0;
+    bills.forEach((bill) => {
+      debt = debt + bill.Total - bill.Balance;
+    });
+    return debt;
+  }
 }

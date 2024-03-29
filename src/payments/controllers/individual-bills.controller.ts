@@ -29,6 +29,13 @@ export class IndividualBillsController {
     private readonly individualBillsService: IndividualBillsService,
   ) {}
 
+  @Roles('Staff', 'Admin', 'User')
+  @Get('debt/:id')
+  getDebt(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
+    const user = req.user as any;
+    return this.individualBillsService.individualDebt(user.userId, id);
+  }
+
   @Roles('Staff')
   @Get()
   findAll() {
