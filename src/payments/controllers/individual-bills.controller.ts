@@ -30,6 +30,12 @@ export class IndividualBillsController {
   ) {}
 
   @Roles('Staff', 'Admin', 'User')
+  @Get('apartments-with-debt/:id')
+  getApartmentsWithDebt(@Param('id', ParseIntPipe) id: number) {
+    return this.individualBillsService.apartmentsWithDebt(id);
+  }
+
+  @Roles('Staff', 'Admin', 'User')
   @Get('debt/:id')
   getDebt(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
     const user = req.user as any;

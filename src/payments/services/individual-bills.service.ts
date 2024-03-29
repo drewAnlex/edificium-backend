@@ -109,4 +109,18 @@ export class IndividualBillsService {
     });
     return debt;
   }
+
+  async apartmentsWithDebt(buildingId: number) {
+    const apartments = await this.billRepo.find({
+      where: {
+        buildingBillId: { buildingId: { id: buildingId } },
+        IsPaid: false,
+      },
+      relations: ['apartmentId'],
+    });
+    const uniqueApartmentIds = new Set(
+      apartments.map((apartment) => apartment.apartmentId.id),
+    );
+    return uniqueApartmentIds.size;
+  }
 }
