@@ -28,6 +28,7 @@ export class IndividualBillsService {
     const bills = await this.billRepo.find({
       where: { apartmentId: { id: apartmentId, userId: { id: ownerId } } },
       relations: ['buildingBillId'],
+      order: { createdAt: 'DESC' },
     });
     if (!bills) {
       throw new NotFoundException(
