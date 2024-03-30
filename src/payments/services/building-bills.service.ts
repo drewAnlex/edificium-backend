@@ -63,6 +63,7 @@ export class BuildingBillsService {
         buildingId: { id: buildingId, apartments: { userId: { id: userId } } },
         isPublished: true,
       },
+      order: { createdAt: 'DESC' },
     });
     if (!buildingBills) {
       throw new NotFoundException(`Building Bill not found`);
