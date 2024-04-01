@@ -4,6 +4,7 @@ import {
   IsPositive,
   IsOptional,
   Min,
+  IsNumber,
 } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 
@@ -27,6 +28,13 @@ export class CreateBuildingDto implements Readonly<CreateBuildingDto> {
   @IsNotEmpty()
   @IsString()
   zone: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  nApartments: number;
+
+  @IsNotEmpty()
+  status: string;
 }
 export class UpdateBuildingDto extends PartialType(CreateBuildingDto) {}
 
