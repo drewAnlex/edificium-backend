@@ -27,6 +27,13 @@ export class MyApartmentsController {
     return this.apartmentsService.getApartmentsByOwner(user.userId);
   }
 
+  @Roles('Admin')
+  @Get('building')
+  getApartmentsByBuilding(@Req() req: Request) {
+    const user = req.user as any;
+    return this.apartmentsService.getApartmentsByBuilding(user.buildingId);
+  }
+
   @Roles('Staff', 'Admin', 'User')
   @Get(':id')
   getAparment(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
