@@ -36,6 +36,36 @@ export class ApartmentsService {
     return apartment;
   }
 
+  async findOneByAdmin(id: number, buildingId: number) {
+    const apartment = await this.apartmentRepo.findOne({
+      where: { id, buildingId: { id: buildingId } },
+      relations: ['buildingId', 'userId', 'individualBills'],
+    });
+    if (!apartment) {
+      throw new NotFoundException(`Apartment #${id} not found`);
+    }
+    return apartment;
+  }
+
+  async getApartmentsByBuilding(id: number) {
+    const apartments = await this.apartmentRepo.find({
+      where: { buildingId: { id } },
+      relations: ['userId', 'individualBills'],
+    });
+    if (!apartments) {
+      throw new NotFoundException(`Apartments not found`);
+    }
+    apartments.forEach((apartment) => {
+      apartment.individualBills = apartment.individualBills.filter(
+        (bill) => !bill.IsPaid,
+      );
+      apartment.individualBills.forEach((bill) => {
+        apartment.balance = apartment.balance + bill.Total - bill.Balance;
+      });
+    });
+    return apartments;
+  }
+
   async getApartmentsByOwner(id: number) {
     const apartments = await this.apartmentRepo.find({
       where: { userId: { id } },
