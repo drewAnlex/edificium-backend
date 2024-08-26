@@ -61,7 +61,6 @@ export class ApartmentsService {
         return total + (bill.Total - bill.Balance);
       }, 0);
     });
-    console.log(apartments);
     return apartments;
   }
 
