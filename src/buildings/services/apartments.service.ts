@@ -55,14 +55,13 @@ export class ApartmentsService {
     if (!apartments) {
       throw new NotFoundException(`Apartments not found`);
     }
+
     apartments.forEach((apartment) => {
-      apartment.individualBills = apartment.individualBills.filter(
-        (bill) => !bill.IsPaid,
-      );
-      apartment.individualBills.forEach((bill) => {
-        apartment.balance = apartment.balance + bill.Total - bill.Balance;
-      });
+      apartment.balance = apartment.individualBills.reduce((total, bill) => {
+        return total + (bill.Total - bill.Balance);
+      }, 0);
     });
+    console.log(apartments);
     return apartments;
   }
 
