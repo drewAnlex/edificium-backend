@@ -47,7 +47,10 @@ export class BuildingsService {
 
   async findMyBuildings(userId: number) {
     const buildings = await this.buildingRepo.find({
-      where: { apartments: { userId: { id: userId } } },
+      where: [
+        { apartments: { userId: { id: userId } } },
+        { admins: { id: userId } },
+      ],
     });
     if (!buildings) {
       throw new NotFoundException(`Buildings not found`);

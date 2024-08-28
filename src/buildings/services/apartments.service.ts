@@ -60,6 +60,7 @@ export class ApartmentsService {
       apartment.balance = apartment.individualBills.reduce((total, bill) => {
         return total + (bill.Total - bill.Balance);
       }, 0);
+      apartment.balance = parseFloat(apartment.balance.toFixed(2));
     });
     return apartments;
   }

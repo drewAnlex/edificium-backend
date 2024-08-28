@@ -113,6 +113,22 @@ export class IndividualBillsService {
     return debt;
   }
 
+  async adminIndividualDebt(apartmentId: number) {
+    const bills = await this.billRepo.find({
+      where: {
+        apartmentId: { id: apartmentId },
+        IsPaid: false,
+      },
+    });
+    let debt = 0;
+    bills.forEach((bill) => {
+      const total = parseFloat(bill.Total.toString());
+      const balance = parseFloat(bill.Balance.toString());
+      debt = debt + total - balance;
+    });
+    return debt;
+  }
+
   async apartmentsWithDebt(buildingId: number) {
     const apartments = await this.billRepo.find({
       where: {

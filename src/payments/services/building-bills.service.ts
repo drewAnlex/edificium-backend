@@ -59,10 +59,23 @@ export class BuildingBillsService {
 
   async findByOwner(buildingId: number, userId: number) {
     const buildingBills = await this.billRepo.find({
-      where: {
-        buildingId: { id: buildingId, apartments: { userId: { id: userId } } },
-        isPublished: true,
-      },
+      // where: {
+      //   buildingId: { id: buildingId, apartments: { userId: { id: userId } } },
+      //   isPublished: true,
+      // },
+      where: [
+        {
+          buildingId: { id: buildingId, admins: { id: userId } },
+          isPublished: true,
+        },
+        {
+          buildingId: {
+            id: buildingId,
+            apartments: { userId: { id: userId } },
+          },
+          isPublished: true,
+        },
+      ],
       order: { createdAt: 'DESC' },
     });
     if (!buildingBills) {
@@ -73,7 +86,11 @@ export class BuildingBillsService {
 
   async findOneByOwner(id: number, userId: number) {
     const bill = await this.billRepo.findOne({
-      where: { id: id, buildingId: { apartments: { userId: { id: userId } } } },
+      // where: { id: id, buildingId: { apartments: { userId: { id: userId } } } },
+      where: [
+        { id: id, buildingId: { apartments: { userId: { id: userId } } } },
+        { id: id, buildingId: { admins: { id: userId } } },
+      ],
       relations: [
         'buildingId',
         'userId',

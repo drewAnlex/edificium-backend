@@ -47,4 +47,11 @@ export class MyApartmentsController {
     const user = req.user as any;
     return this.apartmentsService.setApartmentToUser(uuid, user.userId);
   }
+
+  @Roles('Staff', 'Admin')
+  @Get('admin/:id')
+  getOneByAdmin(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
+    const user = req.user as any;
+    return this.apartmentsService.findOneByAdmin(id, user.buildingId);
+  }
 }

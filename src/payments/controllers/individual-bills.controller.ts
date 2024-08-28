@@ -42,6 +42,12 @@ export class IndividualBillsController {
     return this.individualBillsService.individualDebt(user.userId, id);
   }
 
+  @Roles('Staff', 'Admin')
+  @Get('admindebt/:id')
+  getAdminDebt(@Param('id', ParseIntPipe) id: number) {
+    return this.individualBillsService.adminIndividualDebt(id);
+  }
+
   @Roles('Staff')
   @Get()
   findAll() {
