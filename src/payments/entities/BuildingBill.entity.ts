@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Building } from '../../buildings/entities/building.entity';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../users/entities/User.entity';
 import { Product } from './Product.entity';
 import { Service } from './Service.entity';
 import { IndividualBill } from './IndividualBill.entity';

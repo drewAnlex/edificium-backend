@@ -1,7 +1,7 @@
 import { BuildingBill } from '../../payments/entities/BuildingBill.entity';
 import { Contractor } from '../../payments/entities/Contractor.entity';
 import { Supplier } from '../../payments/entities/Supplier.entity';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../users/entities/User.entity';
 import {
   Entity,
   Column,

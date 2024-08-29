@@ -1,5 +1,5 @@
 import { Apartment } from '../../buildings/entities/apartment.entity';
-import { Role } from './role.entity';
+import { Role } from './Role.entity';
 import {
   Column,
   Entity,

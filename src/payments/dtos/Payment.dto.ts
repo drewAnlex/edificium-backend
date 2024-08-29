@@ -8,7 +8,7 @@ import {
 import { PartialType } from '@nestjs/swagger';
 import { IndividualBill } from '../entities/IndividualBill.entity';
 import { PaymentMethod } from 'src/payment-method/entities/PaymentMethod.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/users/entities/User.entity';
 
 export class PaymentDTO implements Readonly<PaymentDTO> {
   @IsNotEmpty()

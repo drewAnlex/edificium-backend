@@ -8,7 +8,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { BuildingBill } from './BuildingBill.entity';
-import { Apartment } from '../../buildings/entities/Apartment.entity';
+import { Apartment } from '../../buildings/entities/apartment.entity';
 import { Payment } from './Payment.entity';
 
 @Entity()

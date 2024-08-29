@@ -15,7 +15,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BuildingBill } from './entities/BuildingBill.entity';
 import { BuildingBillsController } from './controllers/building-bills.controller';
 import { IndividualBill } from './entities/IndividualBill.entity';
-import { Apartment } from '../buildings/entities/Apartment.entity';
+import { Apartment } from '../buildings/entities/apartment.entity';
 import { Service } from './entities/Service.entity';
 import { Contractor } from './entities/Contractor.entity';
 import { ContractorService } from './services/contractor.service';
