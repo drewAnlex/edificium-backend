@@ -28,6 +28,7 @@ export class IndividualBillsService {
     const bills = await this.billRepo.find({
       where: { apartmentId: { id: apartmentId, userId: { id: ownerId } } },
       relations: ['buildingBillId'],
+      order: { createdAt: 'DESC' },
     });
     if (!bills) {
       throw new NotFoundException(
@@ -93,5 +94,52 @@ export class IndividualBillsService {
 
   remove(id: number) {
     return this.billRepo.delete(id);
+  }
+
+  async individualDebt(userId: number, buildingId: number) {
+    const bills = await this.billRepo.find({
+      where: {
+        buildingBillId: { buildingId: { id: buildingId } },
+        apartmentId: { userId: { id: userId } },
+        IsPaid: false,
+      },
+    });
+    let debt = 0;
+    bills.forEach((bill) => {
+      const total = parseInt(bill.Total.toString());
+      const balance = parseInt(bill.Balance.toString());
+      debt = debt + total - balance;
+    });
+    return debt;
+  }
+
+  async adminIndividualDebt(apartmentId: number) {
+    const bills = await this.billRepo.find({
+      where: {
+        apartmentId: { id: apartmentId },
+        IsPaid: false,
+      },
+    });
+    let debt = 0;
+    bills.forEach((bill) => {
+      const total = parseFloat(bill.Total.toString());
+      const balance = parseFloat(bill.Balance.toString());
+      debt = debt + total - balance;
+    });
+    return debt;
+  }
+
+  async apartmentsWithDebt(buildingId: number) {
+    const apartments = await this.billRepo.find({
+      where: {
+        buildingBillId: { buildingId: { id: buildingId } },
+        IsPaid: false,
+      },
+      relations: ['apartmentId'],
+    });
+    const uniqueApartmentIds = new Set(
+      apartments.map((apartment) => apartment.apartmentId.id),
+    );
+    return uniqueApartmentIds.size;
   }
 }

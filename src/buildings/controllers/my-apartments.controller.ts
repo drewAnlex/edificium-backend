@@ -27,6 +27,13 @@ export class MyApartmentsController {
     return this.apartmentsService.getApartmentsByOwner(user.userId);
   }
 
+  @Roles('Admin')
+  @Get('building')
+  getApartmentsByBuilding(@Req() req: Request) {
+    const user = req.user as any;
+    return this.apartmentsService.getApartmentsByBuilding(user.buildingId);
+  }
+
   @Roles('Staff', 'Admin', 'User')
   @Get(':id')
   getAparment(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
@@ -39,5 +46,12 @@ export class MyApartmentsController {
   assignApartmentToUser(@Param('uuid') uuid: string, @Req() req: Request) {
     const user = req.user as any;
     return this.apartmentsService.setApartmentToUser(uuid, user.userId);
+  }
+
+  @Roles('Staff', 'Admin')
+  @Get('admin/:id')
+  getOneByAdmin(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
+    const user = req.user as any;
+    return this.apartmentsService.findOneByAdmin(id, user.buildingId);
   }
 }

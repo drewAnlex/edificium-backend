@@ -30,7 +30,7 @@ export class Payment {
   @Column({ type: 'int', default: 0 })
   Status: number;
 
-  @Column({ type: 'varchar', length: 32 })
+  @Column({ type: 'varchar', length: 32, nullable: true })
   PayCode: string;
 
   @Column({ type: 'decimal', precision: 8, scale: 2 })

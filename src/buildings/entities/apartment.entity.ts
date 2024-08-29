@@ -38,10 +38,10 @@ export class Apartment {
   )
   individualBills: IndividualBill[];
 
-  @Column({ type: 'float' })
+  @Column({ type: 'decimal', precision: 8, scale: 2 })
   share: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'decimal', precision: 8, scale: 2 })
   balance: number;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

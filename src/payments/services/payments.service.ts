@@ -29,6 +29,7 @@ export class PaymentsService {
         },
       },
       relations: ['IndividualBill', 'Method', 'paymentInfos'],
+      order: { createdAt: 'DESC' },
     });
   }
 
@@ -50,6 +51,7 @@ export class PaymentsService {
         'Method',
         'paymentInfos',
       ],
+      order: { createdAt: 'DESC' },
     });
   }
 
