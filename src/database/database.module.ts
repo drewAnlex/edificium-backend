@@ -23,6 +23,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 	  ssl: {
         require: true,
         rejectUnauthorized: false, // Opcional: ajusta según tus necesidades
+	ca: process.env.SSL_CERT,
       },
 	          };
       },
