@@ -20,11 +20,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           database: name,
           synchronize: true,
           autoLoadEntities: true,
-	  ssl: {
-        require: true,
-        rejectUnauthorized: false, // Opcional: ajusta según tus necesidades
-	ca: process.env.SSL_CERT,
-      },
 	          };
       },
     }),
