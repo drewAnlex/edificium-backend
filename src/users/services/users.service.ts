@@ -10,10 +10,14 @@ import { CreateUserDto, UpdateUserDto } from '../dtos/users.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { OutboundService } from '../../mailing/services/outbound.service';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private userRepo: Repository<User>,
+    private mailingService: OutboundService,
+  ) {}
 
   findAll() {
     return this.userRepo.find({
@@ -52,6 +56,7 @@ export class UsersService {
     newUser.password = hashPassword;
     try {
       await this.userRepo.save(newUser);
+      this.mailingService.userRegistrationEmail(newUser.email);
     } catch (error) {
       throw new HttpException(
         `An error occurred while trying to create the User: ${error}`,
