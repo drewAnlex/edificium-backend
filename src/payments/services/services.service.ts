@@ -77,7 +77,6 @@ export class ServicesService {
       await this.serviceRepo.save(newService);
       return newService;
     } catch (error) {
-      console.log(error);
       throw new HttpException(`Error ${error}`, HttpStatus.BAD_REQUEST);
     }
   }
