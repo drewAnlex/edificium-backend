@@ -55,7 +55,7 @@ export class Building {
   @OneToMany(() => Product, (product) => product.buildingId)
   products: Product[];
 
-  @OneToMany(() => Service, (service) => service.buildingId)
+  @OneToMany(() => Service, (service) => service.building)
   services: Service[];
 
   @OneToMany(() => BuildingBill, (buildingBill) => buildingBill.buildingId)
