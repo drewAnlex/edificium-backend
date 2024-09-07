@@ -15,10 +15,10 @@ export class Product {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Building, (building) => building.buildingBills, {
+  @ManyToOne(() => Building, (building) => building.products, {
     onDelete: 'CASCADE',
   })
-  buildingId: Building;
+  building: Building;
 
   @ManyToOne(() => BuildingBill, (bill) => bill.products, {
     onDelete: 'CASCADE',

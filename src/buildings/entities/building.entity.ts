@@ -52,7 +52,7 @@ export class Building {
   @OneToMany(() => User, (user) => user.building)
   admins: User[];
 
-  @OneToMany(() => Product, (product) => product.buildingId)
+  @OneToMany(() => Product, (product) => product.building)
   products: Product[];
 
   @OneToMany(() => Service, (service) => service.building)
