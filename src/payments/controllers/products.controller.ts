@@ -55,9 +55,9 @@ export class ProductsController {
     return this.productsService.update(id, payload);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin')
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.remove(+id);
+    return this.productsService.remove(id);
   }
 }
