@@ -12,9 +12,14 @@ import { User } from 'src/users/entities/User.entity';
 import { UsersService } from 'src/users/services/users.service';
 import { MyApartmentsController } from './controllers/my-apartments.controller';
 import { MyBuildingsController } from './controllers/my-buildings.controller';
+import { MailingModule } from 'src/mailing/mailing.module';
 
 @Module({
-  imports: [UsersModule, TypeOrmModule.forFeature([Building, Apartment, User])],
+  imports: [
+    UsersModule,
+    MailingModule,
+    TypeOrmModule.forFeature([Building, Apartment, User]),
+  ],
   controllers: [
     BuildingsController,
     ApartmentController,

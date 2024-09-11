@@ -109,4 +109,20 @@ export class BuildingsService {
     await this.userService.update(adminId, admin);
     return { message: 'Building admin assigned' };
   }
+
+  async getBuildingExpenses(buildingId: number) {
+    const building = await this.buildingRepo.find({
+      where: { id: buildingId },
+      relations: [
+        'products',
+        'products.BuildingBillsID',
+        'services',
+        'services.buildingBillId',
+      ],
+    });
+    if (!building) {
+      throw new NotFoundException(`Building #${buildingId} not found`);
+    }
+    return building;
+  }
 }

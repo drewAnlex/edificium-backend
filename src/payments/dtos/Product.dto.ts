@@ -2,11 +2,16 @@ import { IsNotEmpty, IsString, IsNumber, IsOptional } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 import { BuildingBill } from '../entities/BuildingBill.entity';
 import { Supplier } from '../entities/Supplier.entity';
+import { Building } from 'src/buildings/entities/building.entity';
 
 export class CreateProductDto implements Readonly<CreateProductDto> {
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   BuildingBillsID: BuildingBill;
+
+  @IsNotEmpty()
+  @IsNumber()
+  building: Building;
 
   @IsNotEmpty()
   @IsString()

@@ -11,6 +11,8 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Apartment } from './apartment.entity';
+import { Product } from 'src/payments/entities/Product.entity';
+import { Service } from 'src/payments/entities/Service.entity';
 
 @Entity()
 export class Building {
@@ -49,6 +51,12 @@ export class Building {
 
   @OneToMany(() => User, (user) => user.building)
   admins: User[];
+
+  @OneToMany(() => Product, (product) => product.building)
+  products: Product[];
+
+  @OneToMany(() => Service, (service) => service.building)
+  services: Service[];
 
   @OneToMany(() => BuildingBill, (buildingBill) => buildingBill.buildingId)
   buildingBills: BuildingBill[];

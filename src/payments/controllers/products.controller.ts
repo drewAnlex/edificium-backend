@@ -22,6 +22,12 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
+  @Roles('Staff', 'Admin')
+  @Get('building/:id')
+  findAllByBuilding(@Param('id', ParseIntPipe) id: number) {
+    return this.productsService.findAllByBuilding(id);
+  }
+
   @Roles('Staff')
   @Get()
   findAll() {
@@ -40,7 +46,7 @@ export class ProductsController {
     return this.productsService.create(payload);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin')
   @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -49,9 +55,9 @@ export class ProductsController {
     return this.productsService.update(id, payload);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin')
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.remove(+id);
+    return this.productsService.remove(id);
   }
 }

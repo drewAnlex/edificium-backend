@@ -36,6 +36,16 @@ export class ServicesService {
     return services;
   }
 
+  async findAllByBuilding(buildingId: number) {
+    const services = await this.serviceRepo.find({
+      where: { building: { id: buildingId } },
+    });
+    if (!services) {
+      throw new NotFoundException(`Services not found`);
+    }
+    return services;
+  }
+
   async findOne(id: number) {
     const service = await this.serviceRepo.findOne({
       where: { id: id },
@@ -62,13 +72,13 @@ export class ServicesService {
   }
 
   async create(payload: CreateServiceDTO) {
-    const newService = this.serviceRepo.create(payload);
     try {
+      const newService = this.serviceRepo.create(payload);
       await this.serviceRepo.save(newService);
+      return newService;
     } catch (error) {
       throw new HttpException(`Error ${error}`, HttpStatus.BAD_REQUEST);
     }
-    return newService;
   }
 
   async update(id: number, payload: UpdateServiceDTO) {

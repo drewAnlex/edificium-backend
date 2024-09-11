@@ -8,14 +8,21 @@ import {
 } from 'typeorm';
 import { BuildingBill } from './BuildingBill.entity';
 import { Contractor } from './Contractor.entity';
+import { Building } from 'src/buildings/entities/building.entity';
 
 @Entity()
 export class Service {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ManyToOne(() => Building, (building) => building.services, {
+    onDelete: 'CASCADE',
+  })
+  building: Building;
+
   @ManyToOne(() => BuildingBill, (bill) => bill.services, {
     onDelete: 'CASCADE',
+    nullable: true,
   })
   buildingBillId: BuildingBill;
 
@@ -30,7 +37,7 @@ export class Service {
   })
   contractorId: Contractor;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'decimal', precision: 8, scale: 2 })
   price: number;
 
   @Column({ type: 'date', nullable: true })

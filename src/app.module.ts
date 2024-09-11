@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 
 import { environment } from './environments';
 import { AuthModule } from './auth/auth.module';
+import { MailingModule } from './mailing/mailing.module';
 import config from './config';
 
 @Module({
@@ -25,6 +26,7 @@ import config from './config';
     PaymentMethodModule,
     DatabaseModule,
     AuthModule,
+    MailingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

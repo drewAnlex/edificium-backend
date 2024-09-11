@@ -35,6 +35,16 @@ export class ProductsService {
     return product;
   }
 
+  async findAllByBuilding(buildingId: number) {
+    const products = this.productRepo.find({
+      where: { building: { id: buildingId } },
+    });
+    if (!products) {
+      throw new NotFoundException(`Products not found`);
+    }
+    return products;
+  }
+
   async create(payload: CreateProductDto) {
     const newProduct = this.productRepo.create(payload);
     try {

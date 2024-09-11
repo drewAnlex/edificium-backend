@@ -9,6 +9,7 @@ import {
 import { PartialType } from '@nestjs/swagger';
 import { Contractor } from '../entities/Contractor.entity';
 import { BuildingBill } from '../entities/BuildingBill.entity';
+import { Building } from 'src/buildings/entities/building.entity';
 
 export class CreateServiceDTO implements Readonly<CreateServiceDTO> {
   @IsNotEmpty()
@@ -24,6 +25,10 @@ export class CreateServiceDTO implements Readonly<CreateServiceDTO> {
   contractorId: Contractor;
 
   @IsNotEmpty()
+  @IsNumber()
+  building: Building;
+
+  @IsOptional()
   @IsNumber()
   buildingBillId: BuildingBill;
 

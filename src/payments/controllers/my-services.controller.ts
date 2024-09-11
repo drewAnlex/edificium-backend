@@ -22,6 +22,12 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 export class MyServicesController {
   constructor(private servicesService: ServicesService) {}
 
+  @Roles('Admin')
+  @Get('building/:id')
+  findAllByBuiilding(@Param('id', ParseIntPipe) id: number) {
+    return this.servicesService.findAllByBuilding(id);
+  }
+
   @Roles('Admin', 'User')
   @Get(':uuid')
   findAll(@Param('uuid') uuid: string) {
