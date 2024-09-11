@@ -39,6 +39,7 @@ export class ServicesService {
   async findAllByBuilding(buildingId: number) {
     const services = await this.serviceRepo.find({
       where: { building: { id: buildingId } },
+      relations: ['buildingBillId'],
     });
     if (!services) {
       throw new NotFoundException(`Services not found`);

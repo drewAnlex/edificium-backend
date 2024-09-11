@@ -38,6 +38,7 @@ export class ProductsService {
   async findAllByBuilding(buildingId: number) {
     const products = this.productRepo.find({
       where: { building: { id: buildingId } },
+      relations: ['BuildingBillsID'],
     });
     if (!products) {
       throw new NotFoundException(`Products not found`);
