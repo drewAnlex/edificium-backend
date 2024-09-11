@@ -22,6 +22,12 @@ import { Request } from 'express';
 export class MyBuildingsController {
   constructor(private buildingsService: BuildingsService) {}
 
+  @Roles('Staff', 'Admin')
+  @Get('expenses/:id')
+  getExpenses(@Param('id', ParseIntPipe) id: number) {
+    return this.buildingsService.getBuildingExpenses(id);
+  }
+
   @Roles('Staff', 'Admin', 'User')
   @Get()
   getMyBuildings(@Req() req: Request) {

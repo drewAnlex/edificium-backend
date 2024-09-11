@@ -46,7 +46,7 @@ export class ProductsController {
     return this.productsService.create(payload);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin')
   @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
