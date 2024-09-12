@@ -86,18 +86,11 @@ export class BuildingBillsService {
 
   async findOneByOwner(id: number, userId: number) {
     const bill = await this.billRepo.findOne({
-      // where: { id: id, buildingId: { apartments: { userId: { id: userId } } } },
       where: [
         { id: id, buildingId: { apartments: { userId: { id: userId } } } },
         { id: id, buildingId: { admins: { id: userId } } },
       ],
-      relations: [
-        'buildingId',
-        'userId',
-        'services',
-        'products',
-        'individualBills',
-      ],
+      relations: ['services', 'products'],
     });
     if (!bill) {
       throw new NotFoundException(`Building Bill #${id} not found`);
