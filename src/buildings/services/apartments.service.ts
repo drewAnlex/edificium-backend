@@ -39,7 +39,12 @@ export class ApartmentsService {
   async findOneByAdmin(id: number, buildingId: number) {
     const apartment = await this.apartmentRepo.findOne({
       where: { id, buildingId: { id: buildingId } },
-      relations: ['buildingId', 'userId', 'individualBills'],
+      relations: [
+        'buildingId',
+        'userId',
+        'individualBills',
+        'individualBills.apartmentId',
+      ],
     });
     if (!apartment) {
       throw new NotFoundException(`Apartment #${id} not found`);
@@ -51,6 +56,9 @@ export class ApartmentsService {
     const apartments = await this.apartmentRepo.find({
       where: { buildingId: { id } },
       relations: ['userId', 'individualBills'],
+      order: {
+        identifier: 'ASC',
+      },
     });
     if (!apartments) {
       throw new NotFoundException(`Apartments not found`);

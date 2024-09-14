@@ -11,7 +11,7 @@ import { Apartment } from 'src/buildings/entities/apartment.entity';
 import { BuildingBill } from '../entities/BuildingBill.entity';
 
 export class IndividualBillDto implements Readonly<IndividualBillDto> {
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   buildingBillId: BuildingBill;
 

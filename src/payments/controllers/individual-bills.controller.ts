@@ -82,7 +82,7 @@ export class IndividualBillsController {
     return this.individualBillsService.findOne(id);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin')
   @Post()
   create(@Body() data: IndividualBillDto) {
     return this.individualBillsService.create(data);
@@ -97,7 +97,7 @@ export class IndividualBillsController {
     return this.individualBillsService.update(id, changes);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin')
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.individualBillsService.remove(id);
