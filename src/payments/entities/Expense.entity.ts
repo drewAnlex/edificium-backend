@@ -2,38 +2,39 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  OneToMany,
+  ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
 } from 'typeorm';
-import { Service } from './Service.entity';
 import { Building } from '../../buildings/entities/building.entity';
+import { BuildingBill } from './BuildingBill.entity';
 
 @Entity()
-export class Contractor {
+export class Expense {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 32 })
+  @Column({ type: 'varchar', length: 128 })
   name: string;
 
-  @Column({ type: 'varchar', length: 32 })
-  email: string;
-
-  @Column({ type: 'varchar', length: 32 })
-  phone: string;
-
   @Column({ type: 'text' })
-  address: string;
+  description: string;
 
-  @OneToMany(() => Service, (service) => service.contractorId)
-  services: Service[];
+  @ManyToOne(() => BuildingBill, (buildingBill) => buildingBill.expenses, {
+    onDelete: 'CASCADE',
+  })
+  buildingBill: BuildingBill;
 
-  @ManyToOne(() => Building, (building) => building.contractors, {
+  @ManyToOne(() => Building, (building) => building.expenses, {
     onDelete: 'CASCADE',
   })
   building: Building;
+
+  @Column({ type: 'decimal', default: 0, precision: 10, scale: 2 })
+  total: number;
+
+  @Column({ type: 'boolean', default: false })
+  isPaid: boolean;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

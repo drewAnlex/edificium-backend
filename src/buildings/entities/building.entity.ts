@@ -1,6 +1,4 @@
 import { BuildingBill } from '../../payments/entities/BuildingBill.entity';
-import { Contractor } from '../../payments/entities/Contractor.entity';
-import { Supplier } from '../../payments/entities/Supplier.entity';
 import { User } from '../../users/entities/User.entity';
 import {
   Entity,
@@ -11,8 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Apartment } from './apartment.entity';
-import { Product } from 'src/payments/entities/Product.entity';
-import { Service } from 'src/payments/entities/Service.entity';
+import { Expense } from 'src/payments/entities/Expense.entity';
 
 @Entity()
 export class Building {
@@ -43,23 +40,14 @@ export class Building {
   @Column({ type: 'varchar', length: 32, nullable: false })
   status: string;
 
-  @OneToMany(() => Supplier, (supplier) => supplier.buildings)
-  suppliers: Supplier[];
-
-  @OneToMany(() => Contractor, (contractor) => contractor.building)
-  contractors: Contractor[];
-
   @OneToMany(() => User, (user) => user.building)
   admins: User[];
 
-  @OneToMany(() => Product, (product) => product.building)
-  products: Product[];
-
-  @OneToMany(() => Service, (service) => service.building)
-  services: Service[];
-
   @OneToMany(() => BuildingBill, (buildingBill) => buildingBill.buildingId)
   buildingBills: BuildingBill[];
+
+  @OneToMany(() => Expense, (expense) => expense.building)
+  expenses: Expense[];
 
   @OneToMany(() => Apartment, (apartment) => apartment.buildingId)
   apartments: Apartment[];

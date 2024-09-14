@@ -9,9 +9,8 @@ import {
 } from 'typeorm';
 import { Building } from '../../buildings/entities/building.entity';
 import { User } from '../../users/entities/User.entity';
-import { Product } from './Product.entity';
-import { Service } from './Service.entity';
 import { IndividualBill } from './IndividualBill.entity';
+import { Expense } from './Expense.entity';
 
 @Entity()
 export class BuildingBill {
@@ -31,15 +30,10 @@ export class BuildingBill {
   @Column({ type: 'varchar', length: 64, nullable: true })
   uuid: string;
 
-  @OneToMany(() => Product, (product) => product.BuildingBillsID, {
+  @OneToMany(() => Expense, (expense) => expense.buildingBill, {
     cascade: true,
   })
-  products: Product[];
-
-  @OneToMany(() => Service, (service) => service.buildingBillId, {
-    cascade: true,
-  })
-  services: Service[];
+  expenses: Expense[];
 
   @OneToMany(
     () => IndividualBill,
