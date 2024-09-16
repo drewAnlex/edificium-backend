@@ -31,8 +31,7 @@ export class BuildingBillsService {
       where: { isPublished: true, buildingId: { id: buildingId } },
       order: { createdAt: 'DESC' },
       relations: [
-        'products',
-        'services',
+        'expenses',
         'individualBills',
         'individualBills.apartmentId',
         'individualBills.payment',
@@ -90,7 +89,7 @@ export class BuildingBillsService {
         { id: id, buildingId: { apartments: { userId: { id: userId } } } },
         { id: id, buildingId: { admins: { id: userId } } },
       ],
-      relations: ['services', 'products'],
+      relations: ['expenses'],
     });
     if (!bill) {
       throw new NotFoundException(`Building Bill #${id} not found`);
@@ -101,7 +100,7 @@ export class BuildingBillsService {
   async findOneByUuid(uuid: string) {
     const bill = await this.billRepo.findOne({
       where: { uuid: uuid },
-      relations: ['buildingId'],
+      relations: ['buildingId', 'expenses'],
     });
     if (!bill) {
       throw new NotFoundException(`Building Bill #${uuid} not found`);
@@ -112,13 +111,7 @@ export class BuildingBillsService {
   async findOne(id: number) {
     const bill = await this.billRepo.findOne({
       where: { id: id },
-      relations: [
-        'buildingId',
-        'userId',
-        'services',
-        'products',
-        'individualBills',
-      ],
+      relations: ['buildingId', 'userId', 'expenses', 'individualBills'],
     });
     if (!bill) {
       throw new NotFoundException(`Building Bill #${id} not found`);
@@ -198,11 +191,21 @@ export class BuildingBillsService {
   async setToPublished(uuid: string) {
     const bill = await this.findOneByUuid(uuid);
     const building = await this.buildingService.findOne(bill.buildingId.id);
+    let totalPerShare = 0;
+    let totalNotPerShare = 0;
+    bill.expenses.forEach((expense) => {
+      if (expense.dependsOnShare) {
+        totalPerShare = totalPerShare + expense.total;
+      } else {
+        totalNotPerShare =
+          totalNotPerShare + expense.total / building.nApartments;
+      }
+    });
     (await building).apartments.forEach((Apartment) => {
       const payload: IndividualBillDto = {
         buildingBillId: bill,
         apartmentId: Apartment,
-        Total: bill.total * Apartment.share,
+        Total: totalPerShare * Apartment.share + totalNotPerShare,
         Name: bill.name,
         Description: bill.description,
         IsPaid: false,

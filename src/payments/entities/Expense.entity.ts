@@ -36,6 +36,12 @@ export class Expense {
   @Column({ type: 'boolean', default: false })
   isPaid: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  isFixed: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  dependsOnShare: boolean;
+
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
