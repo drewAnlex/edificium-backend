@@ -23,6 +23,7 @@ export class ExpenseService {
   async findOne(id: number) {
     const expense = this.expenseRepo.findOne({
       where: { id: id },
+      relations: ['buildingBill'],
     });
     if (!expense) {
       throw new NotFoundException(`Expense #${id} not found`);
@@ -33,6 +34,32 @@ export class ExpenseService {
   async findAllByBuilding(building: number) {
     const expenses = this.expenseRepo.find({
       where: { building: { id: building } },
+      relations: ['buildingBill'],
+    });
+    if (!expenses) {
+      throw new NotFoundException(
+        `Expenses in building #${building} not found`,
+      );
+    }
+    return expenses;
+  }
+
+  async findUnpaidsByBuilding(building: number) {
+    const expenses = this.expenseRepo.find({
+      where: { building: { id: building }, isPaid: false },
+      relations: ['buildingBill'],
+    });
+    if (!expenses) {
+      throw new NotFoundException(
+        `Expenses in building #${building} not found`,
+      );
+    }
+    return expenses;
+  }
+
+  async findPaidsByBuilding(building: number) {
+    const expenses = this.expenseRepo.find({
+      where: { building: { id: building }, isPaid: true },
       relations: ['buildingBill'],
     });
     if (!expenses) {

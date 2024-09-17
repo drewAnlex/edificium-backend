@@ -18,6 +18,10 @@ export class CreateExpenseDTO implements Readonly<CreateExpenseDTO> {
   @IsString()
   description: string;
 
+  @IsOptional()
+  @IsBoolean()
+  isPaid: boolean;
+
   @IsNotEmpty()
   @IsBoolean()
   isFixed: boolean;

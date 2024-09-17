@@ -35,6 +35,24 @@ export class ExpenseController {
   }
 
   @Roles('Staff', 'Admin')
+  @Get('unpaids/:id')
+  findUnpaids(@Param('id', ParseIntPipe) id: number) {
+    return this.expenseService.findUnpaidsByBuilding(id);
+  }
+
+  @Roles('Staff', 'Admin')
+  @Get('paids/:id')
+  findPaids(@Param('id', ParseIntPipe) id: number) {
+    return this.expenseService.findPaidsByBuilding(id);
+  }
+
+  @Roles('Staff', 'Admin')
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.expenseService.findOne(id);
+  }
+
+  @Roles('Staff', 'Admin')
   @Post()
   create(@Body() data: CreateExpenseDTO) {
     return this.expenseService.create(data);
