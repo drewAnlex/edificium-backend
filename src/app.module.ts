@@ -11,6 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 import { environment } from './environments';
 import { AuthModule } from './auth/auth.module';
 import { MailingModule } from './mailing/mailing.module';
+import { ReportsModule } from './reports/reports.module';
 import config from './config';
 
 @Module({
@@ -27,6 +28,7 @@ import config from './config';
     DatabaseModule,
     AuthModule,
     MailingModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

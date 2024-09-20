@@ -89,12 +89,29 @@ export class BuildingBillsService {
         { id: id, buildingId: { apartments: { userId: { id: userId } } } },
         { id: id, buildingId: { admins: { id: userId } } },
       ],
-      relations: ['expenses'],
+      relations: [
+        'expenses',
+        'buildingId',
+        'buildingId.admins',
+        'buildingId.apartments',
+        'buildingId.apartments.userId',
+      ],
     });
     if (!bill) {
       throw new NotFoundException(`Building Bill #${id} not found`);
     }
-    return bill;
+    const { buildingId } = bill;
+    const apartment = buildingId.apartments.find(
+      (apartment) => apartment.userId?.id === userId,
+    );
+    const owner = apartment
+      ? apartment?.userId
+      : buildingId.admins.find((admin) => admin.id === userId);
+    return {
+      bill,
+      apartment,
+      owner,
+    };
   }
 
   async findOneByUuid(uuid: string) {

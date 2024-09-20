@@ -22,6 +22,14 @@ export class Building {
   @Column({ type: 'varchar', length: 32, nullable: false })
   name: string;
 
+  @Column({
+    type: 'varchar',
+    length: 32,
+    nullable: true,
+    default: 'J-0000000',
+  })
+  fiscalId: string;
+
   @Column({ type: 'varchar', length: 32, nullable: false })
   country: string;
 
