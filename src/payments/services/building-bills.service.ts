@@ -95,22 +95,30 @@ export class BuildingBillsService {
         'buildingId.admins',
         'buildingId.apartments',
         'buildingId.apartments.userId',
+        'individualBills',
+        'individualBills.apartmentId',
       ],
     });
     if (!bill) {
       throw new NotFoundException(`Building Bill #${id} not found`);
     }
     const { buildingId } = bill;
+
     const apartment = buildingId.apartments.find(
       (apartment) => apartment.userId?.id === userId,
     );
     const owner = apartment
       ? apartment?.userId
       : buildingId.admins.find((admin) => admin.id === userId);
+
+    const individualBill = bill.individualBills.find(
+      (indiBill) => indiBill.apartmentId.id === apartment.id,
+    );
     return {
       bill,
       apartment,
       owner,
+      individualBill,
     };
   }
 

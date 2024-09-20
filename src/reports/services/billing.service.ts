@@ -82,6 +82,24 @@ export class BillingService {
       const variableExpenses = data.bill.expenses.filter(
         (expense) => !expense.isFixed,
       );
+      const totalGeneral = data.bill.total;
+      const totalCuota = data.individualBill?.Total || 0; // Manejar posible valor indefinido
+
+      const tableOptions = {
+        width: doc.page.width, // Adjust table width
+        layout: 'lightHorizontalLines', // Add thin horizontal lines
+        cellPadding: 5, // Add some padding to cells
+        headerRows: 1, // Only show header row as bold
+        columnsSize: [260, 50, 100, 100],
+      };
+
+      // Crear la tabla con los totales
+      const totalsTable = {
+        headers: ['', '', 'TOTAL GENERAL', 'TOTAL CUOTA'],
+        rows: [
+          ['', '', totalGeneral.toFixed(2).toString(), totalCuota.toString()],
+        ],
+      };
 
       doc.moveDown(2);
       const table = {
@@ -109,14 +127,6 @@ export class BillingService {
 
       doc.fillColor('black'); // Set default text color to black
 
-      const tableOptions = {
-        width: doc.page.width, // Adjust table width
-        layout: 'lightHorizontalLines', // Add thin horizontal lines
-        cellPadding: 5, // Add some padding to cells
-        headerRows: 1, // Only show header row as bold
-        columnsSize: [260, 50, 100, 100],
-      };
-
       doc.table(table, tableOptions);
 
       doc.moveDown(2);
@@ -141,6 +151,8 @@ export class BillingService {
         }),
       };
       doc.table(tableVariables, tableOptions);
+      doc.moveDown(2);
+      doc.table(totalsTable, tableOptions);
       doc.text(`AP: A: Aplica por alícuota P: Aplica por propietario `);
 
       const buffer = [];
