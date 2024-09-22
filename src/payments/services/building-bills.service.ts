@@ -89,14 +89,13 @@ export class BuildingBillsService {
         { id: id, buildingId: { apartments: { userId: { id: userId } } } },
         { id: id, buildingId: { admins: { id: userId } } },
       ],
+      select: ['id', 'name', 'description', 'createdAt', 'total'],
       relations: [
         'expenses',
         'buildingId',
         'buildingId.admins',
         'buildingId.apartments',
         'buildingId.apartments.userId',
-        'individualBills',
-        'individualBills.apartmentId',
       ],
     });
     if (!bill) {
@@ -111,9 +110,14 @@ export class BuildingBillsService {
       ? apartment?.userId
       : buildingId.admins.find((admin) => admin.id === userId);
 
-    const individualBill = bill.individualBills.find(
-      (indiBill) => indiBill.apartmentId.id === apartment.id,
+    const individualBills = await this.billService.findByApartment(
+      apartment.id,
+      owner.id,
     );
+    const individualBill = individualBills.find(
+      (billItem) => billItem.buildingBillId.id === bill.id,
+    );
+
     return {
       bill,
       apartment,
