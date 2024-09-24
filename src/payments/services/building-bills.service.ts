@@ -115,7 +115,7 @@ export class BuildingBillsService {
       owner.id,
     );
     const individualBill = individualBills.find(
-      (billItem) => billItem.buildingBillId.id === bill.id,
+      (billItem) => billItem.buildingBillId?.id === bill.id,
     );
 
     return {
