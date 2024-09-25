@@ -36,10 +36,10 @@ export class IndividualBillsController {
   }
 
   @Roles('Staff', 'Admin', 'User')
-  @Get('debt/:id')
-  getDebt(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
+  @Get('debt')
+  getDebt(@Req() req: Request) {
     const user = req.user as any;
-    return this.individualBillsService.individualDebt(user.userId, id);
+    return this.individualBillsService.individualDebt(user.userId);
   }
 
   @Roles('Staff', 'Admin')
