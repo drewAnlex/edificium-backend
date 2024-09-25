@@ -2,14 +2,35 @@ import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import PDFDocument from 'pdfkit-table';
 import { BuildingBillsService } from 'src/payments/services/building-bills.service';
+import { IndividualBillsService } from 'src/payments/services/individual-bills.service';
 
 const formatter = new Intl.DateTimeFormat('es-ES'); // 'es-ES' para español de España
 
 @Injectable()
 export class BillingService {
-  constructor(private bbService: BuildingBillsService) {}
+  constructor(
+    private bbService: BuildingBillsService,
+    private ibService: IndividualBillsService,
+  ) {}
   async generateBillPDF(bill: number, user: number): Promise<Buffer> {
     const data = await this.bbService.findOneByOwner(bill, user);
+    const individualBills = await this.ibService.findByApartment(
+      data.apartment.id,
+      data.owner.id,
+    );
+    const individualBill = individualBills.find(
+      (billItem) => billItem.buildingBillId?.id === data.bill.id,
+    );
+    const pastIndividualBills = individualBills.filter((billItem) => {
+      return (
+        billItem.buildingBillId?.id !== data.bill.id &&
+        billItem.IsPaid === false
+      );
+    });
+    const totalGeneral = await this.ibService.adminIndividualDebt(
+      data.apartment.id,
+    );
+
     const logoUrl = 'http://67.205.149.177/images/icon.jpeg';
     const response = await axios.get(logoUrl, { responseType: 'arraybuffer' });
     const imageBuffer = response.data;
@@ -82,10 +103,11 @@ export class BillingService {
       const variableExpenses = data.bill.expenses.filter(
         (expense) => !expense.isFixed,
       );
-      const totalGeneral = data.bill.total;
-      const totalCuota = data.individualBill?.Total || 0; // Manejar posible valor indefinido
+      const totalRecibo = data.bill.total;
+      const totalCuota = individualBill?.Total || 0; // Manejar posible valor indefinido
+      const totalDeuda = totalGeneral - totalCuota;
 
-      const tableOptions = {
+      let tableOptions = {
         width: doc.page.width, // Adjust table width
         layout: 'lightHorizontalLines', // Add thin horizontal lines
         cellPadding: 5, // Add some padding to cells
@@ -95,9 +117,19 @@ export class BillingService {
 
       // Crear la tabla con los totales
       const totalsTable = {
-        headers: ['', '', 'TOTAL GENERAL', 'TOTAL CUOTA'],
+        headers: [
+          'TOTAL RECIBO',
+          'TOTAL CUOTA',
+          'TOTAL DEUDA',
+          'TOTAL POR PAGAR',
+        ],
         rows: [
-          ['', '', totalGeneral.toFixed(2).toString(), totalCuota.toString()],
+          [
+            totalRecibo.toFixed(2).toString(),
+            totalCuota.toString(),
+            totalDeuda.toString(),
+            totalGeneral.toString(),
+          ],
         ],
       };
 
@@ -152,6 +184,32 @@ export class BillingService {
       };
       doc.table(tableVariables, tableOptions);
       doc.moveDown(2);
+      tableOptions = {
+        width: doc.page.width, // Adjust table width
+        layout: 'lightHorizontalLines', // Add thin horizontal lines
+        cellPadding: 5, // Add some padding to cells
+        headerRows: 1, // Only show header row as bold
+        columnsSize: [260, 125, 125],
+      };
+      const tableDebt = {
+        headers: ['TITULO', 'FECHA DE EMISIÓN', 'MONTO'],
+        rows: pastIndividualBills.map((bill) => {
+          return [
+            bill.Name,
+            formatter.format(bill.createdAt),
+            bill.Total.toString(),
+          ];
+        }),
+      };
+      doc.table(tableDebt, tableOptions);
+      doc.moveDown(2);
+      tableOptions = {
+        width: doc.page.width, // Adjust table width
+        layout: 'lightHorizontalLines', // Add thin horizontal lines
+        cellPadding: 5, // Add some padding to cells
+        headerRows: 1, // Only show header row as bold
+        columnsSize: [125, 125, 130, 130],
+      };
       doc.table(totalsTable, tableOptions);
       doc.text(`AP: A: Aplica por alícuota P: Aplica por propietario `);
 

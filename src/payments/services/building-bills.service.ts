@@ -110,19 +110,10 @@ export class BuildingBillsService {
       ? apartment?.userId
       : buildingId.admins.find((admin) => admin.id === userId);
 
-    const individualBills = await this.billService.findByApartment(
-      apartment.id,
-      owner.id,
-    );
-    const individualBill = individualBills.find(
-      (billItem) => billItem.buildingBillId?.id === bill.id,
-    );
-
     return {
       bill,
       apartment,
       owner,
-      individualBill,
     };
   }
 
