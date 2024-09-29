@@ -17,10 +17,4 @@ export class PaymentMethodDetails {
 
   @Column({ type: 'varchar', length: 128 })
   description: string;
-
-  @Column({ type: 'varchar', length: 32 })
-  type: string;
-
-  @Column({ type: 'varchar', length: 32 })
-  validation: string;
 }

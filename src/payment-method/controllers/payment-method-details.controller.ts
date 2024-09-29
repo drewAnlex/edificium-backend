@@ -31,6 +31,12 @@ export class PaymentMethodDetailsController {
     return this.paymentMethodDetails.findAll();
   }
 
+  @Roles('Staff', 'Admin', 'User')
+  @Get('method/:id')
+  getByMethod(@Param('id', ParseIntPipe) id: number) {
+    return this.paymentMethodDetails.findOneByMethod(id);
+  }
+
   @Roles('Staff')
   @Get(':id')
   get(@Param('id', ParseIntPipe) id: number) {

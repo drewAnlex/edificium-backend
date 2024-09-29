@@ -12,18 +12,38 @@ import {
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { IndividualBillsService } from 'src/payments/services/individual-bills.service';
 
 @Injectable()
 export class PaymentMethodListService {
   constructor(
     @InjectRepository(PaymentMethodList)
     private paymentMethodListRepo: Repository<PaymentMethodList>,
+    private ibService: IndividualBillsService,
   ) {}
 
   findAll() {
     return this.paymentMethodListRepo.find({
       relations: ['MethodId', 'BuildingId'],
     });
+  }
+
+  async findByIndividualBill(id: number) {
+    const individualBill = await this.ibService.findOne(id);
+    const building = individualBill.buildingBillId.buildingId.id;
+    const list = await this.findByBuilding(building);
+    return list;
+  }
+
+  async findByBuilding(id: number) {
+    const list = await this.paymentMethodListRepo.find({
+      where: { BuildingId: { id: id } },
+      relations: ['MethodId', 'MethodId.paymentDetails'],
+    });
+    if (!list) {
+      throw new NotFoundException(`Payment Method List #${id} not found`);
+    }
+    return list.map((paymentMethod) => paymentMethod.MethodId);
   }
 
   findOne(id: number) {

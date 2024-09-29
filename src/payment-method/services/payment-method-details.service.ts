@@ -35,6 +35,16 @@ export class PaymentMethodDetailsService {
     return PaymentMethodDetails;
   }
 
+  async findOneByMethod(id: number) {
+    const details = await this.PaymentMethodDetailsRepo.find({
+      where: { MethodId: { id: id } },
+    });
+    if (!details) {
+      throw new NotFoundException(`PaymentMethodDetails #${id} not found`);
+    }
+    return details;
+  }
+
   async create(data: PaymentMethodDetailsDto) {
     const newPaymentMethodDetails = this.PaymentMethodDetailsRepo.create(data);
     try {

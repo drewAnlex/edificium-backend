@@ -33,6 +33,18 @@ export class PaymentMethodListController {
     return this.paymentMethodListService.findAll();
   }
 
+  @Roles('Staff', 'Admin', 'User')
+  @Get('building/:id')
+  getByBuilding(@Param('id', ParseIntPipe) id: number) {
+    return this.paymentMethodListService.findByBuilding(id);
+  }
+
+  @Roles('Staff', 'Admin', 'User')
+  @Get('individual/:id')
+  getByIndividualBill(@Param('id', ParseIntPipe) id: number) {
+    return this.paymentMethodListService.findByIndividualBill(id);
+  }
+
   @Roles('Staff')
   @Get(':id')
   get(@Param('id', ParseIntPipe) id: number) {

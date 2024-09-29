@@ -57,7 +57,7 @@ export class IndividualBillsService {
   async findOne(id: number) {
     const bill = await this.billRepo.findOne({
       where: { id: id },
-      relations: ['buildingBillId'],
+      relations: ['buildingBillId', 'buildingBillId.buildingId'],
     });
     if (!bill) {
       throw new NotFoundException(`Bill #${id} not found`);
