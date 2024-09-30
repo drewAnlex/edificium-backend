@@ -30,7 +30,7 @@ export class PaymentMethodListService {
 
   async findByIndividualBill(id: number) {
     const individualBill = await this.ibService.findOne(id);
-    const building = individualBill.buildingBillId.buildingId.id;
+    const building = individualBill.apartmentId.buildingId.id;
     const list = await this.findByBuilding(building);
     return list;
   }
