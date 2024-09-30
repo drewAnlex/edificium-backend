@@ -94,26 +94,41 @@ export class PaymentsService {
   async updateStatus(id: number, status: number) {
     const payment = await this.findOne(id);
     const bill = await this.ibService.findOne(payment.IndividualBill.id);
-    const buildingBill = await this.bbService.findOne(bill.buildingBillId.id);
+
+    // Manejar la ausencia de buildingBill
+    let buildingBill;
+    try {
+      buildingBill = await this.bbService.findOne(bill.buildingBillId.id);
+    } catch (error) {
+      // Si no se encuentra buildingBill, ignora la actualización de su balance
+      console.warn('Building Bill not found:', error.message);
+    }
+
     const balance: string = bill.Balance.toString();
-    const buildingBalance: string = buildingBill.balance.toString();
     const amount: string = payment.Amount.toString();
     const newBalance: number = parseFloat(amount) + parseFloat(balance);
-    const updatedBalance: number = parseFloat(buildingBalance) + newBalance;
-    if (newBalance == bill.Total) bill.IsPaid = true;
+
+    // Actualizar IsPaid solo para individualBill
+    if (newBalance === bill.Total) {
+      bill.IsPaid = true;
+    }
+
     await this.paymentRepo.merge(payment, { Status: status });
     await this.paymentRepo.save(payment);
-    try {
-      await this.ibService.update(bill.id, {
-        Balance: newBalance,
-        IsPaid: bill.IsPaid,
-      });
-      await this.bbService.update(buildingBill.id, {
-        balance: updatedBalance,
-      });
-    } catch (error) {
-      throw new HttpException(`Error ${error}`, 400);
+
+    // Actualizar individualBill
+    await this.ibService.update(bill.id, {
+      Balance: newBalance,
+      IsPaid: bill.IsPaid,
+    });
+
+    // Actualizar buildingBill si existe
+    if (buildingBill) {
+      const updatedBalance: number =
+        parseFloat(buildingBill.balance.toString()) + newBalance;
+      await this.bbService.update(buildingBill.id, { balance: updatedBalance });
     }
+
     return payment;
   }
 }
