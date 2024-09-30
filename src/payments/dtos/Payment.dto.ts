@@ -28,7 +28,7 @@ export class PaymentDTO implements Readonly<PaymentDTO> {
   @IsNumber()
   Method: PaymentMethod;
 
-  @IsNotEmpty()
+  @IsOptional()
   UserId: User;
 }
 

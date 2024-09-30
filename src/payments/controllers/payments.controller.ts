@@ -52,8 +52,9 @@ export class PaymentsController {
 
   @Roles('Staff', 'User', 'Admin')
   @Post()
-  createPayment(@Body() data: PaymentDTO) {
-    return this.paymentService.create(data);
+  createPayment(@Body() data: PaymentDTO, @Req() req: Request) {
+    const user = req.user as any;
+    return this.paymentService.create(data, user.userId);
   }
 
   @Roles('Staff')

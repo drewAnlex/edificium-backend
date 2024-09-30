@@ -10,7 +10,7 @@ export class PaymentInfoDto implements Readonly<PaymentInfoDto> {
 
   @IsNotEmpty()
   @IsNumber()
-  paymentId: Payment;
+  payment: Payment;
 
   @IsNotEmpty()
   @IsString()

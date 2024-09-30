@@ -40,7 +40,7 @@ export class PaymentInfoController {
     return this.paymentInfoService.findByPaymentId(paymentId);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin', 'User')
   @Post()
   create(@Body() payload: PaymentInfoDto) {
     return this.paymentInfoService.create(payload);

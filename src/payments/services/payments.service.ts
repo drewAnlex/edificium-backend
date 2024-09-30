@@ -66,8 +66,8 @@ export class PaymentsService {
     return payment;
   }
 
-  async create(data: PaymentDTO) {
-    const newPayment = this.paymentRepo.create(data);
+  async create(data: PaymentDTO, id: number) {
+    const newPayment = this.paymentRepo.create({ ...data, UserId: { id: id } });
     try {
       await this.paymentRepo.save(newPayment);
     } catch (error) {

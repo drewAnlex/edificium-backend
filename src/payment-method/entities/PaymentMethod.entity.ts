@@ -9,6 +9,7 @@ import {
 import { Payment } from '../../payments/entities/Payment.entity';
 import { PaymentInfo } from '../../payments/entities/payment-info.entity';
 import { PaymentMethodDetails } from './payment-method-details.entity';
+import { PaymentMethodFields } from './payment-method-fields.entity';
 
 @Entity()
 export class PaymentMethod {
@@ -26,6 +27,12 @@ export class PaymentMethod {
 
   @OneToMany(() => PaymentInfo, (paymentInfo) => paymentInfo.methodId)
   paymentInfos: PaymentInfo[];
+
+  @OneToMany(
+    () => PaymentMethodFields,
+    (paymentMethodField) => paymentMethodField.methodId,
+  )
+  paymentFields: PaymentMethodFields[];
 
   @OneToMany(
     () => PaymentMethodDetails,
