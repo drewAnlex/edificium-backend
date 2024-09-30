@@ -34,7 +34,7 @@ export class PaymentInfoController {
     return this.paymentInfoService.findOne(id);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin', 'User')
   @Get('payment/:paymentId')
   getByPaymentId(@Param('paymentId', ParseIntPipe) paymentId: number) {
     return this.paymentInfoService.findByPaymentId(paymentId);

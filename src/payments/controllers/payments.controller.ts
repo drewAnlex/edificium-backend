@@ -44,7 +44,7 @@ export class PaymentsController {
     return this.paymentService.findBuildingPayments(user.building);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin')
   @Get(':id')
   getPayment(@Param('id', ParseIntPipe) id: number) {
     return this.paymentService.findOne(id);
