@@ -119,7 +119,7 @@ export class PaymentsService {
     // Actualizar individualBill
     await this.ibService.update(bill.id, {
       Balance: newBalance,
-      IsPaid: true,
+      IsPaid: newBalance >= bill.Total ? true : false,
     });
 
     // Actualizar buildingBill si existe
