@@ -1,14 +1,22 @@
 import * as fs from 'fs/promises';
-import { Injectable } from '@nestjs/common';
-import * as FormData from 'form-data';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+// import * as FormData from 'form-data';
 import Mailgun from 'mailgun.js';
 import * as path from 'path';
+import { BuildingBillsService } from 'src/payments/services/building-bills.service';
+import { IndividualBillsService } from 'src/payments/services/individual-bills.service';
+import { BillingService } from 'src/reports/services/billing.service';
 
 @Injectable()
 export class OutboundService {
   private readonly mg: any;
 
-  constructor() {
+  constructor(
+    @Inject(forwardRef(() => BuildingBillsService))
+    private buildingBill: BuildingBillsService,
+    private individualBill: IndividualBillsService,
+    private billing: BillingService,
+  ) {
     const mailgun = new Mailgun(FormData);
     this.mg = mailgun.client({
       username: 'api',
@@ -59,5 +67,38 @@ export class OutboundService {
       console.error(error); // logs any error
       throw new Error(error);
     }
+  }
+  async buildingBillEmail(building: number): Promise<void> {
+    const relativePath = '../../templates/receipt.html';
+    const absolutePath = path.resolve(__dirname, relativePath);
+    const bill = await this.buildingBill.getLatestForEmail(building);
+    const apartments = bill.buildingId.apartments;
+    apartments.forEach(async (apartment) => {
+      const debt = await this.individualBill.adminIndividualDebt(apartment.id);
+      if (debt != 0 && apartment.userId.email) {
+        const user = apartment.userId;
+        const buffer = await this.billing.generateBillPDF(bill.id, user.id);
+        try {
+          const receipt = await fs.readFile(absolutePath, 'utf8');
+          const messageData = {
+            from: process.env.EMAIL_SYSTEM_ADDR,
+            to: [user.email],
+            subject: bill.name,
+            text: 'Avsio de cobro',
+            html: receipt,
+            attachment: buffer,
+          };
+
+          const response = await this.mg.messages.create(
+            process.env.MAILING_DOMAIN,
+            messageData,
+          );
+          console.log(response); // logs response data
+        } catch (error) {
+          console.error(error); // logs any error
+          throw new Error(error);
+        }
+      }
+    });
   }
 }

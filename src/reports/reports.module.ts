@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { BillingService } from './services/billing.service';
 import { BillingController } from './controllers/billing.controller';
 import { PaymentsModule } from 'src/payments/payments.module';
@@ -14,6 +14,7 @@ import { IndividualBillsService } from 'src/payments/services/individual-bills.s
 import { UsersService } from 'src/users/services/users.service';
 import { User } from 'src/users/entities/User.entity';
 import { OutboundService } from 'src/mailing/services/outbound.service';
+import { MailingModule } from 'src/mailing/mailing.module';
 
 @Module({
   imports: [
@@ -24,8 +25,9 @@ import { OutboundService } from 'src/mailing/services/outbound.service';
       Expense,
       User,
     ]),
-    PaymentsModule,
-    BuildingsModule,
+    forwardRef(() => PaymentsModule),
+    forwardRef(() => BuildingsModule),
+    forwardRef(() => MailingModule),
   ],
   providers: [
     BillingService,

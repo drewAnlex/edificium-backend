@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { BuildingBillsService } from './services/building-bills.service';
 import { IndividualBillsService } from './services/individual-bills.service';
 import { IndividualBillsController } from './controllers/individual-bills.controller';
@@ -19,18 +19,31 @@ import { MyBuildingBillsController } from './controllers/my-building-bills.contr
 import { Expense } from './entities/Expense.entity';
 import { ExpenseService } from './services/expense.service';
 import { ExpenseController } from './controllers/expense.controller';
+import { MailingModule } from 'src/mailing/mailing.module';
+import { OutboundService } from 'src/mailing/services/outbound.service';
+import { Building } from 'src/buildings/entities/building.entity';
+import { BillingService } from 'src/reports/services/billing.service';
+import { ReportsModule } from 'src/reports/reports.module';
+import { UsersService } from 'src/users/services/users.service';
+import { UsersModule } from 'src/users/users.module';
+import { User } from 'src/users/entities/User.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
+      Building,
       Apartment,
       BuildingBill,
       IndividualBill,
       Payment,
       PaymentInfo,
       Expense,
+      User,
     ]),
-    BuildingsModule,
+    forwardRef(() => BuildingsModule),
+    forwardRef(() => MailingModule),
+    forwardRef(() => ReportsModule),
+    forwardRef(() => UsersModule),
   ],
   providers: [
     BuildingBillsService,
@@ -38,6 +51,9 @@ import { ExpenseController } from './controllers/expense.controller';
     PaymentsService,
     PaymentInfoService,
     ExpenseService,
+    BillingService,
+    OutboundService,
+    UsersService,
   ],
   controllers: [
     BuildingBillsController,

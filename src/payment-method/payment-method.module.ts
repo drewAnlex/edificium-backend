@@ -25,6 +25,8 @@ import { BuildingsService } from 'src/buildings/services/buildings.service';
 import { PaymentMethodFieldsService } from './services/payment-method-fields.service';
 import { PaymentMethodFields } from './entities/payment-method-fields.entity';
 import { PaymentMethodFieldsController } from './controllers/payment-method-fields.controller';
+import { ReportsModule } from 'src/reports/reports.module';
+import { BillingService } from 'src/reports/services/billing.service';
 
 @Module({
   imports: [
@@ -41,6 +43,7 @@ import { PaymentMethodFieldsController } from './controllers/payment-method-fiel
       PaymentMethodFields,
     ]),
     PaymentMethodModule,
+    ReportsModule,
   ],
   controllers: [
     PaymentMethodsController,
@@ -59,6 +62,7 @@ import { PaymentMethodFieldsController } from './controllers/payment-method-fiel
     OutboundService,
     BuildingsService,
     PaymentMethodFieldsService,
+    BillingService,
   ],
 })
 export class PaymentMethodModule {}

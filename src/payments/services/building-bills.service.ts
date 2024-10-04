@@ -1,6 +1,8 @@
 import {
+  forwardRef,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -22,9 +24,22 @@ import { v4 as uuidv4 } from 'uuid';
 export class BuildingBillsService {
   constructor(
     @InjectRepository(BuildingBill) private billRepo: Repository<BuildingBill>,
+    @Inject(forwardRef(() => BuildingsService))
     private buildingService: BuildingsService,
     private billService: IndividualBillsService,
   ) {}
+
+  async getLatestForEmail(building: number) {
+    return await this.billRepo.findOne({
+      where: { isPublished: true, buildingId: { id: building } },
+      order: { createdAt: 'DESC' },
+      relations: [
+        'buildingId',
+        'buildingId.apartments',
+        'buildingId.apartments.userId',
+      ],
+    });
+  }
 
   getLatest(buildingId: number) {
     return this.billRepo.findOne({
