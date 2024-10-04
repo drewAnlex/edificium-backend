@@ -75,7 +75,7 @@ export class OutboundService {
     const apartments = bill.buildingId.apartments;
     apartments.forEach(async (apartment) => {
       const debt = await this.individualBill.adminIndividualDebt(apartment.id);
-      if (debt != 0 && apartment.userId.email) {
+      if (debt != 0 && apartment?.userId?.email) {
         const user = apartment.userId;
         const buffer = await this.billing.generateBillPDF(bill.id, user.id);
         try {
