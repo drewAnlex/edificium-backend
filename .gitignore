@@ -1,4 +1,6 @@
 *.env
+*.crt
+*.key
 docker-compose.yaml
 ngrok.exe
 docker-compose.yaml

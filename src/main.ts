@@ -4,11 +4,19 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
+import * as fs from 'fs';
 
 const port = process.env.PORT || 3000;
 
+const httpsOptions = {
+  key: fs.readFileSync(process.env.KEY),
+  cert: fs.readFileSync(process.env.CRT),
+};
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    httpsOptions,
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
