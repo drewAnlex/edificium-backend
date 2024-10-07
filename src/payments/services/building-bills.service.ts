@@ -226,14 +226,15 @@ export class BuildingBillsService {
   async setToPublished(uuid: string) {
     const bill = await this.findOneByUuid(uuid);
     const building = await this.buildingService.findOne(bill.buildingId.id);
+    const nApartments = building.nApartments;
     let totalPerShare = 0;
     let totalNotPerShare = 0;
     bill.expenses.forEach((expense) => {
       if (expense.dependsOnShare) {
-        totalPerShare = totalPerShare + expense.total;
+        const gasto = expense.total.toString();
+        totalPerShare = totalPerShare + parseFloat(gasto);
       } else {
-        totalNotPerShare =
-          totalNotPerShare + expense.total / building.nApartments;
+        totalNotPerShare = totalNotPerShare + expense.total / nApartments;
       }
     });
     (await building).apartments.forEach((Apartment) => {
