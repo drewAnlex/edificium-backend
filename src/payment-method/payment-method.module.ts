@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PaymentMethodsService } from './services/payment-methods.service';
 import { PaymentMethodsController } from './controllers/payment-methods.controller';
 import { PaymentMethodListService } from './services/payment-method-list.service';
@@ -43,7 +43,7 @@ import { BillingService } from 'src/reports/services/billing.service';
       PaymentMethodFields,
     ]),
     PaymentMethodModule,
-    ReportsModule,
+    forwardRef(() => ReportsModule),
   ],
   controllers: [
     PaymentMethodsController,

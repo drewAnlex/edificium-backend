@@ -15,6 +15,11 @@ import { UsersService } from 'src/users/services/users.service';
 import { User } from 'src/users/entities/User.entity';
 import { OutboundService } from 'src/mailing/services/outbound.service';
 import { MailingModule } from 'src/mailing/mailing.module';
+import { PaymentMethodModule } from 'src/payment-method/payment-method.module';
+import { PaymentMethodListService } from 'src/payment-method/services/payment-method-list.service';
+import { PaymentMethodList } from 'src/payment-method/entities/payment-method-list.entity';
+import { PaymentMethodDetailsService } from 'src/payment-method/services/payment-method-details.service';
+import { PaymentMethodDetails } from 'src/payment-method/entities/payment-method-details.entity';
 
 @Module({
   imports: [
@@ -24,12 +29,17 @@ import { MailingModule } from 'src/mailing/mailing.module';
       IndividualBill,
       Expense,
       User,
+      PaymentMethodList,
+      PaymentMethodDetails,
     ]),
     forwardRef(() => PaymentsModule),
+    forwardRef(() => PaymentMethodModule),
     forwardRef(() => BuildingsModule),
     forwardRef(() => MailingModule),
   ],
   providers: [
+    PaymentMethodListService,
+    PaymentMethodDetailsService,
     BillingService,
     BuildingBillsService,
     IndividualBillsService,

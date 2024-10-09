@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import PDFDocument from 'pdfkit-table';
+import { PaymentMethodDetailsService } from 'src/payment-method/services/payment-method-details.service';
+import { PaymentMethodListService } from 'src/payment-method/services/payment-method-list.service';
 import { BuildingBillsService } from 'src/payments/services/building-bills.service';
 import { IndividualBillsService } from 'src/payments/services/individual-bills.service';
 
@@ -11,6 +13,8 @@ export class BillingService {
   constructor(
     private bbService: BuildingBillsService,
     private ibService: IndividualBillsService,
+    private paymnetMethodList: PaymentMethodListService,
+    private paymentMethodDetails: PaymentMethodDetailsService,
   ) {}
   async generateBillPDF(bill: number, user: number): Promise<Buffer> {
     const data = await this.bbService.findOneByOwner(bill, user);
@@ -29,6 +33,13 @@ export class BillingService {
     });
     const totalGeneral = await this.ibService.adminIndividualDebt(
       data.apartment.id,
+    );
+    let paymentMethodList = await this.paymnetMethodList.findByIndividualBill(
+      individualBill.id,
+    );
+
+    paymentMethodList = paymentMethodList.filter(
+      (paymentMethod) => paymentMethod.status === 1,
     );
 
     const logoUrl = 'http://67.205.149.177/images/icon.jpeg';
@@ -49,16 +60,28 @@ export class BillingService {
         doc.font('Helvetica').fontSize(10);
 
         // Building information in header
-        doc.text(
-          `${data.bill.buildingId.name}, ${data.bill.buildingId.fiscalId}`,
-          50,
-          20,
-        );
-        doc.text(
-          `${data.bill.buildingId.city}, ${data.bill.buildingId.zone}`,
-          50,
-          35,
-        );
+        doc.text(``, 50, 20);
+        const adressOptions = {
+          width: doc.page.width, // Adjust table width
+          cellPadding: 5, // Add some padding to cells
+          headerRows: 1, // Only show header row as bold
+          columnsSize: [350],
+          divider: {
+            header: { disabled: true, width: 2, opacity: 1 },
+            horizontal: { disabled: true, width: 0.5, opacity: 0.5 },
+          },
+        };
+        const adressTable = {
+          headers: [
+            {
+              label: `${data.bill.buildingId.name}, ${data.bill.buildingId.fiscalId}`,
+              headerColor: 'white',
+            },
+          ],
+          rows: [[data.bill.buildingId.zone]],
+        };
+        doc.table(adressTable, adressOptions);
+        // doc.text(`${data.bill.buildingId.zone}`, 50, 35);
         doc.font('Helvetica-Bold').fontSize(18).fillColor('purple'); // Adjust font size and color
 
         doc.text('NEXIADMIN', doc.page.width - 220, 25, { align: 'left' });
@@ -212,6 +235,18 @@ export class BillingService {
       };
       doc.table(totalsTable, tableOptions);
       doc.text(`AP: A: Aplica por alícuota P: Aplica por propietario `);
+
+      doc.moveDown(2);
+      doc.font('Helvetica-Bold').fontSize(12);
+      doc.text(`Metodos de pago:`);
+      doc.font('Helvetica').fontSize(10);
+      paymentMethodList.map((method) => {
+        doc.text(`${method.name}`);
+        method.paymentDetails.map((detail) => {
+          doc.text(`${detail.Name}: ${detail.description}`);
+        });
+        doc.moveDown(2);
+      });
 
       const buffer = [];
       doc.on('data', buffer.push.bind(buffer));

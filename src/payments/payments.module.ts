@@ -27,6 +27,11 @@ import { ReportsModule } from 'src/reports/reports.module';
 import { UsersService } from 'src/users/services/users.service';
 import { UsersModule } from 'src/users/users.module';
 import { User } from 'src/users/entities/User.entity';
+import { PaymentMethodModule } from 'src/payment-method/payment-method.module';
+import { PaymentMethodListService } from 'src/payment-method/services/payment-method-list.service';
+import { PaymentMethodList } from 'src/payment-method/entities/payment-method-list.entity';
+import { PaymentMethodDetails } from 'src/payment-method/entities/payment-method-details.entity';
+import { PaymentMethodDetailsService } from 'src/payment-method/services/payment-method-details.service';
 
 @Module({
   imports: [
@@ -39,13 +44,18 @@ import { User } from 'src/users/entities/User.entity';
       PaymentInfo,
       Expense,
       User,
+      PaymentMethodList,
+      PaymentMethodDetails,
     ]),
     forwardRef(() => BuildingsModule),
     forwardRef(() => MailingModule),
     forwardRef(() => ReportsModule),
     forwardRef(() => UsersModule),
+    forwardRef(() => PaymentMethodModule),
   ],
   providers: [
+    PaymentMethodListService,
+    PaymentMethodDetailsService,
     BuildingBillsService,
     IndividualBillsService,
     PaymentsService,

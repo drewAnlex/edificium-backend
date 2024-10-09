@@ -20,12 +20,18 @@ import { BuildingsService } from 'src/buildings/services/buildings.service';
 import { BuildingsModule } from 'src/buildings/buildings.module';
 import { IndividualBill } from 'src/payments/entities/IndividualBill.entity';
 import { Building } from 'src/buildings/entities/building.entity';
+import { PaymentMethodModule } from 'src/payment-method/payment-method.module';
+import { PaymentMethodListService } from 'src/payment-method/services/payment-method-list.service';
+import { PaymentMethodList } from 'src/payment-method/entities/payment-method-list.entity';
+import { PaymentMethodDetailsService } from 'src/payment-method/services/payment-method-details.service';
+import { PaymentMethodDetails } from 'src/payment-method/entities/payment-method-details.entity';
 
 @Module({
   imports: [
     MailingModule,
     PaymentsModule,
     forwardRef(() => ReportsModule),
+    forwardRef(() => PaymentMethodModule),
     forwardRef(() => BuildingsModule),
     TypeOrmModule.forFeature([
       Role,
@@ -33,10 +39,14 @@ import { Building } from 'src/buildings/entities/building.entity';
       BuildingBill,
       IndividualBill,
       Building,
+      PaymentMethodList,
+      PaymentMethodDetails,
     ]),
   ],
   controllers: [UsersController, RolesController, ProfileController],
   providers: [
+    PaymentMethodListService,
+    PaymentMethodDetailsService,
     UsersService,
     RolesService,
     OutboundService,
