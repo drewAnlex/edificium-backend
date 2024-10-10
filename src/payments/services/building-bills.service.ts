@@ -220,7 +220,16 @@ export class BuildingBillsService {
     if (bill.userId.id != userId) {
       throw new NotFoundException(`Building Bill #${id} not found`);
     }
-    return this.billRepo.delete(id);
+    try {
+      this.billRepo.merge(bill, { isRemoved: true });
+      await this.billRepo.save(bill);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred: ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return bill;
   }
 
   async setToPublished(uuid: string) {
@@ -246,6 +255,7 @@ export class BuildingBillsService {
         Description: bill.description,
         IsPaid: false,
         Balance: 0,
+        isRemoved: false,
       };
       try {
         this.billService.create(payload);

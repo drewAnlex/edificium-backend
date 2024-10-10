@@ -30,6 +30,10 @@ export class CreateExpenseDTO implements Readonly<CreateExpenseDTO> {
   @IsBoolean()
   dependsOnShare: boolean;
 
+  @IsBoolean()
+  @IsOptional()
+  isRemoved: any;
+
   @IsNotEmpty()
   @IsNumber()
   building: Building;

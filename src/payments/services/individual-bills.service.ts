@@ -97,8 +97,18 @@ export class IndividualBillsService {
     return bill;
   }
 
-  remove(id: number) {
-    return this.billRepo.delete(id);
+  async remove(id: number) {
+    const bill = await this.findOne(id);
+    try {
+      this.billRepo.merge(bill, { isRemoved: true });
+      await this.billRepo.save(bill);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred: ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return bill;
   }
 
   async individualDebt(userId: number) {

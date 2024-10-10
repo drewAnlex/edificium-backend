@@ -40,6 +40,9 @@ export class Expense {
   isFixed: boolean;
 
   @Column({ type: 'boolean', default: false })
+  isRemoved: boolean;
+
+  @Column({ type: 'boolean', default: false })
   dependsOnShare: boolean;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

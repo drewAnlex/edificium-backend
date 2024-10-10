@@ -100,7 +100,8 @@ export class ExpenseService {
   async delete(id: number) {
     const expense = await this.findOne(id);
     try {
-      this.expenseRepo.delete(id);
+      this.expenseRepo.merge(expense, { isRemoved: true });
+      await this.expenseRepo.save(expense);
     } catch (error) {
       throw new HttpException(
         `An error occurred: ${error}`,

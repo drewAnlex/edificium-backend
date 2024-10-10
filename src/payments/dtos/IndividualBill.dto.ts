@@ -39,6 +39,10 @@ export class IndividualBillDto implements Readonly<IndividualBillDto> {
   @IsOptional()
   @IsBoolean()
   IsPaid: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  isRemoved: any;
 }
 
 export class UpdateIndividualBillDto extends PartialType(IndividualBillDto) {}

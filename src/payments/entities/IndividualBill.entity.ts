@@ -45,6 +45,9 @@ export class IndividualBill {
   @Column({ type: 'boolean' })
   IsPaid: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  isRemoved: boolean;
+
   @OneToMany(() => Payment, (payment) => payment.IndividualBill)
   payment: Payment;
 

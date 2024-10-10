@@ -24,6 +24,10 @@ export class CreateBuildingBillDTO implements Readonly<CreateBuildingBillDTO> {
   @IsOptional()
   isPublished: any;
 
+  @IsBoolean()
+  @IsOptional()
+  isRemoved: any;
+
   @IsOptional()
   @IsNumber()
   total: number;

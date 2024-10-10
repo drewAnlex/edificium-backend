@@ -54,6 +54,9 @@ export class BuildingBill {
   total: number;
 
   @Column({ type: 'boolean', default: false })
+  isRemoved: boolean;
+
+  @Column({ type: 'boolean', default: false })
   isPublished: boolean;
 
   @Column({ type: 'boolean', default: false })
