@@ -26,7 +26,10 @@ export class IndividualBillsService {
 
   async findByApartment(apartmentId: number, ownerId: number) {
     const bills = await this.billRepo.find({
-      where: { apartmentId: { id: apartmentId, userId: { id: ownerId } } },
+      where: {
+        apartmentId: { id: apartmentId, userId: { id: ownerId } },
+        isRemoved: false,
+      },
       relations: ['buildingBillId'],
       order: { createdAt: 'DESC' },
     });
@@ -40,7 +43,7 @@ export class IndividualBillsService {
 
   async findOneByIdAndApartment(id: number, apartmentId: number) {
     const bill = await this.billRepo.findOne({
-      where: { id: id, apartmentId: { id: apartmentId } },
+      where: { id: id, apartmentId: { id: apartmentId }, isRemoved: false },
       relations: [
         'buildingBillId',
         'buildingBillId.services',
@@ -56,7 +59,7 @@ export class IndividualBillsService {
 
   async findOne(id: number) {
     const bill = await this.billRepo.findOne({
-      where: { id: id },
+      where: { id: id, isRemoved: false },
       relations: [
         'buildingBillId',
         'buildingBillId.buildingId',

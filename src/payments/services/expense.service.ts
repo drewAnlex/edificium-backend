@@ -22,7 +22,7 @@ export class ExpenseService {
 
   async findOne(id: number) {
     const expense = this.expenseRepo.findOne({
-      where: { id: id },
+      where: { id: id, isRemoved: false },
       relations: ['buildingBill'],
     });
     if (!expense) {
@@ -33,7 +33,7 @@ export class ExpenseService {
 
   async findAllByBuilding(building: number) {
     const expenses = this.expenseRepo.find({
-      where: { building: { id: building } },
+      where: { building: { id: building }, isRemoved: false },
       relations: ['buildingBill'],
     });
     if (!expenses) {
@@ -46,7 +46,7 @@ export class ExpenseService {
 
   async findUnpaidsByBuilding(building: number) {
     const expenses = this.expenseRepo.find({
-      where: { building: { id: building }, isPaid: false },
+      where: { building: { id: building }, isPaid: false, isRemoved: false },
       relations: ['buildingBill'],
     });
     if (!expenses) {
@@ -59,7 +59,7 @@ export class ExpenseService {
 
   async findPaidsByBuilding(building: number) {
     const expenses = this.expenseRepo.find({
-      where: { building: { id: building }, isPaid: true },
+      where: { building: { id: building }, isPaid: true, isRemoved: false },
       relations: ['buildingBill'],
     });
     if (!expenses) {

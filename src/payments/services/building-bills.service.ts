@@ -31,7 +31,11 @@ export class BuildingBillsService {
 
   async getLatestForEmail(building: number) {
     return await this.billRepo.findOne({
-      where: { isPublished: true, buildingId: { id: building } },
+      where: {
+        isPublished: true,
+        buildingId: { id: building },
+        isRemoved: false,
+      },
       order: { createdAt: 'DESC' },
       relations: [
         'buildingId',
@@ -43,7 +47,11 @@ export class BuildingBillsService {
 
   getLatest(buildingId: number) {
     return this.billRepo.findOne({
-      where: { isPublished: true, buildingId: { id: buildingId } },
+      where: {
+        isPublished: true,
+        buildingId: { id: buildingId },
+        isRemoved: false,
+      },
       order: { createdAt: 'DESC' },
       relations: [
         'expenses',
@@ -56,7 +64,11 @@ export class BuildingBillsService {
 
   async isNotPublished(buildingId: number) {
     const bills = await this.billRepo.find({
-      where: { isPublished: false, buildingId: { id: buildingId } },
+      where: {
+        isPublished: false,
+        buildingId: { id: buildingId },
+        isRemoved: false,
+      },
       relations: ['buildingId'],
     });
     if (!bills) {
@@ -81,6 +93,7 @@ export class BuildingBillsService {
         {
           buildingId: { id: buildingId, admins: { id: userId } },
           isPublished: true,
+          isRemoved: false,
         },
         {
           buildingId: {
@@ -88,6 +101,7 @@ export class BuildingBillsService {
             apartments: { userId: { id: userId } },
           },
           isPublished: true,
+          isRemoved: false,
         },
       ],
       order: { createdAt: 'DESC' },
@@ -101,8 +115,12 @@ export class BuildingBillsService {
   async findOneByOwner(id: number, userId: number) {
     const bill = await this.billRepo.findOne({
       where: [
-        { id: id, buildingId: { apartments: { userId: { id: userId } } } },
-        { id: id, buildingId: { admins: { id: userId } } },
+        {
+          id: id,
+          buildingId: { apartments: { userId: { id: userId } } },
+          isRemoved: false,
+        },
+        { id: id, buildingId: { admins: { id: userId } }, isRemoved: false },
       ],
       select: ['id', 'name', 'description', 'createdAt', 'total'],
       relations: [
@@ -134,7 +152,7 @@ export class BuildingBillsService {
 
   async findOneByUuid(uuid: string) {
     const bill = await this.billRepo.findOne({
-      where: { uuid: uuid },
+      where: { uuid: uuid, isRemoved: false },
       relations: ['buildingId', 'expenses'],
     });
     if (!bill) {
@@ -145,7 +163,7 @@ export class BuildingBillsService {
 
   async findOne(id: number) {
     const bill = await this.billRepo.findOne({
-      where: { id: id },
+      where: { id: id, isRemoved: false },
       relations: ['buildingId', 'userId', 'expenses', 'individualBills'],
     });
     if (!bill) {
