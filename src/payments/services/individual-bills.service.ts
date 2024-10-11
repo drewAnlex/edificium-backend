@@ -102,6 +102,11 @@ export class IndividualBillsService {
 
   async remove(id: number) {
     const bill = await this.findOne(id);
+    if (bill.buildingBillId != null)
+      throw new HttpException(
+        `Recibo asociado existente`,
+        HttpStatus.BAD_REQUEST,
+      );
     try {
       this.billRepo.merge(bill, { isRemoved: true });
       await this.billRepo.save(bill);
@@ -116,10 +121,19 @@ export class IndividualBillsService {
 
   async individualDebt(userId: number) {
     const bills = await this.billRepo.find({
-      where: {
-        apartmentId: { userId: { id: userId } },
-        IsPaid: false,
-      },
+      where: [
+        {
+          apartmentId: { userId: { id: userId } },
+          IsPaid: false,
+          isRemoved: false,
+          buildingBillId: { isRemoved: false },
+        },
+        {
+          apartmentId: { userId: { id: userId } },
+          IsPaid: false,
+          isRemoved: false,
+        },
+      ],
     });
     console.log(bills);
     let debt = 0;
@@ -133,10 +147,19 @@ export class IndividualBillsService {
 
   async adminIndividualDebt(apartmentId: number) {
     const bills = await this.billRepo.find({
-      where: {
-        apartmentId: { id: apartmentId },
-        IsPaid: false,
-      },
+      where: [
+        {
+          apartmentId: { id: apartmentId },
+          IsPaid: false,
+          isRemoved: false,
+          buildingBillId: { isRemoved: false },
+        },
+        {
+          apartmentId: { id: apartmentId },
+          IsPaid: false,
+          isRemoved: false,
+        },
+      ],
     });
     let debt = 0;
     bills.forEach((bill) => {
@@ -150,8 +173,9 @@ export class IndividualBillsService {
   async apartmentsWithDebt(buildingId: number) {
     const apartments = await this.billRepo.find({
       where: {
-        buildingBillId: { buildingId: { id: buildingId } },
+        buildingBillId: { buildingId: { id: buildingId }, isRemoved: false },
         IsPaid: false,
+        isRemoved: false,
       },
       relations: ['apartmentId'],
     });

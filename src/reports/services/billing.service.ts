@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import PDFDocument from 'pdfkit-table';
-import { PaymentMethodDetailsService } from 'src/payment-method/services/payment-method-details.service';
 import { PaymentMethodListService } from 'src/payment-method/services/payment-method-list.service';
 import { BuildingBillsService } from 'src/payments/services/building-bills.service';
 import { IndividualBillsService } from 'src/payments/services/individual-bills.service';
@@ -14,7 +13,6 @@ export class BillingService {
     private bbService: BuildingBillsService,
     private ibService: IndividualBillsService,
     private paymnetMethodList: PaymentMethodListService,
-    private paymentMethodDetails: PaymentMethodDetailsService,
   ) {}
   async generateBillPDF(bill: number, user: number): Promise<Buffer> {
     const data = await this.bbService.findOneByOwner(bill, user);
@@ -121,10 +119,10 @@ export class BillingService {
       doc.text(`Fecha de emisión: ${formatter.format(data.bill.createdAt)}`);
 
       const fixedExpenses = data.bill.expenses.filter(
-        (expense) => expense.isFixed,
+        (expense) => expense.isFixed && expense.isRemoved === false,
       );
       const variableExpenses = data.bill.expenses.filter(
-        (expense) => !expense.isFixed,
+        (expense) => !expense.isFixed && expense.isRemoved === false,
       );
       const totalRecibo = data.bill.total;
       const totalCuota = individualBill?.Total || 0; // Manejar posible valor indefinido

@@ -22,7 +22,7 @@ export class ExpenseService {
 
   async findOne(id: number) {
     const expense = this.expenseRepo.findOne({
-      where: { id: id, isRemoved: false },
+      where: { id: id, isRemoved: false, buildingBill: { isRemoved: false } },
       relations: ['buildingBill'],
     });
     if (!expense) {
@@ -33,7 +33,11 @@ export class ExpenseService {
 
   async findAllByBuilding(building: number) {
     const expenses = this.expenseRepo.find({
-      where: { building: { id: building }, isRemoved: false },
+      where: {
+        building: { id: building },
+        isRemoved: false,
+        buildingBill: { isRemoved: false },
+      },
       relations: ['buildingBill'],
     });
     if (!expenses) {
@@ -46,7 +50,12 @@ export class ExpenseService {
 
   async findUnpaidsByBuilding(building: number) {
     const expenses = this.expenseRepo.find({
-      where: { building: { id: building }, isPaid: false, isRemoved: false },
+      where: {
+        building: { id: building },
+        isPaid: false,
+        isRemoved: false,
+        buildingBill: { isRemoved: false },
+      },
       relations: ['buildingBill'],
     });
     if (!expenses) {
@@ -59,7 +68,12 @@ export class ExpenseService {
 
   async findPaidsByBuilding(building: number) {
     const expenses = this.expenseRepo.find({
-      where: { building: { id: building }, isPaid: true, isRemoved: false },
+      where: {
+        building: { id: building },
+        isPaid: true,
+        isRemoved: false,
+        buildingBill: { isRemoved: false },
+      },
       relations: ['buildingBill'],
     });
     if (!expenses) {
@@ -99,6 +113,11 @@ export class ExpenseService {
 
   async delete(id: number) {
     const expense = await this.findOne(id);
+    if (expense.buildingBill != null)
+      throw new HttpException(
+        `Recibo asociado existente`,
+        HttpStatus.BAD_REQUEST,
+      );
     try {
       this.expenseRepo.merge(expense, { isRemoved: true });
       await this.expenseRepo.save(expense);

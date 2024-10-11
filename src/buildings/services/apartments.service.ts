@@ -44,11 +44,15 @@ export class ApartmentsService {
         'userId',
         'individualBills',
         'individualBills.apartmentId',
+        'individualBills.buildingBillId',
       ],
     });
     if (!apartment) {
       throw new NotFoundException(`Apartment #${id} not found`);
     }
+    apartment.individualBills = apartment.individualBills.filter(
+      (bill) => bill.isRemoved === false,
+    );
     return apartment;
   }
 
@@ -65,7 +69,11 @@ export class ApartmentsService {
     }
 
     apartments.forEach((apartment) => {
+      apartment.individualBills = apartment.individualBills.filter(
+        (bill) => bill.IsPaid === false && bill.isRemoved === false,
+      );
       apartment.balance = apartment.individualBills.reduce((total, bill) => {
+        // Solo sumamos al total si la factura NO está pagada
         return total + (bill.Total - bill.Balance);
       }, 0);
       apartment.balance = parseFloat(apartment.balance.toFixed(2));

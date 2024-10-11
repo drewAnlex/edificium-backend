@@ -235,7 +235,7 @@ export class BuildingBillsService {
 
   async deleteByAdmin(id: number, userId: number) {
     const bill = await this.findOne(id);
-    if (bill.userId.id != userId) {
+    if (bill.userId.id != userId || bill.isPublished === true) {
       throw new NotFoundException(`Building Bill #${id} not found`);
     }
     try {
@@ -302,6 +302,7 @@ export class BuildingBillsService {
         buildingId: { id: buildingId },
         isPaid: false,
         isPublished: true,
+        isRemoved: false,
       },
     });
     let debt = 0;
