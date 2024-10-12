@@ -22,7 +22,17 @@ export class ExpenseService {
 
   async findOne(id: number) {
     const expense = this.expenseRepo.findOne({
-      where: { id: id, isRemoved: false, buildingBill: { isRemoved: false } },
+      where: [
+        {
+          id: id,
+          isRemoved: false,
+          buildingBill: { isRemoved: false },
+        },
+        {
+          id: id,
+          isRemoved: false,
+        },
+      ],
       relations: ['buildingBill'],
     });
     if (!expense) {
@@ -32,12 +42,18 @@ export class ExpenseService {
   }
 
   async findAllByBuilding(building: number) {
-    const expenses = this.expenseRepo.find({
-      where: {
-        building: { id: building },
-        isRemoved: false,
-        buildingBill: { isRemoved: false },
-      },
+    const expenses = await this.expenseRepo.find({
+      where: [
+        {
+          building: { id: building },
+          isRemoved: false,
+          buildingBill: { isRemoved: false },
+        },
+        {
+          building: { id: building },
+          isRemoved: false,
+        },
+      ],
       relations: ['buildingBill'],
     });
     if (!expenses) {
@@ -45,7 +61,11 @@ export class ExpenseService {
         `Expenses in building #${building} not found`,
       );
     }
-    return expenses;
+    return expenses.filter(
+      (expense) =>
+        (expense.buildingBill && expense.buildingBill.isRemoved === false) ||
+        (expense.buildingBill === null && expense.isRemoved === false),
+    );
   }
 
   async findUnpaidsByBuilding(building: number) {
@@ -100,7 +120,7 @@ export class ExpenseService {
   async update(payload: UpdateExpenseDTO, id: number) {
     const expense = await this.findOne(id);
     try {
-      await this.expenseRepo.merge(expense, payload);
+      this.expenseRepo.merge(expense, payload);
       await this.expenseRepo.save(expense);
     } catch (error) {
       throw new HttpException(
