@@ -16,7 +16,7 @@ export class PaymentMethod {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 32, unique: true })
+  @Column({ type: 'varchar', length: 32 })
   name: string;
 
   @Column({ type: 'int' })

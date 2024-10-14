@@ -27,7 +27,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       role: user.role.Name,
-      building: user.building ? user.building.id : null,
+      building: user.building ? user.building : null,
       apartments: user.apartments ? user.apartments.map((a) => a.id) : null,
     };
     return {

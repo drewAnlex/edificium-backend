@@ -99,7 +99,7 @@ export class BuildingsService {
     const building = await this.buildingRepo.findOne({ where: { uuid } });
     if (!building) throw new NotFoundException(`Building #${uuid} not found`);
     const admin = await this.userService.findOne(adminId);
-    admin.building = building;
+    admin.building.push(building);
     await this.userService.update(adminId, admin);
     return { message: 'Building admin assigned' };
   }
@@ -118,5 +118,15 @@ export class BuildingsService {
       throw new NotFoundException(`Building #${buildingId} not found`);
     }
     return building;
+  }
+
+  async getBuildingsByAdmin(id: number) {
+    const buildings = await this.buildingRepo.find({
+      where: { admins: { id: id } },
+    });
+    if (!buildings) {
+      throw new NotFoundException(`Building not found`);
+    }
+    return buildings;
   }
 }

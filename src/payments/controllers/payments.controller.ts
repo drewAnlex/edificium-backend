@@ -38,10 +38,9 @@ export class PaymentsController {
   }
 
   @Roles('Admin')
-  @Get('building')
-  getBuildingPayments(@Req() req: Request) {
-    const user = req.user as any;
-    return this.paymentService.findBuildingPayments(user.building);
+  @Get('building/:id')
+  getBuildingPayments(@Param('id', ParseIntPipe) id: number) {
+    return this.paymentService.findBuildingPayments(id);
   }
 
   @Roles('Staff', 'Admin')

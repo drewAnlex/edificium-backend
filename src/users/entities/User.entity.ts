@@ -8,6 +8,8 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Building } from '../../buildings/entities/building.entity';
 import { Payment } from '../../payments/entities/Payment.entity';
@@ -37,8 +39,9 @@ export class User {
   @Column({ type: 'int', default: 1 })
   status: number;
 
-  @ManyToOne(() => Building, (building) => building.id, { nullable: true })
-  building: Building;
+  @ManyToMany(() => Building, (building) => building.admins)
+  @JoinTable()
+  building: Building[];
 
   @OneToMany(() => Apartment, (apartment) => apartment.userId)
   apartments: Apartment[];

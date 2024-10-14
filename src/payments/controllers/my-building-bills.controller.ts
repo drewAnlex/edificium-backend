@@ -36,10 +36,9 @@ export class MyBuildingBillsController {
   }
 
   @Roles('Admin')
-  @Get('unpublished')
-  getUnpublished(@Req() req: Request) {
-    const user = req.user as any;
-    return this.buildingBillService.isNotPublished(user.building);
+  @Get('unpublished/:id')
+  getUnpublished(@Param('id', ParseIntPipe) id: number) {
+    return this.buildingBillService.isNotPublished(id);
   }
 
   @Roles('User', 'Admin')
@@ -69,10 +68,14 @@ export class MyBuildingBillsController {
   }
 
   @Roles('Admin')
-  @Post()
-  create(@Body() payload: CreateBuildingBillDTO, @Req() req: Request) {
+  @Post(':id')
+  create(
+    @Body() payload: CreateBuildingBillDTO,
+    @Req() req: Request,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     const user = req.user as any;
-    return this.buildingBillService.create(payload, user.userId, user.building);
+    return this.buildingBillService.create(payload, user.userId, id);
   }
 
   @Roles('Admin')

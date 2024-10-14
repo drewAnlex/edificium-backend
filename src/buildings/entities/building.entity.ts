@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToMany,
 } from 'typeorm';
 import { Apartment } from './apartment.entity';
 import { Expense } from 'src/payments/entities/Expense.entity';
@@ -48,7 +49,7 @@ export class Building {
   @Column({ type: 'varchar', length: 32, nullable: false })
   status: string;
 
-  @OneToMany(() => User, (user) => user.building)
+  @ManyToMany(() => User, (user) => user.building)
   admins: User[];
 
   @OneToMany(() => BuildingBill, (buildingBill) => buildingBill.buildingId)
