@@ -50,11 +50,7 @@ export class BillingService {
         autoFirstPage: false,
       });
 
-      let pageNumber = 0;
       doc.on('pageAdded', () => {
-        pageNumber++;
-        const bottom = doc.page.margins.bottom;
-
         doc.font('Helvetica').fontSize(10);
 
         // Building information in header
@@ -93,19 +89,8 @@ export class BillingService {
           .lineTo(doc.page.width - 50, 55)
           .stroke();
 
-        doc.page.margins.bottom = 0;
-        doc.font('Helvetica').fontSize(14).fillColor('black');
-        doc.text(
-          'Pág. ' + pageNumber,
-          0.5 * (doc.page.width - 100),
-          doc.page.height - 50,
-          {
-            width: 100,
-            align: 'center',
-            lineBreak: false,
-          },
-        );
-        doc.page.margins.bottom = bottom;
+        doc.text('', 50, 70);
+        doc.font('Helvetica').fontSize(10).fillColor('black');
       });
 
       doc.addPage();
@@ -146,10 +131,10 @@ export class BillingService {
         ],
         rows: [
           [
-            totalRecibo.toFixed(2).toString(),
+            totalRecibo?.toFixed(2),
             totalCuota.toString(),
-            totalDeuda.toString(),
-            totalGeneral.toString(),
+            totalDeuda?.toFixed(2),
+            totalGeneral?.toFixed(2),
           ],
         ],
       };
@@ -239,11 +224,23 @@ export class BillingService {
       doc.text(`Metodos de pago:`);
       doc.font('Helvetica').fontSize(10);
       paymentMethodList.map((method) => {
+        if (
+          doc.y + doc.currentLineHeight(true) >
+          doc.page.height - doc.page.margins.bottom
+        ) {
+          doc.addPage();
+        }
         doc.text(`${method.name}`);
         method.paymentDetails.map((detail) => {
+          if (
+            doc.y + doc.currentLineHeight(true) >
+            doc.page.height - doc.page.margins.bottom
+          ) {
+            doc.addPage();
+          }
           doc.text(`${detail.Name}: ${detail.description}`);
         });
-        doc.moveDown(2);
+        doc.moveDown(1);
       });
 
       const buffer = [];
