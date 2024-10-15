@@ -20,6 +20,7 @@ import { PaymentMethodListService } from 'src/payment-method/services/payment-me
 import { PaymentMethodList } from 'src/payment-method/entities/payment-method-list.entity';
 import { PaymentMethodDetailsService } from 'src/payment-method/services/payment-method-details.service';
 import { PaymentMethodDetails } from 'src/payment-method/entities/payment-method-details.entity';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -32,18 +33,19 @@ import { PaymentMethodDetails } from 'src/payment-method/entities/payment-method
       PaymentMethodList,
       PaymentMethodDetails,
     ]),
+    forwardRef(() => UsersModule),
     forwardRef(() => PaymentsModule),
     forwardRef(() => PaymentMethodModule),
     forwardRef(() => BuildingsModule),
     forwardRef(() => MailingModule),
   ],
   providers: [
+    UsersService,
     PaymentMethodListService,
     PaymentMethodDetailsService,
     BillingService,
     BuildingBillsService,
     IndividualBillsService,
-    UsersService,
     ApartmentsService,
     OutboundService,
   ],

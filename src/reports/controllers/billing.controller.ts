@@ -36,4 +36,26 @@ export class BillingController {
     });
     res.end(buffer);
   }
+
+  @Roles('Staff', 'Admin')
+  @Get('building-bill-apartment/:id/:apartment')
+  async buildingBillByApartment(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('apartment', ParseIntPipe) apartment: number,
+    @Req() req: Request,
+    @Res() res,
+  ): Promise<void> {
+    const user = req.user as any;
+    const buffer = await this.billingService.generateBillPDF(
+      id,
+      user.userId,
+      apartment,
+    );
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; file-name.pdf',
+      'Content-Length': buffer.length,
+    });
+    res.end(buffer);
+  }
 }

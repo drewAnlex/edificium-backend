@@ -16,17 +16,17 @@ import { MailingModule } from 'src/mailing/mailing.module';
 
 @Module({
   imports: [
-    UsersModule,
+    forwardRef(() => UsersModule),
     forwardRef(() => MailingModule),
     TypeOrmModule.forFeature([Building, Apartment, User]),
   ],
+  providers: [UsersService, BuildingsService, ApartmentsService],
   controllers: [
     BuildingsController,
     ApartmentController,
     MyApartmentsController,
     MyBuildingsController,
   ],
-  providers: [BuildingsService, ApartmentsService, UsersService],
   exports: [BuildingsService, ApartmentsService],
 })
 export class BuildingsModule {}

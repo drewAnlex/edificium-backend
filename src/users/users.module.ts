@@ -28,7 +28,7 @@ import { PaymentMethodDetails } from 'src/payment-method/entities/payment-method
 
 @Module({
   imports: [
-    MailingModule,
+    forwardRef(() => MailingModule),
     PaymentsModule,
     forwardRef(() => ReportsModule),
     forwardRef(() => PaymentMethodModule),

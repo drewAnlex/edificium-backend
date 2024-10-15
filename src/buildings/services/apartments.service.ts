@@ -1,6 +1,8 @@
 import {
+  forwardRef,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -16,6 +18,7 @@ import { UsersService } from 'src/users/services/users.service';
 export class ApartmentsService {
   constructor(
     @InjectRepository(Apartment) private apartmentRepo: Repository<Apartment>,
+    @Inject(forwardRef(() => UsersService))
     private userService: UsersService,
   ) {}
 

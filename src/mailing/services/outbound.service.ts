@@ -77,7 +77,11 @@ export class OutboundService {
       const debt = await this.individualBill.adminIndividualDebt(apartment.id);
       if (debt != 0 && apartment?.userId?.email) {
         const user = apartment.userId;
-        const buffer = await this.billing.generateBillPDF(bill.id, user.id);
+        const buffer = await this.billing.generateBillPDF(
+          bill.id,
+          user.id,
+          apartment.id,
+        );
         try {
           const receipt = await fs.readFile(absolutePath, 'utf8');
           const messageData = {

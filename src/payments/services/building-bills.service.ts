@@ -53,12 +53,7 @@ export class BuildingBillsService {
         isRemoved: false,
       },
       order: { createdAt: 'DESC' },
-      relations: [
-        'expenses',
-        'individualBills',
-        'individualBills.apartmentId',
-        'individualBills.payment',
-      ],
+      relations: ['expenses'],
     });
   }
 

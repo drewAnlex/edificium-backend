@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import PDFDocument from 'pdfkit-table';
+import { ApartmentsService } from 'src/buildings/services/apartments.service';
 import { PaymentMethodListService } from 'src/payment-method/services/payment-method-list.service';
 import { BuildingBillsService } from 'src/payments/services/building-bills.service';
 import { IndividualBillsService } from 'src/payments/services/individual-bills.service';
@@ -13,11 +14,19 @@ export class BillingService {
     private bbService: BuildingBillsService,
     private ibService: IndividualBillsService,
     private paymnetMethodList: PaymentMethodListService,
+    private apartmentService: ApartmentsService,
   ) {}
-  async generateBillPDF(bill: number, user: number): Promise<Buffer> {
+  async generateBillPDF(
+    bill: number,
+    user: number,
+    apartmentId?: number,
+  ): Promise<Buffer> {
     const data = await this.bbService.findOneByOwner(bill, user);
+    apartmentId
+      ? (data.apartment = await this.apartmentService.findOne(apartmentId))
+      : (data.apartment = data.apartment);
     const individualBills = await this.ibService.findByApartment(
-      data.apartment.id,
+      apartmentId ? apartmentId : data.apartment.id,
       data.owner.id,
     );
     const individualBill = individualBills.find(
@@ -30,7 +39,7 @@ export class BillingService {
       );
     });
     const totalGeneral = await this.ibService.adminIndividualDebt(
-      data.apartment.id,
+      apartmentId ? apartmentId : data.apartment.id,
     );
     let paymentMethodList = await this.paymnetMethodList.findByIndividualBill(
       individualBill.id,
