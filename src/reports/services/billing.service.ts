@@ -25,9 +25,8 @@ export class BillingService {
     apartmentId
       ? (data.apartment = await this.apartmentService.findOne(apartmentId))
       : (data.apartment = data.apartment);
-    const individualBills = await this.ibService.findByApartment(
+    const individualBills = await this.ibService.findAllByApartment(
       apartmentId ? apartmentId : data.apartment.id,
-      data.owner.id,
     );
     const individualBill = individualBills.find(
       (billItem) => billItem.buildingBillId?.id === data.bill.id,

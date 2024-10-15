@@ -3,6 +3,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -10,6 +11,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { OutboundService } from '../services/outbound.service';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Request } from 'express';
 
 @ApiTags('outbound')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -19,8 +21,9 @@ export class OutboundController {
 
   @Roles('Staff', 'Admin')
   @Get('debt-reminder/:id')
-  sendReminder(@Param('id', ParseIntPipe) id: number) {
-    this.outbound.buildingBillEmail(id);
+  sendReminder(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
+    const user = req.user as any;
+    this.outbound.buildingBillEmail(id, user.userId);
     return { msg: 'Reminder sended' };
   }
 }

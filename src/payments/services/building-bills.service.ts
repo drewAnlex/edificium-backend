@@ -41,6 +41,7 @@ export class BuildingBillsService {
         'buildingId',
         'buildingId.apartments',
         'buildingId.apartments.userId',
+        'buildingId.admins',
       ],
     });
   }
