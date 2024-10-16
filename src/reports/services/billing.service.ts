@@ -342,8 +342,6 @@ export class BillingService {
         (sum, apartment) => sum + apartment.individualBills.length,
         0,
       );
-      const baseYPosition = 127.5; // Punto de inicio en el eje Y (ajusta según sea necesario)
-      const rowHeight = 16; // Altura de cada fila (ajusta según el diseño)
 
       const table = {
         title: 'Estado de cuenta',
@@ -356,19 +354,7 @@ export class BillingService {
           'Deuda',
         ],
         rows: [
-          ...apartments.map((apartment, index) => {
-            const rowPosition = baseYPosition + index * rowHeight;
-            if (apartment.individualBills.length > 0) {
-              doc
-                .circle(55, rowPosition, 5) // Ajustar la posición X e Y según sea necesario
-                .fillColor('red')
-                .fill();
-            } else {
-              doc
-                .circle(55, rowPosition, 5) // Ajustar la posición X e Y según sea necesario
-                .fillColor('green')
-                .fill();
-            }
+          ...apartments.map((apartment) => {
             return [
               '', // Dejar vacío ya que el círculo se dibuja manualmente
               apartment.identifier,
@@ -382,14 +368,11 @@ export class BillingService {
 
       doc.table(table, tableOptions);
       doc.font('Helvetica-Bold').fontSize(10);
-      const lastRowYPosition =
-        baseYPosition + apartments.length * rowHeight + 20; // Ajustar según sea necesario
-      doc.text(`Pendientes: ${totalBills.toString()}`, 360, lastRowYPosition, {
-        align: 'left',
-      });
-      doc.text(`Deuda: ${totalDebt.toString()}`, 460, lastRowYPosition, {
-        align: 'left',
-      });
+      doc.text(
+        `Pendientes: ${totalBills.toString()}             Deuda: ${totalDebt.toString()}`,
+        360,
+      );
+      // doc.text(`Deuda: ${totalDebt.toString()}`, 460);
 
       const buffer = [];
       doc.on('data', buffer.push.bind(buffer));
