@@ -58,4 +58,19 @@ export class BillingController {
     });
     res.end(buffer);
   }
+
+  @Roles('Staff', 'Admin', 'User')
+  @Get('account-statement/:id')
+  async accountStatement(
+    @Param('id', ParseIntPipe) id: number,
+    @Res() res,
+  ): Promise<void> {
+    const buffer = await this.billingService.accountStatement(id);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; file-name.pdf',
+      'Content-Length': buffer.length,
+    });
+    res.end(buffer);
+  }
 }

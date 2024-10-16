@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import PDFDocument from 'pdfkit-table';
 import { ApartmentsService } from 'src/buildings/services/apartments.service';
+import { BuildingsService } from 'src/buildings/services/buildings.service';
 import { PaymentMethodListService } from 'src/payment-method/services/payment-method-list.service';
 import { BuildingBillsService } from 'src/payments/services/building-bills.service';
 import { IndividualBillsService } from 'src/payments/services/individual-bills.service';
@@ -15,6 +16,8 @@ export class BillingService {
     private ibService: IndividualBillsService,
     private paymnetMethodList: PaymentMethodListService,
     private apartmentService: ApartmentsService,
+    @Inject(forwardRef(() => BuildingsService))
+    private buildingService: BuildingsService,
   ) {}
   async generateBillPDF(
     bill: number,
@@ -249,6 +252,143 @@ export class BillingService {
           doc.text(`${detail.Name}: ${detail.description}`);
         });
         doc.moveDown(1);
+      });
+
+      const buffer = [];
+      doc.on('data', buffer.push.bind(buffer));
+      doc.on('end', () => {
+        const data = Buffer.concat(buffer);
+        resolve(data);
+      });
+      doc.end();
+    });
+    return pdfBuffer;
+  }
+
+  async accountStatement(buildingId: number) {
+    const building = await this.buildingService.findOne(buildingId);
+    const apartments = await this.apartmentService.getApartmentsByBuilding(
+      buildingId,
+    );
+    const logoUrl = 'http://67.205.149.177/images/icon.jpeg';
+    const response = await axios.get(logoUrl, { responseType: 'arraybuffer' });
+    const imageBuffer = response.data;
+    const pdfBuffer: Buffer = await new Promise((resolve) => {
+      const doc = new PDFDocument({
+        size: 'LETTER',
+        bufferPages: true,
+        autoFirstPage: false,
+      });
+      doc.on('pageAdded', () => {
+        doc.font('Helvetica').fontSize(10);
+
+        // Building information in header
+        doc.text(``, 50, 20);
+        const adressOptions = {
+          width: doc.page.width, // Adjust table width
+          cellPadding: 5, // Add some padding to cells
+          headerRows: 1, // Only show header row as bold
+          columnsSize: [350],
+          divider: {
+            header: { disabled: true, width: 2, opacity: 1 },
+            horizontal: { disabled: true, width: 0.5, opacity: 0.5 },
+          },
+        };
+        const adressTable = {
+          headers: [
+            {
+              label: `${building.name}, ${building.fiscalId}`,
+              headerColor: 'white',
+            },
+          ],
+          rows: [[building.zone]],
+        };
+        doc.table(adressTable, adressOptions);
+        // doc.text(`${data.bill.buildingId.zone}`, 50, 35);
+        doc.font('Helvetica-Bold').fontSize(18).fillColor('purple'); // Adjust font size and color
+
+        doc.text('NEXIADMIN', doc.page.width - 220, 25, { align: 'left' });
+
+        doc.image(imageBuffer, doc.page.width - 100, 5, {
+          fit: [45, 45],
+          align: 'center',
+        });
+        doc
+          .moveTo(50, 55)
+          .lineTo(doc.page.width - 50, 55)
+          .stroke();
+
+        doc.text('', 50, 70);
+        doc.font('Helvetica').fontSize(10).fillColor('black');
+      });
+
+      doc.addPage();
+      doc.text('', 50, 70);
+      doc.font('Helvetica').fontSize(10);
+      const tableOptions = {
+        width: doc.page.width,
+        layout: 'lightHorizontalLines',
+        cellPadding: 5,
+        headerRows: 1,
+        columnsSize: [10, 70, 230, 100, 100],
+      };
+
+      const totalDebt = apartments.reduce(
+        (sum, apartment) => sum + apartment.balance,
+        0,
+      );
+
+      const totalBills = apartments.reduce(
+        (sum, apartment) => sum + apartment.individualBills.length,
+        0,
+      );
+      const baseYPosition = 127.5; // Punto de inicio en el eje Y (ajusta según sea necesario)
+      const rowHeight = 16; // Altura de cada fila (ajusta según el diseño)
+
+      const table = {
+        title: 'Estado de cuenta',
+        subtitle: `Deuda actualizada al: ${formatter.format(new Date())}`,
+        headers: [
+          '',
+          'Identificador',
+          'Propietario',
+          'Facturas pendientes',
+          'Deuda',
+        ],
+        rows: [
+          ...apartments.map((apartment, index) => {
+            const rowPosition = baseYPosition + index * rowHeight;
+            if (apartment.individualBills.length > 0) {
+              doc
+                .circle(55, rowPosition, 5) // Ajustar la posición X e Y según sea necesario
+                .fillColor('red')
+                .fill();
+            } else {
+              doc
+                .circle(55, rowPosition, 5) // Ajustar la posición X e Y según sea necesario
+                .fillColor('green')
+                .fill();
+            }
+            return [
+              '', // Dejar vacío ya que el círculo se dibuja manualmente
+              apartment.identifier,
+              apartment.userId?.name ? apartment.userId.name : '',
+              apartment.individualBills.length.toString(),
+              apartment.balance.toString(),
+            ];
+          }),
+        ],
+      };
+
+      doc.table(table, tableOptions);
+      doc.font('Helvetica-Bold').fontSize(10);
+      const lastRowYPosition =
+        baseYPosition + apartments.length * rowHeight + 20; // Ajustar según sea necesario
+      doc.text(`Pendientes: ${totalBills.toString()}`, 360, lastRowYPosition, {
+        align: 'left',
+      });
+      doc.text(`Deuda: ${totalDebt.toString()}`, 460, lastRowYPosition, {
+        align: 'left',
       });
 
       const buffer = [];
