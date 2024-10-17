@@ -60,13 +60,25 @@ export class ApartmentsService {
   }
 
   async getApartmentsByBuilding(id: number) {
-    const apartments = await this.apartmentRepo.find({
-      where: { buildingId: { id } },
-      relations: ['userId', 'individualBills'],
-      order: {
-        identifier: 'ASC',
-      },
-    });
+    const apartments = await this.apartmentRepo
+      .createQueryBuilder('apartment')
+      .leftJoinAndSelect('apartment.userId', 'user')
+      .leftJoinAndSelect('apartment.individualBills', 'individualBills')
+      .where('apartment.buildingId = :buildingId', { buildingId: id })
+      .orderBy(
+        `CASE
+               WHEN apartment.identifier ~ '^[0-9]' THEN CAST(substring(apartment.identifier, 1, length(apartment.identifier) - 1) AS INTEGER)
+               ELSE 9999
+             END`,
+      )
+      .addOrderBy(
+        `CASE
+                   WHEN apartment.identifier ~ '^[0-9]' THEN substring(apartment.identifier, -1)
+                   ELSE apartment.identifier
+                 END`,
+      )
+      .getMany();
+
     if (!apartments) {
       throw new NotFoundException(`Apartments not found`);
     }
