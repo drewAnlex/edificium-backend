@@ -73,4 +73,19 @@ export class BillingController {
     });
     res.end(buffer);
   }
+
+  @Get('simple-account-statement-excel/:id')
+  async simpleAccountStatementExcel(
+    @Param('id', ParseIntPipe) id: number,
+    @Res() res,
+  ): Promise<void> {
+    const buffer = await this.billingService.simpleAccountStatementExcel(id);
+
+    res.setHeader('Content-Disposition', 'attachment; filename=datos.xlsx');
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.end(buffer);
+  }
 }

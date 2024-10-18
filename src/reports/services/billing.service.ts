@@ -6,6 +6,7 @@ import { BuildingsService } from 'src/buildings/services/buildings.service';
 import { PaymentMethodListService } from 'src/payment-method/services/payment-method-list.service';
 import { BuildingBillsService } from 'src/payments/services/building-bills.service';
 import { IndividualBillsService } from 'src/payments/services/individual-bills.service';
+import * as ExcelJS from 'exceljs';
 
 const formatter = new Intl.DateTimeFormat('es-ES'); // 'es-ES' para español de España
 
@@ -384,5 +385,31 @@ export class BillingService {
       doc.end();
     });
     return pdfBuffer;
+  }
+
+  async simpleAccountStatementExcel(buildingId: number): Promise<Buffer> {
+    const building = await this.buildingService.findOne(buildingId);
+    const apartments = await this.apartmentService.getApartmentsByBuilding(
+      buildingId,
+    );
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(building.name);
+
+    worksheet.columns = [
+      { header: 'Identificador', key: 'identifier', width: 20 },
+      { header: 'Propietario', key: 'name', width: 20 },
+      { header: 'Facturas pendientes', key: 'bills', width: 20 },
+      { header: 'Deuda', key: 'debt', width: 20 },
+    ];
+    apartments.forEach((apartment) => {
+      worksheet.addRow({
+        identifier: apartment.identifier,
+        name: apartment.userId?.name ? apartment.userId.name : '',
+        bills: apartment.individualBills.length,
+        debt: apartment.balance,
+      });
+    });
+    const buffer = await workbook.xlsx.writeBuffer();
+    return Buffer.from(buffer);
   }
 }
