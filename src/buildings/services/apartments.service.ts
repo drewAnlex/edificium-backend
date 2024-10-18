@@ -91,7 +91,7 @@ export class ApartmentsService {
         // Solo sumamos al total si la factura NO está pagada
         return total + (bill.Total - bill.Balance);
       }, 0);
-      apartment.balance = parseFloat(apartment.balance.toString());
+      apartment.balance = parseFloat(apartment.balance.toFixed(2));
     });
     return apartments;
   }
