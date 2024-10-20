@@ -85,7 +85,10 @@ export class IndividualBillsController {
   @Roles('Staff', 'Admin')
   @Post()
   create(@Body() data: IndividualBillDto) {
-    return this.individualBillsService.create(data);
+    return this.individualBillsService.create(
+      data,
+      parseInt(data.apartmentId.toString()),
+    );
   }
 
   @Roles('Staff')

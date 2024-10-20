@@ -38,7 +38,7 @@ export class IndividualBillDto implements Readonly<IndividualBillDto> {
 
   @IsOptional()
   @IsBoolean()
-  IsPaid: boolean;
+  IsPaid: any;
 
   @IsBoolean()
   @IsOptional()

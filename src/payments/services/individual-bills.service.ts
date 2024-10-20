@@ -12,16 +12,34 @@ import {
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ApartmentsService } from 'src/buildings/services/apartments.service';
 
 @Injectable()
 export class IndividualBillsService {
   constructor(
     @InjectRepository(IndividualBill)
     private billRepo: Repository<IndividualBill>,
+    private apartmentService: ApartmentsService,
   ) {}
 
   findAll() {
     return this.billRepo.find();
+  }
+
+  async findUnpaidBillsByApartment(apartmentId: number) {
+    const bills = await this.billRepo.find({
+      where: {
+        IsPaid: false,
+        isRemoved: false,
+        apartmentId: { id: apartmentId },
+      },
+    });
+    if (!bills) {
+      throw new NotFoundException(
+        `Bills for apartment #${apartmentId} not found`,
+      );
+    }
+    return bills;
   }
 
   async findByApartment(apartmentId: number, ownerId: number) {
@@ -90,10 +108,21 @@ export class IndividualBillsService {
     return bill;
   }
 
-  async create(payload: IndividualBillDto) {
+  async create(payload: IndividualBillDto, id?: number) {
+    const apartmentId = id ? id : payload.apartmentId.id;
+    const apartment = await this.apartmentService.findOne(apartmentId);
+    const balance = apartment.balance.toString();
+    if (apartment.balance > 0) {
+      payload.Balance =
+        parseFloat(payload.Balance.toString()) + parseFloat(balance);
+    }
     const newBill = this.billRepo.create(payload);
     try {
       await this.billRepo.save(newBill);
+      const total = payload.Total.toFixed(2);
+      await this.apartmentService.update(apartmentId, {
+        balance: parseFloat(balance) - parseFloat(total),
+      });
     } catch (error) {
       throw new HttpException(
         `An error occurred: ${error}`,
@@ -117,9 +146,23 @@ export class IndividualBillsService {
     return bill;
   }
 
+  async updateBalance(id: number, balance: number, status: boolean) {
+    const bill = await this.findOne(id);
+    try {
+      this.billRepo.merge(bill, { IsPaid: status, Balance: balance });
+      await this.billRepo.save(bill);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred: ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return bill;
+  }
+
   async remove(id: number) {
     const bill = await this.findOne(id);
-    if (bill.buildingBillId != null)
+    if (bill.buildingBillId != null || bill.Balance != 0)
       throw new HttpException(
         `Recibo asociado existente`,
         HttpStatus.BAD_REQUEST,

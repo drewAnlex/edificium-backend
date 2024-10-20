@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IndividualBillsService } from './individual-bills.service';
 import { BuildingBillsService } from './building-bills.service';
+import { ApartmentsService } from 'src/buildings/services/apartments.service';
 
 @Injectable()
 export class PaymentsService {
@@ -13,6 +14,7 @@ export class PaymentsService {
     @InjectRepository(Payment) private paymentRepo: Repository<Payment>,
     private ibService: IndividualBillsService,
     private bbService: BuildingBillsService,
+    private apartmentService: ApartmentsService,
   ) {}
 
   findAll() {
@@ -104,28 +106,61 @@ export class PaymentsService {
       console.warn('Building Bill not found:', error.message);
     }
 
-    const balance: string = bill.Balance.toString();
-    const amount: string = payment.Amount.toString();
-    const newBalance: number = parseFloat(amount) + parseFloat(balance);
+    let amount = parseFloat(payment.Amount.toString());
+    let balance = parseFloat(bill.Balance.toString());
 
-    // Actualizar IsPaid solo para individualBill
-    if (newBalance === bill.Total) {
-      bill.IsPaid = true;
+    const apartmentId = bill.apartmentId.id;
+    const apartment = await this.apartmentService.findOne(apartmentId);
+    const apartmentBalance = parseFloat(apartment.balance.toString());
+    await this.apartmentService.update(apartmentId, {
+      balance: apartmentBalance + amount,
+    });
+
+    // Actualizar la bill actual
+    const newBalance = Math.min(balance + amount, bill.Total);
+    amount -= newBalance - balance;
+    balance = newBalance;
+    await this.ibService.updateBalance(
+      bill.id,
+      balance,
+      balance >= bill.Total ? true : false,
+    );
+    console.log(bill.Total, balance);
+    console.log(balance >= bill.Total ? true : false);
+
+    // Distribuir sobrante entre otras bills no pagas del apartment
+    if (amount > 0) {
+      const unpaidBills = await this.ibService.findUnpaidBillsByApartment(
+        apartmentId,
+      );
+
+      for (const unpaidBill of unpaidBills) {
+        if (amount <= 0) break;
+
+        let unpaidBalance = parseFloat(unpaidBill.Balance.toString());
+        const unpaidNewBalance = Math.min(
+          unpaidBalance + amount,
+          unpaidBill.Total,
+        );
+        amount -= unpaidNewBalance - unpaidBalance;
+        unpaidBalance = unpaidNewBalance;
+
+        await this.ibService.updateBalance(
+          unpaidBill.id,
+          unpaidBalance,
+          unpaidBalance >= unpaidBill.Total ? true : false,
+        );
+      }
     }
 
     await this.paymentRepo.merge(payment, { Status: status });
     await this.paymentRepo.save(payment);
 
-    // Actualizar individualBill
-    await this.ibService.update(bill.id, {
-      Balance: newBalance,
-      IsPaid: newBalance >= bill.Total ? true : false,
-    });
-
     // Actualizar buildingBill si existe
     if (buildingBill) {
-      const updatedBalance: number =
-        parseFloat(buildingBill.balance.toString()) + newBalance;
+      const updatedBalance =
+        parseFloat(buildingBill.balance.toString()) +
+        (newBalance - parseFloat(bill.Balance.toString()));
       await this.bbService.update(buildingBill.id, { balance: updatedBalance });
     }
 
