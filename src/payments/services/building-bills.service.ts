@@ -293,18 +293,12 @@ export class BuildingBillsService {
   }
 
   async buildingDebt(buildingId: number) {
-    const buildingBills = await this.billRepo.find({
-      where: {
-        buildingId: { id: buildingId },
-        isPaid: false,
-        isPublished: true,
-        isRemoved: false,
-      },
-    });
-    let debt = 0;
-    buildingBills.forEach((bill) => {
-      debt = debt + bill.total - bill.balance;
-    });
+    const building = await this.buildingService.findOne(buildingId);
+    const debt = building.apartments.reduce((acc, apartment) => {
+      return apartment.balance < 0
+        ? acc + parseFloat(apartment.balance.toString())
+        : acc;
+    }, 0);
     return debt;
   }
 }

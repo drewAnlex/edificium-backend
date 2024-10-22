@@ -180,28 +180,12 @@ export class IndividualBillsService {
   }
 
   async individualDebt(userId: number) {
-    const bills = await this.billRepo.find({
-      where: [
-        {
-          apartmentId: { userId: { id: userId } },
-          IsPaid: false,
-          isRemoved: false,
-          buildingBillId: { isRemoved: false },
-        },
-        {
-          apartmentId: { userId: { id: userId } },
-          IsPaid: false,
-          isRemoved: false,
-        },
-      ],
-    });
-    console.log(bills);
-    let debt = 0;
-    bills.forEach((bill) => {
-      const total = parseFloat(bill.Total.toString());
-      const balance = parseFloat(bill.Balance.toString());
-      debt = debt + total - balance;
-    });
+    const apartments = await this.apartmentService.getApartmentsByOwner(userId);
+    const debt = apartments.reduce((acc, apartment) => {
+      return apartment.balance < 0
+        ? acc + parseFloat(apartment.balance.toString())
+        : acc;
+    }, 0);
     return debt;
   }
 

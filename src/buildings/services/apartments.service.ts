@@ -87,11 +87,6 @@ export class ApartmentsService {
       apartment.individualBills = apartment.individualBills.filter(
         (bill) => bill.IsPaid === false && bill.isRemoved === false,
       );
-      apartment.balance = apartment.individualBills.reduce((total, bill) => {
-        // Solo sumamos al total si la factura NO está pagada
-        return total + (bill.Total - bill.Balance);
-      }, 0);
-      apartment.balance = parseFloat(apartment.balance.toFixed(2));
     });
     return apartments;
   }
