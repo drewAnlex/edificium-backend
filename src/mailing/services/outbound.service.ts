@@ -9,6 +9,8 @@ import { IndividualBillsService } from 'src/payments/services/individual-bills.s
 import { BillingService } from 'src/reports/services/billing.service';
 import { UsersService } from 'src/users/services/users.service';
 
+const formatter = new Intl.DateTimeFormat('es-ES'); // 'es-ES' para español de España
+
 @Injectable()
 export class OutboundService {
   private readonly mg: any;
@@ -40,6 +42,51 @@ export class OutboundService {
 
       const response = await this.mg.messages.create(
         'sandbox0918d61f84384276b051e69e193a6178.mailgun.org',
+        messageData,
+      );
+      console.log(response); // logs response data
+    } catch (error) {
+      console.error(error); // logs any error
+      throw new Error(error);
+    }
+  }
+
+  async paymentConfirmationEmail(
+    email: string,
+    user: any,
+    payment: any,
+  ): Promise<void> {
+    try {
+      const messageData = {
+        from: process.env.EMAIL_SYSTEM_ADDR,
+        to: [email],
+        subject: 'Confirmación de pago',
+        text: `Estimado(a) ${
+          user.name
+        }, usted ha reportado un pago a través de nuestra plataforma web, con el siguiente detalle:
+
+SOPORTE DE PAGO:
+Forma de pago: ${payment.Method.name}
+${payment.Method.paymentDetails.map(
+  (detail) => `\n${detail.Name}: ${detail.description}`,
+)}
+${payment.paymentInfos.map((info) => `\n${info.name}: ${info.value}`)}
+Fecha: ${formatter.format(new Date())}
+Contácto: ${email} / ${user.phone}
+
+Yo declaro que estoy ingresando datos reales, fidedignos y legales de transferencia o depósito, de ser rechazados los mismos por el banco emisor o receptor, será cargado dicho valor en mi cuenta de gastos de condominio, sin aviso ni protesta. ${
+          user.name
+        }
+
+Gracias por utilizar nuestros servicios.
+
+Ley especial contra los Delitos Informáticos
+
+Artículo 14º Fraude. El que, a través del uso indebido de tecnologías de información, valiéndose de cualquier manipulación en sistemas o cualquiera de sus componentes o en la data o información en ellos contenida, consiga insertar instrucciones falsas o fraudulentas que produzcan un resultado que permita obtener un provecho injusto en perjuicio ajeno, será penado con prisión de tres a siete años y multa de trescientas a setecientas unidades tributarias.`,
+      };
+
+      const response = await this.mg.messages.create(
+        process.env.MAILING_DOMAIN,
         messageData,
       );
       console.log(response); // logs response data

@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { IndividualBillsService } from './individual-bills.service';
 import { BuildingBillsService } from './building-bills.service';
 import { ApartmentsService } from 'src/buildings/services/apartments.service';
+import { OutboundService } from 'src/mailing/services/outbound.service';
 
 @Injectable()
 export class PaymentsService {
@@ -15,6 +16,7 @@ export class PaymentsService {
     private ibService: IndividualBillsService,
     private bbService: BuildingBillsService,
     private apartmentService: ApartmentsService,
+    private outboundService: OutboundService,
   ) {}
 
   findAll() {
@@ -60,7 +62,13 @@ export class PaymentsService {
   async findOne(id: number) {
     const payment = await this.paymentRepo.findOne({
       where: { id: id },
-      relations: ['IndividualBill', 'UserId', 'Method', 'paymentInfos'],
+      relations: [
+        'IndividualBill',
+        'UserId',
+        'Method',
+        'Method.paymentDetails',
+        'paymentInfos',
+      ],
     });
     if (!payment) {
       throw new NotFoundException(`Payment #${id} not found`);
@@ -162,6 +170,16 @@ export class PaymentsService {
         parseFloat(buildingBill.balance.toString()) +
         (newBalance - parseFloat(bill.Balance.toString()));
       await this.bbService.update(buildingBill.id, { balance: updatedBalance });
+    }
+
+    try {
+      await this.outboundService.paymentConfirmationEmail(
+        apartment.userId.email,
+        apartment.userId,
+        payment,
+      );
+    } catch (error) {
+      console.log(error);
     }
 
     return payment;
