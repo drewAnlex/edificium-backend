@@ -49,6 +49,12 @@ export class Building {
   @Column({ type: 'varchar', length: 32, nullable: false })
   status: string;
 
+  @Column({ type: 'varchar', length: 128, nullable: true })
+  logoImg: string;
+
+  @Column({ type: 'varchar', length: 32, nullable: true })
+  billTitle: string;
+
   @ManyToMany(() => User, (user) => user.building)
   admins: User[];
 

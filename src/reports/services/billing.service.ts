@@ -41,9 +41,6 @@ export class BillingService {
         billItem.IsPaid === false
       );
     });
-    const totalGeneral = await this.ibService.adminIndividualDebt(
-      apartmentId ? apartmentId : data.apartment.id,
-    );
     let paymentMethodList = await this.paymnetMethodList.findByIndividualBill(
       individualBill.id,
     );
@@ -52,10 +49,21 @@ export class BillingService {
       (paymentMethod) => paymentMethod.status === 1,
     );
 
-    const logoUrl = 'http://67.205.149.177/images/icon.jpeg';
+    const billTitle = data.bill.buildingId.billTitle
+      ? data.bill.buildingId.billTitle
+      : 'NEXIADMIN';
+    const logoUrl = data.bill.buildingId.logoImg
+      ? data.bill.buildingId.logoImg
+      : 'http://67.205.149.177/images/icon.jpeg';
+
+    const nexiLogo = 'http://67.205.149.177/images/icon.jpeg';
     const response = await axios.get(logoUrl, { responseType: 'arraybuffer' });
     const imageBuffer = response.data;
-    const pdfBuffer: Buffer = await new Promise((resolve) => {
+    const responseNexi = await axios.get(nexiLogo, {
+      responseType: 'arraybuffer',
+    });
+    const nexiLogoBuffer = responseNexi.data;
+    const pdfBuffer: Buffer = await new Promise(async (resolve) => {
       const doc = new PDFDocument({
         size: 'LETTER',
         bufferPages: true,
@@ -63,6 +71,34 @@ export class BillingService {
       });
 
       doc.on('pageAdded', () => {
+        const bottom = doc.page.margins.bottom;
+        doc.page.margins.bottom = 0;
+        doc.font('Helvetica-Bold').fontSize(10);
+        doc.text(
+          'Generado por NexiAdmin',
+          0.5 * (doc.page.width - 100),
+          doc.page.height - 50,
+          {
+            width: 100,
+            align: 'center',
+            lineBreak: false,
+            continued: true,
+          },
+        );
+        doc.image(
+          nexiLogoBuffer,
+          0.5 * (doc.page.width - 20),
+          doc.page.height - 25,
+          {
+            fit: [16, 16],
+            align: 'center',
+          },
+        );
+
+        // Reset text writer position
+
+        doc.text('', 50, 50);
+        doc.page.margins.bottom = bottom;
         doc.font('Helvetica').fontSize(10);
 
         // Building information in header
@@ -90,7 +126,9 @@ export class BillingService {
         // doc.text(`${data.bill.buildingId.zone}`, 50, 35);
         doc.font('Helvetica-Bold').fontSize(18).fillColor('purple'); // Adjust font size and color
 
-        doc.text('NEXIADMIN', doc.page.width - 220, 25, { align: 'left' });
+        doc.text(billTitle, doc.page.width - 220, 25, {
+          align: 'left',
+        });
 
         doc.image(imageBuffer, doc.page.width - 100, 5, {
           fit: [45, 45],
@@ -113,6 +151,7 @@ export class BillingService {
       doc.text(
         `Inmueble: ${data.apartment ? data.apartment.identifier : 'Admin'}`,
       );
+      doc.text(`Alicuota: ${data.apartment.share}`);
       doc.text(`Fecha de emisión: ${formatter.format(data.bill.createdAt)}`);
 
       const fixedExpenses = data.bill.expenses.filter(
@@ -123,7 +162,11 @@ export class BillingService {
       );
       const totalRecibo = data.bill.total;
       const totalCuota = individualBill?.Total || 0; // Manejar posible valor indefinido
-      const totalDeuda = totalGeneral - totalCuota;
+      const totalDeuda = await this.ibService.adminIndividualDebt(
+        data.apartment.id,
+      );
+      const facturasPendientes =
+        await this.ibService.findUnpaidBillsByApartment(data.apartment.id);
 
       let tableOptions = {
         width: doc.page.width, // Adjust table width
@@ -139,14 +182,16 @@ export class BillingService {
           'TOTAL RECIBO',
           'TOTAL CUOTA',
           'TOTAL DEUDA',
-          'TOTAL POR PAGAR',
+          'FACTURAS PENDIENTES',
+          'BALANCE',
         ],
         rows: [
           [
             totalRecibo?.toFixed(2),
             totalCuota.toString(),
-            totalDeuda?.toFixed(2),
-            totalGeneral?.toFixed(2),
+            totalDeuda.toString(),
+            facturasPendientes.length.toString(),
+            data.apartment.balance.toString(),
           ],
         ],
       };
@@ -226,7 +271,7 @@ export class BillingService {
         layout: 'lightHorizontalLines', // Add thin horizontal lines
         cellPadding: 5, // Add some padding to cells
         headerRows: 1, // Only show header row as bold
-        columnsSize: [125, 125, 130, 130],
+        columnsSize: [125, 125, 100, 60, 100],
       };
       doc.table(totalsTable, tableOptions);
       doc.text(`AP: A: Aplica por alícuota P: Aplica por propietario `);
