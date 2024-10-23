@@ -319,7 +319,7 @@ export class BillingService {
     const logoUrl = 'http://67.205.149.177/images/icon.jpeg';
     const response = await axios.get(logoUrl, { responseType: 'arraybuffer' });
     const imageBuffer = response.data;
-    const pdfBuffer: Buffer = await new Promise((resolve) => {
+    const pdfBuffer: Buffer = await new Promise(async (resolve) => {
       const doc = new PDFDocument({
         size: 'LETTER',
         bufferPages: true,
@@ -379,10 +379,7 @@ export class BillingService {
         columnsSize: [10, 70, 230, 100, 100],
       };
 
-      const totalDebt = apartments.reduce(
-        (sum, apartment) => sum + apartment.balance,
-        0,
-      );
+      const totalDebt = await this.bbService.buildingDebt(building.id);
 
       const totalBills = apartments.reduce(
         (sum, apartment) => sum + apartment.individualBills.length,
@@ -397,7 +394,7 @@ export class BillingService {
           'Identificador',
           'Propietario',
           'Facturas pendientes',
-          'Deuda',
+          'Balance',
         ],
         rows: [
           ...apartments.map((apartment) => {
@@ -415,9 +412,7 @@ export class BillingService {
       doc.table(table, tableOptions);
       doc.font('Helvetica-Bold').fontSize(10);
       doc.text(
-        `Pendientes: ${totalBills.toString()}    Deuda: ${totalDebt.toFixed(
-          2,
-        )}`,
+        `Pendientes: ${totalBills.toString()}    Deuda: ${totalDebt}`,
         360,
       );
 
@@ -444,7 +439,7 @@ export class BillingService {
       { header: 'Identificador', key: 'identifier', width: 20 },
       { header: 'Propietario', key: 'name', width: 20 },
       { header: 'Facturas pendientes', key: 'bills', width: 20 },
-      { header: 'Deuda', key: 'debt', width: 20 },
+      { header: 'Balance', key: 'debt', width: 20 },
     ];
     apartments.forEach((apartment) => {
       worksheet.addRow({
