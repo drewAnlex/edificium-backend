@@ -412,7 +412,9 @@ export class BillingService {
       doc.table(table, tableOptions);
       doc.font('Helvetica-Bold').fontSize(10);
       doc.text(
-        `Pendientes: ${totalBills.toString()}    Deuda: ${totalDebt}`,
+        `Pendientes: ${totalBills.toString()}    Deuda: ${(
+          totalDebt * -1
+        ).toFixed(2)}`,
         360,
       );
 
