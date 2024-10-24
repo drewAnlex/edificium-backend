@@ -105,15 +105,6 @@ export class PaymentsService {
     const payment = await this.findOne(id);
     const bill = await this.ibService.findOne(payment.IndividualBill.id);
 
-    // Manejar la ausencia de buildingBill
-    let buildingBill;
-    try {
-      buildingBill = await this.bbService.findOne(bill.buildingBillId.id);
-    } catch (error) {
-      // Si no se encuentra buildingBill, ignora la actualización de su balance
-      console.warn('Building Bill not found:', error.message);
-    }
-
     let amount = parseFloat(payment.Amount.toString());
     let balance = parseFloat(bill.Balance.toString());
 
@@ -133,8 +124,6 @@ export class PaymentsService {
       balance,
       balance >= bill.Total ? true : false,
     );
-    console.log(bill.Total, balance);
-    console.log(balance >= bill.Total ? true : false);
 
     // Distribuir sobrante entre otras bills no pagas del apartment
     if (amount > 0) {
@@ -163,14 +152,6 @@ export class PaymentsService {
 
     await this.paymentRepo.merge(payment, { Status: status });
     await this.paymentRepo.save(payment);
-
-    // Actualizar buildingBill si existe
-    if (buildingBill) {
-      const updatedBalance =
-        parseFloat(buildingBill.balance.toString()) +
-        (newBalance - parseFloat(bill.Balance.toString()));
-      await this.bbService.update(buildingBill.id, { balance: updatedBalance });
-    }
 
     try {
       await this.outboundService.paymentConfirmationEmail(

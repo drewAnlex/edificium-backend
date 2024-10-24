@@ -1,6 +1,8 @@
 import {
+  forwardRef,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,6 +15,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApartmentsService } from 'src/buildings/services/apartments.service';
+import { BuildingBillsService } from './building-bills.service';
 
 @Injectable()
 export class IndividualBillsService {
@@ -20,6 +23,8 @@ export class IndividualBillsService {
     @InjectRepository(IndividualBill)
     private billRepo: Repository<IndividualBill>,
     private apartmentService: ApartmentsService,
+    @Inject(forwardRef(() => BuildingBillsService))
+    private bbService: BuildingBillsService,
   ) {}
 
   findAll() {
@@ -151,6 +156,9 @@ export class IndividualBillsService {
     try {
       this.billRepo.merge(bill, { IsPaid: status, Balance: balance });
       await this.billRepo.save(bill);
+      if (bill.buildingBillId?.id) {
+        await this.bbService.updateBalance(bill.buildingBillId.id, balance);
+      }
     } catch (error) {
       throw new HttpException(
         `An error occurred: ${error}`,

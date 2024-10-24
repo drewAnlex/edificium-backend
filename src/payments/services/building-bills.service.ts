@@ -204,6 +204,26 @@ export class BuildingBillsService {
     return bill;
   }
 
+  async updateBalance(id: number, balance: number) {
+    const bill = await this.findOne(id);
+    try {
+      await this.billRepo.merge(bill, {
+        balance: parseFloat(bill.balance.toString()) + balance,
+        isPaid:
+          parseFloat(bill.balance.toString()) + balance === bill.total
+            ? true
+            : false,
+      });
+      await this.billRepo.save(bill);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred: ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return bill;
+  }
+
   async updateByAdmin(
     id: number,
     payload: UpdateBuildingBillDTO,
