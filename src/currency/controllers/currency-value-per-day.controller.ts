@@ -35,6 +35,29 @@ export class CurrencyValuePerDayController {
     return this.currencyValuePerDayService.findByDate(date, currency);
   }
 
+  @Roles('Staff', 'Admin', 'User')
+  @Get('/:currency/:value/:date')
+  convertToCurrencyAtDate(
+    @Param('currency', ParseIntPipe) currency: number,
+    @Param('value', ParseIntPipe) value: number,
+    @Param('date') date: string,
+  ) {
+    return this.currencyValuePerDayService.convertToCurrencyAtDate(
+      currency,
+      value,
+      date,
+    );
+  }
+
+  @Roles('Staff', 'Admin', 'User')
+  @Get('/:currency/:value')
+  convertToCurrency(
+    @Param('currency', ParseIntPipe) currency: number,
+    @Param('value', ParseIntPipe) value: number,
+  ) {
+    return this.currencyValuePerDayService.convertToCurrency(currency, value);
+  }
+
   @Roles('Staff')
   @Post()
   createValuePerDay(@Body() payload: ValuePerDayDto) {
