@@ -8,9 +8,12 @@ import {
   UpdateDateColumn,
   OneToMany,
   ManyToMany,
+  JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 import { Apartment } from './apartment.entity';
 import { Expense } from 'src/payments/entities/Expense.entity';
+import { currencyList } from 'src/currency/entities/currency-list.entity';
 
 @Entity()
 export class Building {
@@ -30,6 +33,14 @@ export class Building {
     default: 'J-0000000',
   })
   fiscalId: string;
+
+  @ManyToOne(() => currencyList, { nullable: true })
+  @JoinColumn({ name: 'baseCurrencyId' })
+  baseCurrency: currencyList;
+
+  @ManyToOne(() => currencyList, { nullable: true })
+  @JoinColumn({ name: 'auxiliaryCurrencyId' })
+  auxiliaryCurrency: currencyList;
 
   @Column({ type: 'varchar', length: 32, nullable: false })
   country: string;

@@ -36,7 +36,7 @@ export class CurrencyValuePerDayController {
   }
 
   @Roles('Staff', 'Admin', 'User')
-  @Get('/:currency/:value/:date')
+  @Get('/convert/:currency/:value/:date')
   convertToCurrencyAtDate(
     @Param('currency', ParseIntPipe) currency: number,
     @Param('value', ParseIntPipe) value: number,
@@ -50,7 +50,7 @@ export class CurrencyValuePerDayController {
   }
 
   @Roles('Staff', 'Admin', 'User')
-  @Get('/:currency/:value')
+  @Get('/convert/:currency/:value')
   convertToCurrency(
     @Param('currency', ParseIntPipe) currency: number,
     @Param('value', ParseIntPipe) value: number,
