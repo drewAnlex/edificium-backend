@@ -12,6 +12,7 @@ import { environment } from './environments';
 import { AuthModule } from './auth/auth.module';
 import { MailingModule } from './mailing/mailing.module';
 import { ReportsModule } from './reports/reports.module';
+import { CurrencyModule } from './currency/currency.module';
 import config from './config';
 
 @Module({
@@ -29,6 +30,7 @@ import config from './config';
     AuthModule,
     MailingModule,
     ReportsModule,
+    CurrencyModule,
   ],
   controllers: [AppController],
   providers: [AppService],
