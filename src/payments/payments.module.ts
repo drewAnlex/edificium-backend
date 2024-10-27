@@ -32,6 +32,9 @@ import { PaymentMethodListService } from 'src/payment-method/services/payment-me
 import { PaymentMethodList } from 'src/payment-method/entities/payment-method-list.entity';
 import { PaymentMethodDetails } from 'src/payment-method/entities/payment-method-details.entity';
 import { PaymentMethodDetailsService } from 'src/payment-method/services/payment-method-details.service';
+import { CurrencyModule } from 'src/currency/currency.module';
+import { CurrencyValuePerDayService } from 'src/currency/services/currency-value-per-day.service';
+import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-day.entity';
 
 @Module({
   imports: [
@@ -46,12 +49,14 @@ import { PaymentMethodDetailsService } from 'src/payment-method/services/payment
       User,
       PaymentMethodList,
       PaymentMethodDetails,
+      currencyValuePerDay,
     ]),
     forwardRef(() => BuildingsModule),
     forwardRef(() => MailingModule),
     forwardRef(() => ReportsModule),
     forwardRef(() => UsersModule),
     forwardRef(() => PaymentMethodModule),
+    forwardRef(() => CurrencyModule),
   ],
   providers: [
     PaymentMethodListService,
@@ -64,6 +69,7 @@ import { PaymentMethodDetailsService } from 'src/payment-method/services/payment
     BillingService,
     OutboundService,
     UsersService,
+    CurrencyValuePerDayService,
   ],
   controllers: [
     BuildingBillsController,

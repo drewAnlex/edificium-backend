@@ -27,6 +27,9 @@ import { PaymentMethodFields } from './entities/payment-method-fields.entity';
 import { PaymentMethodFieldsController } from './controllers/payment-method-fields.controller';
 import { ReportsModule } from 'src/reports/reports.module';
 import { BillingService } from 'src/reports/services/billing.service';
+import { CurrencyModule } from 'src/currency/currency.module';
+import { CurrencyValuePerDayService } from 'src/currency/services/currency-value-per-day.service';
+import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-day.entity';
 
 @Module({
   imports: [
@@ -41,9 +44,11 @@ import { BillingService } from 'src/reports/services/billing.service';
       Expense,
       User,
       PaymentMethodFields,
+      currencyValuePerDay,
     ]),
     PaymentMethodModule,
     forwardRef(() => ReportsModule),
+    forwardRef(() => CurrencyModule),
   ],
   controllers: [
     PaymentMethodsController,
@@ -63,6 +68,7 @@ import { BillingService } from 'src/reports/services/billing.service';
     BuildingsService,
     PaymentMethodFieldsService,
     BillingService,
+    CurrencyValuePerDayService,
   ],
 })
 export class PaymentMethodModule {}

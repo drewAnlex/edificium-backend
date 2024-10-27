@@ -25,6 +25,9 @@ import { PaymentMethodListService } from 'src/payment-method/services/payment-me
 import { PaymentMethodList } from 'src/payment-method/entities/payment-method-list.entity';
 import { PaymentMethodDetailsService } from 'src/payment-method/services/payment-method-details.service';
 import { PaymentMethodDetails } from 'src/payment-method/entities/payment-method-details.entity';
+import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-day.entity';
+import { CurrencyModule } from 'src/currency/currency.module';
+import { CurrencyValuePerDayService } from 'src/currency/services/currency-value-per-day.service';
 
 @Module({
   imports: [
@@ -33,6 +36,7 @@ import { PaymentMethodDetails } from 'src/payment-method/entities/payment-method
     forwardRef(() => ReportsModule),
     forwardRef(() => PaymentMethodModule),
     forwardRef(() => BuildingsModule),
+    forwardRef(() => CurrencyModule),
     TypeOrmModule.forFeature([
       Role,
       User,
@@ -41,6 +45,7 @@ import { PaymentMethodDetails } from 'src/payment-method/entities/payment-method
       Building,
       PaymentMethodList,
       PaymentMethodDetails,
+      currencyValuePerDay,
     ]),
   ],
   controllers: [UsersController, RolesController, ProfileController],
@@ -54,6 +59,7 @@ import { PaymentMethodDetails } from 'src/payment-method/entities/payment-method
     IndividualBillsService,
     BillingService,
     BuildingsService,
+    CurrencyValuePerDayService,
   ],
   exports: [UsersService, RolesService],
 })

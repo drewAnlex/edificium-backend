@@ -7,6 +7,7 @@ import { PaymentMethodListService } from 'src/payment-method/services/payment-me
 import { BuildingBillsService } from 'src/payments/services/building-bills.service';
 import { IndividualBillsService } from 'src/payments/services/individual-bills.service';
 import * as ExcelJS from 'exceljs';
+import { CurrencyValuePerDayService } from 'src/currency/services/currency-value-per-day.service';
 
 const formatter = new Intl.DateTimeFormat('es-ES'); // 'es-ES' para español de España
 
@@ -19,6 +20,7 @@ export class BillingService {
     private apartmentService: ApartmentsService,
     @Inject(forwardRef(() => BuildingsService))
     private buildingService: BuildingsService,
+    private currencyService: CurrencyValuePerDayService,
   ) {}
   async generateBillPDF(
     bill: number,
@@ -189,7 +191,10 @@ export class BillingService {
           [
             totalRecibo?.toFixed(2),
             totalCuota.toString(),
-            totalDeuda.toString(),
+            `${totalDeuda.toString()}$ - ${await this.currencyService.convertToCurrency(
+              1,
+              totalDeuda,
+            )}Bs`,
             facturasPendientes.length.toString(),
             data.apartment.balance.toString(),
           ],
@@ -256,15 +261,21 @@ export class BillingService {
       };
       const tableDebt = {
         headers: ['TITULO', 'FECHA DE EMISIÓN', 'MONTO'],
-        rows: pastIndividualBills.map((bill) => {
-          return [
-            bill.Name,
-            formatter.format(bill.createdAt),
-            bill.Total.toString(),
-          ];
-        }),
+        rows: await Promise.all(
+          pastIndividualBills.map(async (bill) => {
+            return [
+              bill.Name,
+              formatter.format(bill.createdAt),
+              `${bill.Total.toString()}$ - ${await (
+                await this.currencyService.convertToCurrency(1, bill.Total)
+              ).toFixed(2)}Bs`,
+            ];
+          }),
+        ),
       };
+
       doc.table(tableDebt, tableOptions);
+
       doc.moveDown(2);
       tableOptions = {
         width: doc.page.width, // Adjust table width
