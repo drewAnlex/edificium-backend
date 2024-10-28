@@ -193,7 +193,7 @@ export class BillingService {
             totalCuota.toString(),
             `${totalDeuda.toString()}$ - ${await this.currencyService.convertToCurrency(
               1,
-              totalDeuda,
+              totalDeuda.toFixed(2),
             )}Bs`,
             facturasPendientes.length.toString(),
             data.apartment.balance.toString(),
@@ -267,7 +267,10 @@ export class BillingService {
               bill.Name,
               formatter.format(bill.createdAt),
               `${bill.Total.toString()}$ - ${await (
-                await this.currencyService.convertToCurrency(1, bill.Total)
+                await this.currencyService.convertToCurrency(
+                  1,
+                  bill.Total.toFixed(2),
+                )
               ).toFixed(2)}Bs`,
             ];
           }),

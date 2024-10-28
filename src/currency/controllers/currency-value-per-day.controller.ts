@@ -39,7 +39,7 @@ export class CurrencyValuePerDayController {
   @Get('/convert/:currency/:value/:date')
   convertToCurrencyAtDate(
     @Param('currency', ParseIntPipe) currency: number,
-    @Param('value', ParseIntPipe) value: number,
+    @Param('value') value: string,
     @Param('date') date: string,
   ) {
     return this.currencyValuePerDayService.convertToCurrencyAtDate(
@@ -53,7 +53,7 @@ export class CurrencyValuePerDayController {
   @Get('/convert/:currency/:value')
   convertToCurrency(
     @Param('currency', ParseIntPipe) currency: number,
-    @Param('value', ParseIntPipe) value: number,
+    @Param('value') value: string,
   ) {
     return this.currencyValuePerDayService.convertToCurrency(currency, value);
   }
