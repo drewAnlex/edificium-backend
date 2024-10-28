@@ -11,14 +11,14 @@ export class CurrencyValuePerDayService {
     private valuePerDayRepo: Repository<currencyValuePerDay>,
   ) {}
 
-  async convertToCurrencyAtDate(currency: number, value: string, date: string) {
+  async convertToCurrencyAtDate(currency: number, value: number, date: string) {
     const currencyValue = await this.findByDate(date, currency);
-    return parseFloat(value) * currencyValue.value;
+    return value * currencyValue.value;
   }
 
-  async convertToCurrency(currency: number, value: string) {
+  async convertToCurrency(currency: number, value: number) {
     const currencyValue = await this.getLatestValue(currency);
-    return parseFloat(value) * currencyValue.value;
+    return value * currencyValue.value;
   }
 
   async getLatestValue(currency: number) {

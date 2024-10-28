@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseFloatPipe,
   ParseIntPipe,
   Post,
   UseGuards,
@@ -39,7 +40,7 @@ export class CurrencyValuePerDayController {
   @Get('/convert/:currency/:value/:date')
   convertToCurrencyAtDate(
     @Param('currency', ParseIntPipe) currency: number,
-    @Param('value') value: string,
+    @Param('value', ParseFloatPipe) value: number,
     @Param('date') date: string,
   ) {
     return this.currencyValuePerDayService.convertToCurrencyAtDate(
@@ -53,7 +54,7 @@ export class CurrencyValuePerDayController {
   @Get('/convert/:currency/:value')
   convertToCurrency(
     @Param('currency', ParseIntPipe) currency: number,
-    @Param('value') value: string,
+    @Param('value', ParseFloatPipe) value: number,
   ) {
     return this.currencyValuePerDayService.convertToCurrency(currency, value);
   }
