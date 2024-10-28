@@ -56,7 +56,7 @@ export class PaymentsController {
     return this.paymentService.create(data, user.userId);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin')
   @Put(':id')
   updatePayment(
     @Param('id', ParseIntPipe) id: number,
@@ -65,7 +65,7 @@ export class PaymentsController {
     return this.paymentService.update(id, changes);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin')
   @Delete(':id')
   deletePayment(@Param('id', ParseIntPipe) id: number) {
     return this.paymentService.remove(id);

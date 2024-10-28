@@ -30,6 +30,9 @@ export class Payment {
   @Column({ type: 'int', default: 0 })
   Status: number;
 
+  @Column({ type: 'boolean', default: false })
+  isRemoved: boolean;
+
   @Column({ type: 'varchar', length: 32, nullable: true })
   PayCode: string;
 

@@ -1,4 +1,9 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Payment } from '../entities/Payment.entity';
 import { PaymentDTO, PaymentUpdateDTO } from '../dtos/Payment.dto';
 
@@ -21,6 +26,7 @@ export class PaymentsService {
 
   findAll() {
     return this.paymentRepo.find({
+      where: { isRemoved: false },
       relations: ['IndividualBill', 'UserId', 'Method', 'paymentInfos'],
     });
   }
@@ -31,6 +37,7 @@ export class PaymentsService {
         UserId: {
           id: userId,
         },
+        isRemoved: false,
       },
       relations: ['IndividualBill', 'Method', 'paymentInfos'],
       order: { createdAt: 'DESC' },
@@ -41,6 +48,7 @@ export class PaymentsService {
     return await this.paymentRepo.find({
       where: {
         Status: 0,
+        isRemoved: false,
         IndividualBill: {
           apartmentId: {
             buildingId: {
@@ -61,7 +69,7 @@ export class PaymentsService {
 
   async findOne(id: number) {
     const payment = await this.paymentRepo.findOne({
-      where: { id: id },
+      where: { id: id, isRemoved: false },
       relations: [
         'IndividualBill',
         'UserId',
@@ -97,8 +105,18 @@ export class PaymentsService {
     return payment;
   }
 
-  remove(id: number) {
-    return this.paymentRepo.delete(id);
+  async remove(id: number) {
+    const payment = await this.findOne(id);
+    try {
+      this.paymentRepo.merge(payment, { isRemoved: true });
+      await this.paymentRepo.save(payment);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred: ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return payment;
   }
 
   async updateStatus(id: number, status: number) {
