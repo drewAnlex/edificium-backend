@@ -191,10 +191,9 @@ export class BillingService {
           [
             totalRecibo?.toFixed(2),
             totalCuota.toString(),
-            `${totalDeuda.toString()}$ - ${await this.currencyService.convertToCurrency(
-              1,
-              totalDeuda,
-            )}Bs`,
+            `${totalDeuda.toString()}$ - ${(
+              await this.currencyService.convertToCurrency(1, totalDeuda)
+            ).toFixed(2)}Bs`,
             facturasPendientes.length.toString(),
             data.apartment.balance.toString(),
           ],
