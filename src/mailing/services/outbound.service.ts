@@ -65,7 +65,7 @@ export class OutboundService {
           user.name
         }, usted ha reportado un pago a través de nuestra plataforma web, con el siguiente detalle:
 
-SOPORTE DE PAGO:
+RECIBO DE PAGO:
 Forma de pago: ${payment.Method.name}
 ${payment.Method.paymentDetails.map(
   (detail) => `\n${detail.Name}: ${detail.description}`,

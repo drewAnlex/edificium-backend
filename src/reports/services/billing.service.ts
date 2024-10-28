@@ -452,6 +452,7 @@ export class BillingService {
       { header: 'Propietario', key: 'name', width: 20 },
       { header: 'Facturas pendientes', key: 'bills', width: 20 },
       { header: 'Balance', key: 'debt', width: 20 },
+      { header: 'Alicuota', key: 'share', width: 20 },
     ];
     apartments.forEach((apartment) => {
       worksheet.addRow({
@@ -459,6 +460,7 @@ export class BillingService {
         name: apartment.userId?.name ? apartment.userId.name : '',
         bills: apartment.individualBills.length,
         debt: apartment.balance,
+        share: apartment.share,
       });
     });
     const buffer = await workbook.xlsx.writeBuffer();
