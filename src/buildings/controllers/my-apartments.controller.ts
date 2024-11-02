@@ -41,7 +41,7 @@ export class MyApartmentsController {
   }
 
   @Roles('Staff', 'Admin', 'User')
-  @Put('/assign/:uuid/:userId')
+  @Put('/assign/:uuid')
   assignApartmentToUser(@Param('uuid') uuid: string, @Req() req: Request) {
     const user = req.user as any;
     return this.apartmentsService.setApartmentToUser(uuid, user.userId);
