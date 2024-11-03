@@ -43,8 +43,8 @@ export class BillingService {
         billItem.IsPaid === false
       );
     });
-    let paymentMethodList = await this.paymnetMethodList.findByIndividualBill(
-      individualBill.id,
+    let paymentMethodList = await this.paymnetMethodList.findByBuilding(
+      data.bill.buildingId.id,
     );
 
     paymentMethodList = paymentMethodList.filter(
