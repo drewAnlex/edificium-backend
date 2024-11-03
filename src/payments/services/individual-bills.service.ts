@@ -49,10 +49,19 @@ export class IndividualBillsService {
 
   async findByApartment(apartmentId: number, ownerId: number) {
     const bills = await this.billRepo.find({
-      where: {
-        apartmentId: { id: apartmentId, userId: { id: ownerId } },
-        isRemoved: false,
-      },
+      where: [
+        {
+          apartmentId: { id: apartmentId, userId: { id: ownerId } },
+          isRemoved: false,
+        },
+        {
+          apartmentId: {
+            id: apartmentId,
+            buildingId: { admins: { id: ownerId } },
+          },
+          isRemoved: false,
+        },
+      ],
       relations: ['buildingBillId'],
       order: { createdAt: 'DESC' },
     });
