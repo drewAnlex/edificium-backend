@@ -326,9 +326,17 @@ export class BillingService {
     const apartments = await this.apartmentService.getApartmentsByBuilding(
       buildingId,
     );
-    const logoUrl = 'http://67.205.149.177/images/icon.jpeg';
+    const billTitle = building.billTitle ? building.billTitle : 'NEXIADMIN';
+    const logoUrl = building.logoImg
+      ? building.logoImg
+      : 'http://67.205.149.177/images/icon.jpeg';
     const response = await axios.get(logoUrl, { responseType: 'arraybuffer' });
     const imageBuffer = response.data;
+    const nexiLogo = 'http://67.205.149.177/images/icon.jpeg';
+    const responseNexi = await axios.get(nexiLogo, {
+      responseType: 'arraybuffer',
+    });
+    const nexiLogoBuffer = responseNexi.data;
     const pdfBuffer: Buffer = await new Promise(async (resolve) => {
       const doc = new PDFDocument({
         size: 'LETTER',
@@ -336,6 +344,34 @@ export class BillingService {
         autoFirstPage: false,
       });
       doc.on('pageAdded', () => {
+        const bottom = doc.page.margins.bottom;
+        doc.page.margins.bottom = 0;
+        doc.font('Helvetica-Bold').fontSize(10);
+        doc.text(
+          'Generado por NexiAdmin',
+          0.5 * (doc.page.width - 100),
+          doc.page.height - 50,
+          {
+            width: 100,
+            align: 'center',
+            lineBreak: false,
+            continued: true,
+          },
+        );
+        doc.image(
+          nexiLogoBuffer,
+          0.5 * (doc.page.width - 20),
+          doc.page.height - 25,
+          {
+            fit: [16, 16],
+            align: 'center',
+          },
+        );
+
+        // Reset text writer position
+
+        doc.text('', 50, 50);
+        doc.page.margins.bottom = bottom;
         doc.font('Helvetica').fontSize(10);
 
         // Building information in header
@@ -363,7 +399,9 @@ export class BillingService {
         // doc.text(`${data.bill.buildingId.zone}`, 50, 35);
         doc.font('Helvetica-Bold').fontSize(18).fillColor('purple'); // Adjust font size and color
 
-        doc.text('NEXIADMIN', doc.page.width - 220, 25, { align: 'left' });
+        doc.text(billTitle, doc.page.width - 220, 25, {
+          align: 'left',
+        });
 
         doc.image(imageBuffer, doc.page.width - 100, 5, {
           fit: [45, 45],
