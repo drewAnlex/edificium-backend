@@ -224,15 +224,8 @@ export class BuildingBillsService {
     return bill;
   }
 
-  async updateByAdmin(
-    id: number,
-    payload: UpdateBuildingBillDTO,
-    buildingId: number,
-  ) {
+  async updateByAdmin(id: number, payload: UpdateBuildingBillDTO) {
     const buildingBill = await this.findOne(id);
-    if (buildingId != buildingBill.buildingId.id) {
-      throw new NotFoundException(`Building Bill #${id} not found`);
-    }
     try {
       await this.billRepo.merge(buildingBill, payload);
       await this.billRepo.save(buildingBill);

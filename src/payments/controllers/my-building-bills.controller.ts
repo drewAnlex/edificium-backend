@@ -83,10 +83,8 @@ export class MyBuildingBillsController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() payload: UpdateBuildingBillDTO,
-    @Req() req: Request,
   ) {
-    const user = req.user as any;
-    return this.buildingBillService.updateByAdmin(id, payload, user.building);
+    return this.buildingBillService.updateByAdmin(id, payload);
   }
 
   @Roles('Admin')

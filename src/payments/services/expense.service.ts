@@ -53,6 +53,11 @@ export class ExpenseService {
           building: { id: building },
           isRemoved: false,
         },
+        {
+          building: { id: building },
+          isRemoved: false,
+          buildingBill: null,
+        },
       ],
       relations: ['buildingBill'],
     });

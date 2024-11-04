@@ -39,7 +39,6 @@ export class CreateExpenseDTO implements Readonly<CreateExpenseDTO> {
   building: Building;
 
   @IsOptional()
-  @IsNumber()
   buildingBill: BuildingBill;
 
   @IsNotEmpty()
