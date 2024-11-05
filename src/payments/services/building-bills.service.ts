@@ -133,7 +133,8 @@ export class BuildingBillsService {
     const { buildingId } = bill;
 
     const apartment = buildingId.apartments.find(
-      (apartment) => apartment.userId?.id === userId,
+      (apartment) =>
+        apartment.userId?.id === userId || buildingId.apartments[0],
     );
     const owner = apartment
       ? apartment?.userId
