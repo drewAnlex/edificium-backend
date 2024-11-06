@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { currencyValuePerDay } from '../entities/currency-value-per-day.entity';
 import { Between, Repository } from 'typeorm';
 import { ValuePerDayDto } from '../dtos/valuePerDay.dto';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class CurrencyValuePerDayService {
@@ -85,5 +86,27 @@ export class CurrencyValuePerDayService {
       );
     }
     return newValue;
+  }
+  @Cron('10 0 * * 1-5', { timeZone: 'America/Caracas' })
+  async getCurrencyValueBCV() {
+    try {
+      const response = await fetch(
+        'https://pydolarve.org/api/v1/dollar?page=bcv',
+        {
+          method: 'GET',
+        },
+      );
+      const data = await response.json();
+      const newValue = this.valuePerDayRepo.create({
+        currency: { id: 1 },
+        value: data.dollar.bcv,
+      });
+      await this.valuePerDayRepo.save(newValue);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred: ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

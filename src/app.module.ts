@@ -14,6 +14,7 @@ import { MailingModule } from './mailing/mailing.module';
 import { ReportsModule } from './reports/reports.module';
 import { CurrencyModule } from './currency/currency.module';
 import config from './config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import config from './config';
       load: [config],
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     BuildingsModule,
     UsersModule,
     PaymentsModule,
