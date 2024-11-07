@@ -99,7 +99,7 @@ export class CurrencyValuePerDayService {
       const data = await response.json();
       const newValue = this.valuePerDayRepo.create({
         currency: { id: 1 },
-        value: data.dollar.bcv,
+        value: data.monitors.usd,
       });
       await this.valuePerDayRepo.save(newValue);
     } catch (error) {
