@@ -11,7 +11,7 @@ import {
   IndividualBillDto,
   UpdateIndividualBillDto,
 } from '../dtos/IndividualBill.dto';
-
+import * as XLSX from 'xlsx';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApartmentsService } from 'src/buildings/services/apartments.service';
@@ -120,6 +120,72 @@ export class IndividualBillsService {
       throw new NotFoundException(`Bill #${id} not found`);
     }
     return bill;
+  }
+
+  async createByFile(file: Express.Multer.File, building: number) {
+    const columnTranslations = {
+      Identificador: 'identifier',
+      Nombre: 'Name',
+      Descripcion: 'Description',
+      Total: 'Total',
+      Saldo: 'Balance',
+    };
+    if (!file) {
+      throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      const workbook = XLSX.read(file.buffer, { type: 'buffer' });
+      if (workbook.SheetNames.length === 0) {
+        throw new HttpException(
+          'The uploaded file is empty',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+      const translatedData = jsonData.map((row: any) => {
+        const translatedRow: any = {};
+        for (const key in row) {
+          if (columnTranslations[key]) {
+            translatedRow[columnTranslations[key]] = row[key];
+          } else {
+            translatedRow[key] = row[key];
+          }
+        }
+        return translatedRow;
+      });
+      const batchSize = 100;
+      for (let i = 0; i < translatedData.length; i += batchSize) {
+        const batch = translatedData.slice(i, i + batchSize);
+        for (const payload of batch) {
+          const apartment = await this.apartmentService.findByIdentifier(
+            payload.identifier,
+            building,
+          );
+          if (!apartment) {
+            throw new HttpException(
+              `Apartment not found for identifier ${payload.identifier}`,
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+          payload.apartmentId = { id: apartment.id };
+          await this.create(payload);
+        }
+        console.log(`Processed batch ${i / batchSize + 1}`);
+      }
+      return { message: 'Data processed successfully' };
+    } catch (error) {
+      console.error('Error processing file:', error);
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        throw new HttpException(
+          'Failed to process file',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
   }
 
   async create(payload: IndividualBillDto, id?: number) {

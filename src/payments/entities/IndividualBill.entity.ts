@@ -42,7 +42,7 @@ export class IndividualBill {
   @Column({ type: 'decimal', precision: 8, scale: 2 })
   Balance: number;
 
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', default: false })
   IsPaid: boolean;
 
   @Column({ type: 'boolean', default: false })

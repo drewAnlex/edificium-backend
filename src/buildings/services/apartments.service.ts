@@ -28,6 +28,16 @@ export class ApartmentsService {
     });
   }
 
+  async findByIdentifier(identifier: string, buildingId: number) {
+    const apartment = await this.apartmentRepo.findOne({
+      where: { identifier, buildingId: { id: buildingId } },
+    });
+    if (!apartment) {
+      throw new NotFoundException(`Apartment #${identifier} not found`);
+    }
+    return apartment;
+  }
+
   async findOne(id: number) {
     const apartment = await this.apartmentRepo.findOne({
       where: { id },

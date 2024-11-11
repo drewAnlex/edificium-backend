@@ -9,6 +9,11 @@ import {
   Param,
   UseGuards,
   Req,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { IndividualBillsService } from '../services/individual-bills.service';
 import {
@@ -20,6 +25,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Request } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('individual-bills')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -89,6 +95,27 @@ export class IndividualBillsController {
       data,
       parseInt(data.apartmentId.toString()),
     );
+  }
+
+  @Roles('Staff', 'Admin')
+  @Post('upload/:building')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadFile(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1000000 }),
+          new FileTypeValidator({
+            fileType:
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+    @Param('building') building: number,
+  ) {
+    return this.individualBillsService.createByFile(file, building);
   }
 
   @Roles('Staff')
