@@ -27,6 +27,12 @@ export class CurrencyValuePerDayController {
     return this.currencyValuePerDayService.getLatestValue(currency);
   }
 
+  @Roles('Staff', 'Admin')
+  @Get('bcv')
+  getBcv() {
+    return this.currencyValuePerDayService.getCurrencyValueBCV();
+  }
+
   @Roles('Staff', 'Admin', 'User')
   @Get('/:date/:currency')
   findByDate(

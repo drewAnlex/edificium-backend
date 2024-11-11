@@ -89,6 +89,14 @@ export class CurrencyValuePerDayService {
   }
   @Cron('10 0 * * 1-5', { timeZone: 'America/Caracas' })
   async getCurrencyValueBCV() {
+    const today = new Date().toISOString().split('T')[0];
+    const lastValue = await this.findByDate(today, 1);
+    if (lastValue) {
+      throw new HttpException(
+        `An error occurred: Already exist a value for today`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     try {
       const response = await fetch(
         'https://pydolarve.org/api/v1/dollar?page=bcv',
@@ -102,6 +110,7 @@ export class CurrencyValuePerDayService {
         value: data.monitors.usd.price,
       });
       await this.valuePerDayRepo.save(newValue);
+      return { msg: 'Updated' };
     } catch (error) {
       throw new HttpException(
         `An error occurred: ${error}`,
