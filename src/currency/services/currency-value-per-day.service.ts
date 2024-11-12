@@ -66,10 +66,10 @@ export class CurrencyValuePerDayService {
     });
 
     if (!value) {
-      throw new HttpException(
-        `Value for currency ${currency} and date ${date} not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      return {
+        msg: `Value for currency ${currency} and date ${date} not found`,
+        value: 0,
+      };
     }
 
     return value;
@@ -91,7 +91,7 @@ export class CurrencyValuePerDayService {
   async getCurrencyValueBCV() {
     const today = new Date().toISOString().split('T')[0];
     const lastValue = await this.findByDate(today, 1);
-    if (lastValue) {
+    if (lastValue.value != 0) {
       throw new HttpException(
         `An error occurred: Already exist a value for today`,
         HttpStatus.BAD_REQUEST,
