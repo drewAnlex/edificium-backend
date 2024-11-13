@@ -189,13 +189,13 @@ export class BillingService {
         ],
         rows: [
           [
-            totalRecibo?.toFixed(2),
-            totalCuota.toString(),
+            `${totalRecibo?.toFixed(2)}$`,
+            `${totalCuota.toString()}$`,
             `${totalDeuda.toString()}$ - ${(
               await this.currencyService.convertToCurrency(1, totalDeuda)
             ).toFixed(2)}Bs`,
             facturasPendientes.length.toString(),
-            data.apartment.balance.toString(),
+            `${data.apartment.balance.toString()}$`,
           ],
         ],
       };
@@ -214,7 +214,7 @@ export class BillingService {
           return [
             expense.name,
             expense.dependsOnShare ? 'A' : 'P',
-            expense.total.toString(),
+            `${expense.total.toString()}$`,
             expense.dependsOnShare
               ? (expense.total * data.apartment.share).toFixed(2).toString()
               : (expense.total / data.bill.buildingId.nApartments)
@@ -240,7 +240,7 @@ export class BillingService {
           return [
             expense.name,
             expense.dependsOnShare ? 'A' : 'P',
-            expense.total.toString(),
+            `${expense.total.toString()}$`,
             expense.dependsOnShare
               ? (expense.total * data.apartment.share).toFixed(2).toString()
               : (expense.total / data.bill.buildingId.nApartments)
