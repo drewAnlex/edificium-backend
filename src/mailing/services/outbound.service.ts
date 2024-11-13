@@ -8,6 +8,7 @@ import { BuildingBillsService } from 'src/payments/services/building-bills.servi
 import { IndividualBillsService } from 'src/payments/services/individual-bills.service';
 import { BillingService } from 'src/reports/services/billing.service';
 import { UsersService } from 'src/users/services/users.service';
+import * as crypto from 'crypto';
 
 const formatter = new Intl.DateTimeFormat('es-ES'); // 'es-ES' para español de España
 
@@ -42,6 +43,35 @@ export class OutboundService {
 
       const response = await this.mg.messages.create(
         'sandbox0918d61f84384276b051e69e193a6178.mailgun.org',
+        messageData,
+      );
+      console.log(response); // logs response data
+    } catch (error) {
+      console.error(error); // logs any error
+      throw new Error(error);
+    }
+  }
+
+  async sendPasswordResetEmail(email: string) {
+    const user = await this.userService.findByEmail(email);
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date();
+    expires.setHours(expires.getHours() + 1);
+    await this.userService.update(user.id, {
+      resetToken: token,
+      resetTokenExpires: expires,
+    });
+
+    const messageData = {
+      from: process.env.EMAIL_SYSTEM_ADDR,
+      to: [email],
+      subject: 'Recuperación de contraseña',
+      text: `Hola ${user.name}, haz click en el siguiente enlace para recuperar tu contraseña: ${process.env.MAILING_DOMAIN}/reset-password/${token}`,
+    };
+
+    try {
+      const response = await this.mg.messages.create(
+        process.env.MAILING_DOMAIN,
         messageData,
       );
       console.log(response); // logs response data

@@ -16,6 +16,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Request } from 'express';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @ApiTags('profile')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -37,6 +38,12 @@ export class ProfileController {
   updateUser(@Req() req: Request, @Body() payload: UpdateUserDto) {
     const user = req.user as any;
     return this.usersService.update(user.userId, payload);
+  }
+
+  @Public()
+  @Put('reset-password')
+  resetPassword(@Body() payload) {
+    return this.usersService.changePassword(payload.newPassword, payload.token);
   }
 
   @Roles('Staff', 'Admin', 'User')

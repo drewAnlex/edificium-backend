@@ -66,6 +66,29 @@ export class UsersService {
     return newUser;
   }
 
+  async changePassword(newPassword: string, token: string) {
+    const user = await this.userRepo.findOne({
+      where: { resetToken: token },
+    });
+    if (!user) {
+      throw new NotFoundException(`Invalid Token`);
+    }
+    const hashPassword = await bcrypt.hash(newPassword, 10);
+    try {
+      await this.update(user.id, {
+        resetToken: null,
+        resetTokenExpires: null,
+        password: hashPassword,
+      });
+      return { message: 'Password changed successfully' };
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred while trying to change the password: ${error}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async update(id: number, payload: UpdateUserDto) {
     const user = await this.findOne(id);
     try {

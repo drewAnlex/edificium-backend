@@ -18,6 +18,14 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   readonly password: string;
+
+  @IsOptional()
+  @IsString()
+  readonly resetToken: string;
+
+  @IsOptional()
+  @IsString()
+  readonly resetTokenExpires: Date;
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}

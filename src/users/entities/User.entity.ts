@@ -49,6 +49,12 @@ export class User {
   @OneToMany(() => Payment, (payment) => payment.UserId)
   payments: Payment[];
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  resetToken: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  resetTokenExpires: Date;
+
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 

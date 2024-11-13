@@ -12,6 +12,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { OutboundService } from '../services/outbound.service';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Request } from 'express';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @ApiTags('outbound')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -25,5 +26,11 @@ export class OutboundController {
     const user = req.user as any;
     this.outbound.buildingBillEmail(id, user.userId);
     return { msg: 'Reminder sended' };
+  }
+
+  @Public()
+  @Get('reset-password/:email')
+  sendPasswordResetEmail(@Param('email') email: string) {
+    return this.outbound.sendPasswordResetEmail(email);
   }
 }
