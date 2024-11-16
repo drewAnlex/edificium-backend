@@ -15,6 +15,7 @@ import { ReportsModule } from './reports/reports.module';
 import { CurrencyModule } from './currency/currency.module';
 import config from './config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { FundModule } from './fund/fund.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     MailingModule,
     ReportsModule,
     CurrencyModule,
+    FundModule,
   ],
   controllers: [AppController],
   providers: [AppService],

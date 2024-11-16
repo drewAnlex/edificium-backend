@@ -14,6 +14,7 @@ import {
 import { Apartment } from './apartment.entity';
 import { Expense } from 'src/payments/entities/Expense.entity';
 import { currencyList } from 'src/currency/entities/currency-list.entity';
+import { Fund } from 'src/fund/entities/Fund.entity';
 
 @Entity()
 export class Building {
@@ -74,6 +75,9 @@ export class Building {
 
   @OneToMany(() => Expense, (expense) => expense.building)
   expenses: Expense[];
+
+  @OneToMany(() => Fund, (fund) => fund.building)
+  funds: Fund[];
 
   @OneToMany(() => Apartment, (apartment) => apartment.buildingId)
   apartments: Apartment[];
