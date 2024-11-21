@@ -38,7 +38,9 @@ export class TransactionService {
   }
 
   async create(payload: TransactionDTO) {
-    const fund = await this.fundService.findOne(payload.fund.id);
+    const fund = await this.fundService.findOne(
+      parseInt(payload.fund.toString()),
+    );
     try {
       const transaction = this.transactionRepo.create(payload);
       await this.transactionRepo.save(transaction);

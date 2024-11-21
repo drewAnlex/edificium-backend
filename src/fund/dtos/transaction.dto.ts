@@ -12,6 +12,7 @@ export class TransactionDTO implements Readonly<TransactionDTO> {
   amount: number;
 
   @IsNotEmpty()
+  @IsNumber()
   fund: Fund;
 }
 

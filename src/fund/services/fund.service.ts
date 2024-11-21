@@ -18,11 +18,14 @@ export class FundService {
   async findOne(id: number) {
     const fund = await this.fundRepo.findOne({
       where: { id: id },
-      relations: ['transactions'],
+      relations: ['transactions', 'building'],
     });
     if (!fund) {
       throw new NotFoundException(`Fund #${id} not found`);
     }
+    fund.transactions.sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    );
     return fund;
   }
 

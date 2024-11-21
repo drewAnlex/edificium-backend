@@ -38,6 +38,21 @@ export class BillingController {
   }
 
   @Roles('Staff', 'Admin')
+  @Get('building-bill-preview/:id')
+  async fakePreview(
+    @Param('id', ParseIntPipe) id: number,
+    @Res() res,
+  ): Promise<void> {
+    const buffer = await this.billingService.generateBillPreviewPDF(id);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; file-name.pdf',
+      'Content-Length': buffer.length,
+    });
+    res.end(buffer);
+  }
+
+  @Roles('Staff', 'Admin')
   @Get('building-bill-apartment/:id/:apartment')
   async buildingBillByApartment(
     @Param('id', ParseIntPipe) id: number,

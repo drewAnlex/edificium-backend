@@ -321,6 +321,270 @@ export class BillingService {
     return pdfBuffer;
   }
 
+  async generateBillPreviewPDF(bill: number): Promise<Buffer> {
+    const data = await this.bbService.findOne(bill);
+    let paymentMethodList = await this.paymnetMethodList.findByBuilding(
+      data.buildingId.id,
+    );
+
+    paymentMethodList = paymentMethodList.filter(
+      (paymentMethod) => paymentMethod.status === 1,
+    );
+
+    const billTitle = data.buildingId.billTitle
+      ? data.buildingId.billTitle
+      : 'NEXIADMIN';
+    const logoUrl = data.buildingId.logoImg
+      ? data.buildingId.logoImg
+      : 'http://67.205.149.177/images/icon.jpeg';
+
+    const nexiLogo = 'http://67.205.149.177/images/icon.jpeg';
+    const response = await axios.get(logoUrl, { responseType: 'arraybuffer' });
+    const imageBuffer = response.data;
+    const responseNexi = await axios.get(nexiLogo, {
+      responseType: 'arraybuffer',
+    });
+    const nexiLogoBuffer = responseNexi.data;
+    const pdfBuffer: Buffer = await new Promise(async (resolve) => {
+      const doc = new PDFDocument({
+        size: 'LETTER',
+        bufferPages: true,
+        autoFirstPage: false,
+      });
+
+      doc.on('pageAdded', () => {
+        const bottom = doc.page.margins.bottom;
+        doc.page.margins.bottom = 0;
+        doc.font('Helvetica-Bold').fontSize(10);
+        doc.text(
+          'Generado por NexiAdmin',
+          0.5 * (doc.page.width - 100),
+          doc.page.height - 50,
+          {
+            width: 100,
+            align: 'center',
+            lineBreak: false,
+            continued: true,
+          },
+        );
+        doc.image(
+          nexiLogoBuffer,
+          0.5 * (doc.page.width - 20),
+          doc.page.height - 25,
+          {
+            fit: [16, 16],
+            align: 'center',
+          },
+        );
+
+        // Reset text writer position
+
+        doc.text('', 50, 50);
+        doc.page.margins.bottom = bottom;
+        doc.font('Helvetica').fontSize(10);
+
+        // Building information in header
+        doc.text(``, 50, 20);
+        const adressOptions = {
+          width: doc.page.width, // Adjust table width
+          cellPadding: 5, // Add some padding to cells
+          headerRows: 1, // Only show header row as bold
+          columnsSize: [350],
+          divider: {
+            header: { disabled: true, width: 2, opacity: 1 },
+            horizontal: { disabled: true, width: 0.5, opacity: 0.5 },
+          },
+        };
+        const adressTable = {
+          headers: [
+            {
+              label: `${data.buildingId.name}, ${data.buildingId.fiscalId}`,
+              headerColor: 'white',
+            },
+          ],
+          rows: [[data.buildingId.zone]],
+        };
+        doc.table(adressTable, adressOptions);
+        // doc.text(`${data.bill.buildingId.zone}`, 50, 35);
+        doc.font('Helvetica-Bold').fontSize(18).fillColor('purple'); // Adjust font size and color
+
+        doc.text(billTitle, doc.page.width - 220, 25, {
+          align: 'left',
+        });
+
+        doc.image(imageBuffer, doc.page.width - 100, 5, {
+          fit: [45, 45],
+          align: 'center',
+        });
+        doc
+          .moveTo(50, 55)
+          .lineTo(doc.page.width - 50, 55)
+          .stroke();
+
+        doc.text('', 50, 70);
+        doc.font('Helvetica').fontSize(10).fillColor('black');
+      });
+
+      doc.addPage();
+      doc.text('', 50, 70);
+      doc.font('Helvetica').fontSize(10);
+      doc.text(`Relación de gastos N°: ${data.id}`);
+      doc.text(`Propietario: Previsualización`);
+      doc.text(`Inmueble:`);
+      doc.text(`Alicuota:`);
+      doc.text(`Fecha de emisión: ${formatter.format(data.createdAt)}`);
+
+      const fixedExpenses = data.expenses.filter(
+        (expense) => expense.isFixed && expense.isRemoved === false,
+      );
+      const variableExpenses = data.expenses.filter(
+        (expense) => !expense.isFixed && expense.isRemoved === false,
+      );
+      const totalRecibo = data.total;
+      const totalCuota = 0; // Manejar posible valor indefinido
+      const totalDeuda = 0;
+
+      let tableOptions = {
+        width: doc.page.width, // Adjust table width
+        layout: 'lightHorizontalLines', // Add thin horizontal lines
+        cellPadding: 5, // Add some padding to cells
+        headerRows: 1, // Only show header row as bold
+        columnsSize: [260, 50, 100, 100],
+      };
+
+      // Crear la tabla con los totales
+      const totalsTable = {
+        headers: [
+          'TOTAL RECIBO',
+          'TOTAL CUOTA',
+          'TOTAL DEUDA',
+          'FACTURAS PENDIENTES',
+          'BALANCE',
+        ],
+        rows: [
+          [
+            `${totalRecibo?.toFixed(2)}$`,
+            `${totalCuota.toString()}$`,
+            `${totalDeuda.toString()}$ - ${(
+              await this.currencyService.convertToCurrency(1, totalDeuda)
+            ).toFixed(2)}Bs`,
+            '0',
+            `0$`,
+          ],
+        ],
+      };
+
+      doc.moveDown(2);
+      const table = {
+        title: data.name,
+        subtitle: data.description,
+        headers: [
+          'DESCRIPCIÓN DE LA RELACIÓN DE GASTOS FIJOS',
+          'AP',
+          'MONTO',
+          'MONTO CUOTA',
+        ],
+        rows: variableExpenses.map((expense) => {
+          return [
+            expense.name,
+            expense.dependsOnShare ? 'A' : 'P',
+            `${expense.total.toString()}$`,
+            expense.dependsOnShare
+              ? (expense.total * 0.1).toFixed(2).toString()
+              : (expense.total / data.buildingId.nApartments)
+                  .toFixed(2)
+                  .toString(),
+          ];
+        }),
+      };
+
+      doc.fillColor('black'); // Set default text color to black
+
+      doc.table(table, tableOptions);
+
+      doc.moveDown(2);
+      const tableVariables = {
+        headers: [
+          'DESCRIPCIÓN DE LA RELACIÓN DE GASTOS VARIABLES',
+          'AP',
+          'MONTO',
+          'MONTO CUOTA',
+        ],
+        rows: fixedExpenses.map((expense) => {
+          return [
+            expense.name,
+            expense.dependsOnShare ? 'A' : 'P',
+            `${expense.total.toString()}$`,
+            expense.dependsOnShare
+              ? (expense.total * 0.1).toFixed(2).toString()
+              : (expense.total / data.buildingId.nApartments)
+                  .toFixed(2)
+                  .toString(),
+          ];
+        }),
+      };
+      doc.table(tableVariables, tableOptions);
+      doc.moveDown(2);
+      tableOptions = {
+        width: doc.page.width, // Adjust table width
+        layout: 'lightHorizontalLines', // Add thin horizontal lines
+        cellPadding: 5, // Add some padding to cells
+        headerRows: 1, // Only show header row as bold
+        columnsSize: [260, 125, 125],
+      };
+      const tableDebt = {
+        headers: ['TITULO', 'FECHA DE EMISIÓN', 'MONTO'],
+        rows: [],
+      };
+
+      doc.table(tableDebt, tableOptions);
+
+      doc.moveDown(2);
+      tableOptions = {
+        width: doc.page.width, // Adjust table width
+        layout: 'lightHorizontalLines', // Add thin horizontal lines
+        cellPadding: 5, // Add some padding to cells
+        headerRows: 1, // Only show header row as bold
+        columnsSize: [125, 125, 100, 60, 100],
+      };
+      doc.table(totalsTable, tableOptions);
+      doc.text(`AP: A: Aplica por alícuota P: Aplica por propietario `);
+
+      doc.moveDown(2);
+      doc.font('Helvetica-Bold').fontSize(12);
+      doc.text(`Metodos de pago:`);
+      doc.font('Helvetica').fontSize(10);
+      paymentMethodList.map((method) => {
+        if (
+          doc.y + doc.currentLineHeight(true) >
+          doc.page.height - doc.page.margins.bottom
+        ) {
+          doc.addPage();
+        }
+        doc.text(`${method.name}`);
+        method.paymentDetails.map((detail) => {
+          if (
+            doc.y + doc.currentLineHeight(true) >
+            doc.page.height - doc.page.margins.bottom
+          ) {
+            doc.addPage();
+          }
+          doc.text(`${detail.Name}: ${detail.description}`);
+        });
+        doc.moveDown(1);
+      });
+
+      const buffer = [];
+      doc.on('data', buffer.push.bind(buffer));
+      doc.on('end', () => {
+        const data = Buffer.concat(buffer);
+        resolve(data);
+      });
+      doc.end();
+    });
+    return pdfBuffer;
+  }
+
   async accountStatement(buildingId: number) {
     const building = await this.buildingService.findOne(buildingId);
     const apartments = await this.apartmentService.getApartmentsByBuilding(
