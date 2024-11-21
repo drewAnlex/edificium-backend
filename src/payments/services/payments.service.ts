@@ -178,7 +178,10 @@ export class PaymentsService {
         payment,
       );
     } catch (error) {
-      console.log(error);
+      throw new HttpException(
+        `An error occurred: ${error}`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     return payment;

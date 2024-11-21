@@ -39,7 +39,6 @@ export class MyBuildingsController {
   @Get('my-admin')
   getBuildingByAdmin(@Req() req: Request) {
     const user = req.user as any;
-    console.log(user);
     return this.buildingsService.findOne(user.building);
   }
 

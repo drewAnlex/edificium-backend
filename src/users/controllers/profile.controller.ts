@@ -29,7 +29,6 @@ export class ProfileController {
   @Get()
   getUser(@Req() req: Request) {
     const user = req.user as any;
-    console.log(user);
     return this.usersService.findOne(user.userId);
   }
 
