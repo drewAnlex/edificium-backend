@@ -232,4 +232,49 @@ Artículo 14º Fraude. El que, a través del uso indebido de tecnologías de inf
       }
     }
   }
+
+  async buildingBillPreview(building: number, userId?: number): Promise<void> {
+    const relativePath = '../../templates/receipt.html';
+    const absolutePath = path.resolve(__dirname, relativePath);
+    const bill = await this.buildingBill.getLatestForEmailPreview(building);
+    const apartments = bill.buildingId.apartments;
+    const pdfBuffers: Uint8Array[] = [];
+
+    for (const apartment of apartments) {
+      const user = apartment.userId
+        ? apartment.userId
+        : await this.userService.findOne(userId);
+      const buffer = await this.billing.generateBillPDF(
+        bill.id,
+        user.id,
+        apartment.id,
+      );
+      pdfBuffers.push(buffer);
+    }
+
+    const mergedPdfBuffer = await this.mergePDFs(pdfBuffers);
+
+    for (const admin of bill.buildingId.admins) {
+      const receipt = await fs.readFile(absolutePath, 'utf8');
+      const messageData = {
+        from: process.env.EMAIL_SYSTEM_ADDR,
+        to: [admin.email],
+        subject: `${bill.name} PREVIEW`,
+        text: 'Aviso de cobro',
+        html: receipt,
+        attachment: Buffer.from(mergedPdfBuffer),
+      };
+
+      try {
+        const response = await this.mg.messages.create(
+          process.env.MAILING_DOMAIN,
+          messageData,
+        );
+        console.log(response); // logs response data
+      } catch (error) {
+        console.error(error); // logs any error
+        throw new Error(error);
+      }
+    }
+  }
 }

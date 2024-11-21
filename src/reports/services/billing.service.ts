@@ -37,6 +37,22 @@ export class BillingService {
     const individualBill = individualBills.find(
       (billItem) => billItem.buildingBillId?.id === data.bill.id,
     );
+    let alternativeBalance = 0;
+    if (!individualBill?.Total) {
+      let totalPerShare = 0;
+      let totalNotPerShare = 0;
+      data.bill.expenses.forEach((expense) => {
+        if (expense.dependsOnShare) {
+          const gasto = expense.total.toString();
+          totalPerShare = totalPerShare + parseFloat(gasto);
+        } else {
+          totalNotPerShare =
+            totalNotPerShare + expense.total / data.bill.buildingId.nApartments;
+        }
+      });
+      alternativeBalance =
+        totalPerShare * data.apartment.share + totalNotPerShare;
+    }
     const pastIndividualBills = individualBills.filter((billItem) => {
       return (
         billItem.buildingBillId?.id !== data.bill.id &&
@@ -163,7 +179,7 @@ export class BillingService {
         (expense) => !expense.isFixed && expense.isRemoved === false,
       );
       const totalRecibo = data.bill.total;
-      const totalCuota = individualBill?.Total || 0; // Manejar posible valor indefinido
+      const totalCuota = individualBill?.Total || alternativeBalance; // Manejar posible valor indefinido
       const totalDeuda = await this.ibService.adminIndividualDebt(
         data.apartment.id,
       );

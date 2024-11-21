@@ -28,6 +28,14 @@ export class OutboundController {
     return { msg: 'Reminder sended' };
   }
 
+  @Roles('Staff', 'Admin')
+  @Get('debt-preview/:id')
+  sendPreview(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
+    const user = req.user as any;
+    this.outbound.buildingBillPreview(id, user.userId);
+    return { msg: 'Preview sended' };
+  }
+
   @Public()
   @Get('reset-password/:email')
   sendPasswordResetEmail(@Param('email') email: string) {

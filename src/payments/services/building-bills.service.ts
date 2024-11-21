@@ -46,6 +46,23 @@ export class BuildingBillsService {
     });
   }
 
+  async getLatestForEmailPreview(building: number) {
+    return await this.billRepo.findOne({
+      where: {
+        isPublished: false,
+        buildingId: { id: building },
+        isRemoved: false,
+      },
+      order: { createdAt: 'DESC' },
+      relations: [
+        'buildingId',
+        'buildingId.apartments',
+        'buildingId.apartments.userId',
+        'buildingId.admins',
+      ],
+    });
+  }
+
   getLatest(buildingId: number) {
     return this.billRepo.findOne({
       where: {
