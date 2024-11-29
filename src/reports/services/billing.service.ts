@@ -179,7 +179,8 @@ export class BillingService {
         (expense) => !expense.isFixed && expense.isRemoved === false,
       );
       const totalRecibo = data.bill.total;
-      const totalCuota = individualBill?.Total || alternativeBalance; // Manejar posible valor indefinido
+      const totalCuota =
+        individualBill?.Total.toFixed(2) || alternativeBalance.toFixed(2); // Manejar posible valor indefinido
       const totalDeuda = await this.ibService.adminIndividualDebt(
         data.apartment.id,
       );

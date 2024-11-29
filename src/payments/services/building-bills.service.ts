@@ -144,9 +144,22 @@ export class BuildingBillsService {
         'buildingId.apartments.userId',
       ],
     });
+
     if (!bill) {
       throw new NotFoundException(`Building Bill #${id} not found`);
     }
+
+    // Ordenar expenses alfabéticamente por expense.name
+    bill.expenses.sort((a, b) => {
+      if (a.name < b.name) {
+        return -1; // a debe ir antes que b
+      }
+      if (a.name > b.name) {
+        return 1; // b debe ir antes que a
+      }
+      return 0; // son iguales
+    });
+
     const { buildingId } = bill;
 
     const apartment = buildingId.apartments.find(
