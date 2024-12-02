@@ -24,6 +24,11 @@ import { UsersModule } from 'src/users/users.module';
 import { CurrencyModule } from 'src/currency/currency.module';
 import { CurrencyValuePerDayService } from 'src/currency/services/currency-value-per-day.service';
 import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-day.entity';
+import { FundService } from './services/fund.service';
+import { FundService as FService } from 'src/fund/services/fund.service';
+import { FundModule } from 'src/fund/fund.module';
+import { FundController } from './controllers/fund.controller';
+import { Fund } from 'src/fund/entities/Fund.entity';
 
 @Module({
   imports: [
@@ -36,6 +41,7 @@ import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-da
       PaymentMethodList,
       PaymentMethodDetails,
       currencyValuePerDay,
+      Fund,
     ]),
     forwardRef(() => UsersModule),
     forwardRef(() => PaymentsModule),
@@ -43,6 +49,7 @@ import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-da
     forwardRef(() => BuildingsModule),
     forwardRef(() => MailingModule),
     forwardRef(() => CurrencyModule),
+    forwardRef(() => FundModule),
   ],
   providers: [
     UsersService,
@@ -54,7 +61,9 @@ import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-da
     ApartmentsService,
     OutboundService,
     CurrencyValuePerDayService,
+    FundService,
+    FService,
   ],
-  controllers: [BillingController],
+  controllers: [BillingController, FundController],
 })
 export class ReportsModule {}

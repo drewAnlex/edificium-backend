@@ -170,7 +170,7 @@ export class BillingService {
         `Inmueble: ${data.apartment ? data.apartment.identifier : 'Admin'}`,
       );
       doc.text(`Alicuota: ${data.apartment.share}`);
-      doc.text(`Fecha de emisión: ${formatter.format(data.bill.createdAt)}`);
+      doc.text(`\nFecha de emisión: ${formatter.format(data.bill.createdAt)}`);
 
       const fixedExpenses = data.bill.expenses.filter(
         (expense) => expense.isFixed && expense.isRemoved === false,
@@ -269,6 +269,7 @@ export class BillingService {
         }),
       };
       doc.table(tableVariables, tableOptions);
+      doc.text(`AP: A: Aplica por alícuota P: Aplica por propietario `);
       doc.moveDown(2);
       tableOptions = {
         width: doc.page.width, // Adjust table width
@@ -292,7 +293,7 @@ export class BillingService {
         ),
       };
 
-      doc.table(tableDebt, tableOptions);
+      // doc.table(tableDebt, tableOptions);
 
       doc.moveDown(2);
       tableOptions = {
@@ -302,9 +303,11 @@ export class BillingService {
         headerRows: 1, // Only show header row as bold
         columnsSize: [125, 125, 100, 60, 100],
       };
-      doc.table(totalsTable, tableOptions);
-      doc.text(`AP: A: Aplica por alícuota P: Aplica por propietario `);
-
+      // doc.table(totalsTable, tableOptions);
+      // doc.moveDown(2);
+      doc.font('Helvetica-Bold').fontSize(12);
+      doc.text(`Total: ${totalRecibo?.toFixed(2)}$`);
+      doc.text(`Cuota: ${totalCuota.toString()}$`);
       doc.moveDown(2);
       doc.font('Helvetica-Bold').fontSize(12);
       doc.text(`Metodos de pago:`);
