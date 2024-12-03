@@ -183,11 +183,11 @@ export class BillingService {
         individualBill?.Total != undefined
           ? individualBill?.Total
           : alternativeBalance.toFixed(2); // Manejar posible valor indefinido
-      const totalDeuda = await this.ibService.adminIndividualDebt(
-        data.apartment.id,
-      );
-      const facturasPendientes =
-        await this.ibService.findUnpaidBillsByApartment(data.apartment.id);
+      // const totalDeuda = await this.ibService.adminIndividualDebt(
+      //   data.apartment.id,
+      // );
+      // const facturasPendientes =
+      //   await this.ibService.findUnpaidBillsByApartment(data.apartment.id);
 
       let tableOptions = {
         width: doc.page.width, // Adjust table width
@@ -199,22 +199,14 @@ export class BillingService {
 
       // Crear la tabla con los totales
       const totalsTable = {
-        headers: [
-          'TOTAL RECIBO',
-          'TOTAL CUOTA',
-          'TOTAL DEUDA',
-          'FACTURAS PENDIENTES',
-          'BALANCE',
-        ],
+        headers: ['', '', '', 'TOTAL RECIBO', 'TOTAL CUOTA'],
         rows: [
           [
+            '',
+            '',
+            '',
             `${totalRecibo?.toFixed(2)}$`,
             `${totalCuota.toString()}$`,
-            `${totalDeuda.toString()}$ - ${(
-              await this.currencyService.convertToCurrency(1, totalDeuda)
-            ).toFixed(2)}Bs`,
-            facturasPendientes.length.toString(),
-            `${data.apartment.balance.toString()}$`,
           ],
         ],
       };
@@ -293,7 +285,7 @@ export class BillingService {
         ),
       };
 
-      // doc.table(tableDebt, tableOptions);
+      doc.table(tableDebt, tableOptions);
 
       doc.moveDown(2);
       tableOptions = {
@@ -301,13 +293,13 @@ export class BillingService {
         layout: 'lightHorizontalLines', // Add thin horizontal lines
         cellPadding: 5, // Add some padding to cells
         headerRows: 1, // Only show header row as bold
-        columnsSize: [125, 125, 100, 60, 100],
+        columnsSize: [100, 100, 100, 110, 100],
       };
-      // doc.table(totalsTable, tableOptions);
+      doc.table(totalsTable, tableOptions);
       // doc.moveDown(2);
-      doc.font('Helvetica-Bold').fontSize(12);
-      doc.text(`Total: ${totalRecibo?.toFixed(2)}$`);
-      doc.text(`Cuota: ${totalCuota.toString()}$`);
+      // doc.font('Helvetica-Bold').fontSize(12);
+      // doc.text(`Total: ${totalRecibo?.toFixed(2)}$`);
+      // doc.text(`Cuota: ${totalCuota.toString()}$`);
       doc.moveDown(2);
       doc.font('Helvetica-Bold').fontSize(12);
       doc.text(`Metodos de pago:`);
