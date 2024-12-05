@@ -16,7 +16,7 @@ export class IndividualBill {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 32 })
+  @Column({ type: 'varchar', length: 64, nullable: true })
   Name: string;
 
   @Column({ type: 'varchar', length: 128 })

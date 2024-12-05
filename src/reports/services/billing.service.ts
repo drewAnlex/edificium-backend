@@ -53,12 +53,12 @@ export class BillingService {
       alternativeBalance =
         totalPerShare * data.apartment.share + totalNotPerShare;
     }
-    const pastIndividualBills = individualBills.filter((billItem) => {
-      return (
-        billItem.buildingBillId?.id !== data.bill.id &&
-        billItem.IsPaid === false
-      );
-    });
+    // const pastIndividualBills = individualBills.filter((billItem) => {
+    //   return (
+    //     billItem.buildingBillId?.id !== data.bill.id &&
+    //     billItem.IsPaid === false
+    //   );
+    // });
     let paymentMethodList = await this.paymnetMethodList.findByBuilding(
       data.bill.buildingId.id,
     );
@@ -170,7 +170,7 @@ export class BillingService {
         `Inmueble: ${data.apartment ? data.apartment.identifier : 'Admin'}`,
       );
       doc.text(`Alicuota: ${data.apartment.share}`);
-      doc.text(`\nFecha de emisión: ${formatter.format(data.bill.createdAt)}`);
+      doc.text(`\nFecha de emisión: ${formatter.format(data.bill.updatedAt)}`);
 
       const fixedExpenses = data.bill.expenses.filter(
         (expense) => expense.isFixed && expense.isRemoved === false,
@@ -270,22 +270,22 @@ export class BillingService {
         headerRows: 1, // Only show header row as bold
         columnsSize: [260, 125, 125],
       };
-      const tableDebt = {
-        headers: ['TITULO', 'FECHA DE EMISIÓN', 'MONTO'],
-        rows: await Promise.all(
-          pastIndividualBills.map(async (bill) => {
-            return [
-              bill.Name,
-              formatter.format(bill.createdAt),
-              `${bill.Total.toString()}$ - ${await (
-                await this.currencyService.convertToCurrency(1, bill.Total)
-              ).toFixed(2)}Bs`,
-            ];
-          }),
-        ),
-      };
+      // const tableDebt = {
+      //   headers: ['TITULO', 'FECHA DE EMISIÓN', 'MONTO'],
+      //   rows: await Promise.all(
+      //     pastIndividualBills.map(async (bill) => {
+      //       return [
+      //         bill.Name,
+      //         formatter.format(bill.createdAt),
+      //         `${bill.Total.toString()}$ - ${await (
+      //           await this.currencyService.convertToCurrency(1, bill.Total)
+      //         ).toFixed(2)}Bs`,
+      //       ];
+      //     }),
+      //   ),
+      // };
 
-      doc.table(tableDebt, tableOptions);
+      // doc.table(tableDebt, tableOptions);
 
       doc.moveDown(2);
       tableOptions = {
