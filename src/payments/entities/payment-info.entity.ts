@@ -31,7 +31,7 @@ export class PaymentInfo {
   @Column({ type: 'varchar', length: 32 })
   name: string;
 
-  @Column({ type: 'varchar', length: 32 })
+  @Column({ type: 'varchar', length: 128 })
   value: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
