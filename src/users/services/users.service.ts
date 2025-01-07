@@ -47,6 +47,18 @@ export class UsersService {
     return user;
   }
 
+  async findByPhone(phoneNumber: string) {
+    const user = await this.userRepo.findOne({
+      where: { phone: phoneNumber },
+      relations: ['role', 'building', 'apartments'],
+    });
+    if (!user) {
+      console.log(`User with #${phoneNumber} not found`);
+      return false;
+    }
+    return user;
+  }
+
   async create(payload: CreateUserDto) {
     const newUser = this.userRepo.create({
       ...payload,

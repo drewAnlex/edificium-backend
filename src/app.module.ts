@@ -16,9 +16,12 @@ import { CurrencyModule } from './currency/currency.module';
 import config from './config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { FundModule } from './fund/fund.module';
+import { BotsModule } from './bots/bots.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
+    CacheModule.register(),
     ConfigModule.forRoot({
       envFilePath: environment[process.env.NODE_ENV] || '.env',
       load: [config],
@@ -35,6 +38,7 @@ import { FundModule } from './fund/fund.module';
     ReportsModule,
     CurrencyModule,
     FundModule,
+    BotsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

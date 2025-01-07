@@ -41,6 +41,7 @@ export class PaymentMethodListService {
       relations: ['MethodId', 'MethodId.paymentDetails'],
     });
     if (!list) {
+      console.log('error al traer los metodos de pago');
       throw new NotFoundException(`Payment Method List #${id} not found`);
     }
     return list.map((paymentMethod) => paymentMethod.MethodId);
