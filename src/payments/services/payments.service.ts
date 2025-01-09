@@ -72,6 +72,7 @@ export class PaymentsService {
       where: { id: id, isRemoved: false },
       relations: [
         'IndividualBill',
+        'IndividualBill.apartmentId',
         'UserId',
         'Method',
         'Method.paymentDetails',

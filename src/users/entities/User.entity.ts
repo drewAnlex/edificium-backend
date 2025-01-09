@@ -26,6 +26,9 @@ export class User {
   @Column({ type: 'varchar', length: 32, unique: true })
   email: string;
 
+  @Column({ type: 'varchar', length: 32, nullable: true })
+  IdDocument: string;
+
   @Exclude()
   @Column({ type: 'varchar', length: 255 })
   password: string;

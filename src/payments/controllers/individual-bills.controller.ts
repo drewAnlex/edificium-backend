@@ -82,7 +82,7 @@ export class IndividualBillsController {
     return this.individualBillsService.findOneByIdAndApartment(id, apartmentId);
   }
 
-  @Roles('Staff')
+  @Roles('Staff', 'Admin', 'User')
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.individualBillsService.findOne(id);
