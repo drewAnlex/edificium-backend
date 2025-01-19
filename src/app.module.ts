@@ -18,6 +18,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { FundModule } from './fund/fund.module';
 import { BotsModule } from './bots/bots.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { LandingModule } from './landing/landing.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     CurrencyModule,
     FundModule,
     BotsModule,
+    LandingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
