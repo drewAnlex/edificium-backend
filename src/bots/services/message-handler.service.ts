@@ -354,7 +354,7 @@ export class MessageHandlerService {
 
       default:
         response =
-          'Ups, parace que no fui programado para entender este mensaje.\n\n Escribe *Menu* para ver las opciones disponibles';
+          'Ups, parace que no fui programado para entender este mensaje.\n\n Escribe *Hola* para ver las opciones disponibles';
         break;
     }
     await this.whatsappService.sendMessage(from, response, messageId);
