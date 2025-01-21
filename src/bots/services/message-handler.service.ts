@@ -90,9 +90,10 @@ export class MessageHandlerService {
   ) {
     if (type === 'text') {
       const incomingMessage = text.body.toLowerCase().trim();
-      if (this.isGreeting(incomingMessage)) {
+      if (this.isGreeting(incomingMessage) || this.isMenu(incomingMessage)) {
         // await this.sendWelcomeMessage(from, id, senderInfo);
-        await this.sendBasicMenu(from);
+        // await this.sendBasicMenu(from);
+        await this.sendBasicList(from);
       } else if (this.paymentState[from]) {
         await this.handlePaymentFlow(from, incomingMessage, id);
       } else {
@@ -100,8 +101,8 @@ export class MessageHandlerService {
       }
       await this.whatsappService.markAsRead(id);
     } else if (type === 'interactive') {
-      const option = interactive?.button_reply?.id.toLowerCase().trim();
-      await this.handleMenuOption(from, option, id);
+      const option = interactive?.list_reply?.id;
+      await this.handleBasicMenuList(from, option, id);
       await this.whatsappService.markAsRead(id);
     }
   }
@@ -135,6 +136,11 @@ export class MessageHandlerService {
   isGreeting(message: any) {
     const greetings = ['hola', 'hello', 'hi', 'buenas tardes'];
     return greetings.includes(message);
+  }
+
+  isMenu(message: any) {
+    const menu = ['menu', 'menú'];
+    return menu.includes(message);
   }
 
   getSenderName(senderInfo: any) {
@@ -211,6 +217,53 @@ export class MessageHandlerService {
       },
     ];
     await this.whatsappService.sendInteractiveButtons(to, menuMessage, buttons);
+  }
+
+  async sendBasicList(to: string) {
+    const header = `Nexi 💜`;
+    const body = `Por favor, escoge una opción del siguiente menú que aparece al tocar las 3 líneas (☰) para poder ayudarte.`;
+    const footer = `Nexi, una plataforma, mil soluciones.`;
+    const buttonText = 'Menú';
+    const list = [
+      {
+        title: 'Mi deuda',
+        rows: [
+          {
+            id: 'list_balance_option',
+            title: 'Balance general',
+            description: 'Recibe el balance general de tus inmuebles',
+          },
+          {
+            id: 'list_unpaid_bills_option',
+            title: 'Recibos pendientes',
+            description: 'Lista de recibos que aún no son pagados',
+          },
+        ],
+      },
+      {
+        title: 'Pagos',
+        rows: [
+          {
+            id: 'list_pay_option',
+            title: 'Pagar',
+            description: 'Notifica el pago de un recibo',
+          },
+          // {
+          //   id: 'list_payments_option',
+          //   title: 'Mis pagos',
+          //   description: 'Lista de pagos realizados',
+          // },
+        ],
+      },
+    ];
+    await this.whatsappService.sendListMessage(
+      to,
+      header,
+      body,
+      footer,
+      buttonText,
+      list,
+    );
   }
 
   async handleLinkFlow(from: string, message: any, messageId: any) {
@@ -560,8 +613,6 @@ export class MessageHandlerService {
 
   async handleMenuOption(from: string, option: string, id: any) {
     let response;
-    let user;
-    const currencyValue = await this.currencyValueService.getLatestValue(1);
     switch (option) {
       case 'website_option':
         response = 'https://nexiadmin.com/';
@@ -576,7 +627,20 @@ export class MessageHandlerService {
           '¿Ya tienes tu código de vinculación? Escribe Si o No para continuar\n\nNota: Este código se obtiene en Perfil -> Vincular número';
         break;
 
-      case 'debt_option':
+      default:
+        response =
+          'Lo siento, no entendí tu selección, por favor elige una de las opciones del menú o di "Hola" para ver el menu';
+        break;
+    }
+    await this.whatsappService.sendMessage(from, response, id);
+  }
+
+  async handleBasicMenuList(from: string, option: string, id: any) {
+    let response;
+    let user;
+    const currencyValue = await this.currencyValueService.getLatestValue(1);
+    switch (option) {
+      case 'list_balance_option':
         user = await this.userService.findByPhone(from);
         if (!user) {
           response = 'Lo siento, no pude traer tu balance. Intenta más tarde';
@@ -593,8 +657,7 @@ export class MessageHandlerService {
           response = 'Tu balance es 0$';
         }
         break;
-
-      case 'bills_option':
+      case 'list_unpaid_bills_option':
         user = await this.userService.findByPhone(from);
         if (!user) {
           response = 'Lo siento, no pude traer tu balance. Intenta más tarde';
@@ -637,20 +700,20 @@ export class MessageHandlerService {
             bill.total - bill.balance
           }$\n${((bill.total - bill.balance) * currencyValue.value).toFixed(
             2,
-          )}Bs \n ----`;
+          )}Bs \n`;
           await this.whatsappService.sendMessage(from, response, id);
         }
         response = 'Estos son todos tus recibos pendientes.';
         break;
 
-      case 'payment_option':
+      case 'list_pay_option':
         this.paymentState[from] = { step: 'bill' };
         response = '¿Cual recibo quieres pagar? Dime el numero de recibo.';
         break;
 
       default:
         response =
-          'Lo siento, no entendí tu selección, por favor elige una de las opciones del menú o di "Hola" para ver el menu';
+          'Lo siento, no entendí tu selección, por favor elige una de las opciones del menú o di "Menu" para ver el menu';
         break;
     }
     await this.whatsappService.sendMessage(from, response, id);

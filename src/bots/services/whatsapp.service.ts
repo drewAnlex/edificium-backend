@@ -25,6 +25,40 @@ export class WhatsappService {
     return await this.sendToWs.sendToWhatsApp(data);
   }
 
+  async sendListMessage(
+    to: string,
+    header: string,
+    body: string,
+    footer: string,
+    buttonText: string,
+    list: any,
+  ) {
+    const data = {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to: to,
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        header: {
+          type: 'text',
+          text: header,
+        },
+        body: {
+          text: body,
+        },
+        footer: {
+          text: footer,
+        },
+        action: {
+          button: buttonText,
+          sections: list,
+        },
+      },
+    };
+    return await this.sendToWs.sendToWhatsApp(data);
+  }
+
   async sendInteractiveButtons(to: string, body: string, buttons: any) {
     const data = {
       messaging_product: 'whatsapp',
