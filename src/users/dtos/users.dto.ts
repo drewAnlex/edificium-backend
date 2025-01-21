@@ -26,6 +26,14 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   readonly resetTokenExpires: Date;
+
+  @IsOptional()
+  @IsString()
+  readonly vinculationCode: string;
+
+  @IsOptional()
+  @IsString()
+  readonly vinculationCodeExpires: Date;
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}

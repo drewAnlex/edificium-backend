@@ -59,6 +59,61 @@ export class UsersService {
     return user;
   }
 
+  async findByVinculationCode(vinculationCode: string) {
+    const user = await this.userRepo.findOne({
+      where: { vinculationCode: vinculationCode },
+    });
+    if (!user) {
+      console.log(`User with vinculation code #${vinculationCode} not found`);
+      return false;
+    }
+    if (
+      user.vinculationCodeExpires &&
+      user.vinculationCodeExpires < new Date()
+    ) {
+      console.log(`Vinculation code #${vinculationCode} has expired`);
+      return false;
+    }
+    return user;
+  }
+
+  async updatePhone(id: number, phone: string) {
+    const user = await this.findOne(id);
+    try {
+      await this.userRepo.merge(user, {
+        phone,
+        vinculationCode: null,
+        vinculationCodeExpires: null,
+      });
+      await this.userRepo.save(user);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred while trying to update the phone: ${error}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    return user;
+  }
+
+  async createVinculationCode(id: number) {
+    const user = await this.findOne(id);
+    const token = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = new Date();
+    expires.setMinutes(expires.getMinutes() + 5);
+    try {
+      await this.update(user.id, {
+        vinculationCode: token,
+        vinculationCodeExpires: expires,
+      });
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred while trying to create the vinculation code: ${error}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+    return user;
+  }
+
   async create(payload: CreateUserDto) {
     const newUser = this.userRepo.create({
       ...payload,

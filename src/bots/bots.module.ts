@@ -32,6 +32,9 @@ import { PaymentInfoService } from 'src/payments/services/payment-info.service';
 import { Payment } from 'src/payments/entities/Payment.entity';
 import { PaymentInfo } from 'src/payments/entities/payment-info.entity';
 import { SendToWhatsappService } from './services/http-service/send-to-whatsapp.service';
+import { Quote } from 'src/landing/entities/Quote.entity';
+import { LandingModule } from 'src/landing/landing.module';
+import { QuotesService } from 'src/landing/services/quotes.service';
 
 @Module({
   imports: [
@@ -47,6 +50,7 @@ import { SendToWhatsappService } from './services/http-service/send-to-whatsapp.
       PaymentMethodFields,
       Payment,
       PaymentInfo,
+      Quote,
     ]),
     UsersModule,
     MailingModule,
@@ -55,6 +59,7 @@ import { SendToWhatsappService } from './services/http-service/send-to-whatsapp.
     ReportsModule,
     PaymentMethodModule,
     CurrencyModule,
+    LandingModule,
   ],
   controllers: [WhatsappController],
   providers: [
@@ -71,6 +76,7 @@ import { SendToWhatsappService } from './services/http-service/send-to-whatsapp.
     PaymentsService,
     PaymentInfoService,
     SendToWhatsappService,
+    QuotesService,
   ],
 })
 export class BotsModule {}

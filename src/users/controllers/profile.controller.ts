@@ -8,6 +8,7 @@ import {
   ClassSerializerInterceptor,
   UseGuards,
   Req,
+  Post,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { UpdateUserDto } from '../dtos/users.dto';
@@ -43,6 +44,13 @@ export class ProfileController {
   @Put('reset-password')
   resetPassword(@Body() payload) {
     return this.usersService.changePassword(payload.newPassword, payload.token);
+  }
+
+  @Roles('Staff', 'Admin', 'User')
+  @Post('vinculate-phone')
+  vinculatePhone(@Req() req: Request) {
+    const user = req.user as any;
+    return this.usersService.createVinculationCode(user.userId);
   }
 
   @Roles('Staff', 'Admin', 'User')

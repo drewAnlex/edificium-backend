@@ -58,6 +58,12 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   resetTokenExpires: Date;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  vinculationCode: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  vinculationCodeExpires: Date;
+
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 

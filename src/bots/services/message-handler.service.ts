@@ -10,10 +10,13 @@ import { PaymentMethodListService } from 'src/payment-method/services/payment-me
 import { PaymentMethodFieldsService } from 'src/payment-method/services/payment-method-fields.service';
 import { PaymentsService } from 'src/payments/services/payments.service';
 import { PaymentInfoService } from 'src/payments/services/payment-info.service';
+import { QuotesService } from 'src/landing/services/quotes.service';
 
 @Injectable()
 export class MessageHandlerService {
   paymentState;
+  quoteState;
+  linkState;
   user;
   constructor(
     private whatsappService: WhatsappService,
@@ -24,9 +27,12 @@ export class MessageHandlerService {
     private paymentMethodFieldsService: PaymentMethodFieldsService,
     private paymentService: PaymentsService,
     private paymentInfoService: PaymentInfoService,
+    private quoteService: QuotesService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
     this.paymentState = {};
+    this.quoteState = {};
+    this.linkState = {};
   }
 
   async handleIncomingMessage(message: any, senderInfo: any) {
@@ -58,6 +64,7 @@ export class MessageHandlerService {
             type,
             from,
             id,
+            text,
             senderInfo,
             interactive,
           );
@@ -103,15 +110,25 @@ export class MessageHandlerService {
     type: string,
     from: string,
     id: string,
+    text: any,
     senderInfo: any,
     interactive: any,
   ) {
     if (type === 'text') {
-      await this.sendWelcomeMessage(from, id, senderInfo);
-      await this.sendWelcomeMenuUnregistered(from);
+      const incomingMessage = text.body.toLowerCase().trim();
+      if (this.isGreeting(incomingMessage)) {
+        await this.sendWelcomeMessage(from, id, senderInfo);
+        await this.sendWelcomeMenuUnregistered(from);
+      } else if (this.quoteState[from]) {
+        await this.handleQuoteFlow(from, incomingMessage, id);
+      } else if (this.linkState[from]) {
+        await this.handleLinkFlow(from, incomingMessage, id);
+      }
+      await this.whatsappService.markAsRead(id);
     } else if (type === 'interactive') {
       const option = interactive?.button_reply?.id.toLowerCase().trim();
       await this.handleMenuOption(from, option, id);
+      await this.whatsappService.markAsRead(id);
     }
   }
 
@@ -128,7 +145,7 @@ export class MessageHandlerService {
     try {
       const name = this.getSenderName(senderInfo);
       const firstName = name.split(' ')[0];
-      const welcomeMessage = `Hola, ${firstName}, bienvenido a Nexi, tu servidcio de administración de inmuebles \n¿En que puedo ayudarte hoy?`;
+      const welcomeMessage = `Hola, ${firstName}, bienvenido a Nexi, tu servicio de administración de inmuebles \n¿En que puedo ayudarte hoy?`;
       await this.whatsappService.sendMessage(to, welcomeMessage, messageId);
     } catch (error) {
       console.log(error);
@@ -146,8 +163,8 @@ export class MessageHandlerService {
       {
         type: 'reply',
         reply: {
-          id: 'register_option',
-          title: 'Vincular numero',
+          id: 'website_option',
+          title: 'Nuestro Website',
         },
       },
       {
@@ -160,8 +177,8 @@ export class MessageHandlerService {
       {
         type: 'reply',
         reply: {
-          id: 'support_option',
-          title: 'Soporte Tecnico',
+          id: 'link_option',
+          title: 'Vincular numero',
         },
       },
     ];
@@ -194,6 +211,100 @@ export class MessageHandlerService {
       },
     ];
     await this.whatsappService.sendInteractiveButtons(to, menuMessage, buttons);
+  }
+
+  async handleLinkFlow(from: string, message: any, messageId: any) {
+    const state = this.linkState[from];
+    let response;
+    switch (state.step) {
+      case 'start':
+        state.confirmation = message;
+        if (state.confirmation === 'no') {
+          response =
+            'Inicia sesión en tu cuenta para obtener el código de vinculación, este se encuentra en tu Perfil -> Vincular número';
+          break;
+        }
+        response = 'Perfecto! Por favor, ingresa el código de vinculación.';
+        state.step = 'code';
+        break;
+
+      case 'code':
+        const user = await this.userService.findByVinculationCode(message);
+        if (!user) {
+          response =
+            'El código de vinculación es incorrecto, intenta nuevamente';
+          break;
+        }
+
+        // Actualizar el número de teléfono del usuario
+        await this.userService.updatePhone(user.id, from);
+        response =
+          'Tu número de teléfono ha sido vinculado con éxito a tu cuenta!';
+        state.step = null;
+        break;
+
+      default:
+        response =
+          'Ups, parace que no fui programado para entender este mensaje.\n\n Escribe *Menu* para ver las opciones disponibles';
+        break;
+    }
+    await this.whatsappService.sendMessage(from, response, messageId);
+  }
+
+  async handleQuoteFlow(from: string, message: any, messageId: any) {
+    const state = this.quoteState[from];
+    let response;
+    switch (state.step) {
+      case 'start':
+        state.step = 'email';
+        state.name = message;
+        response = `Encantado, por favor, indícame tu correo electrónico para continuar:`;
+        break;
+
+      case 'email':
+        state.email = message;
+        state.step = 'phone';
+        response = 'Ahora, indícame tu número de teléfono:';
+        break;
+
+      case 'phone':
+        state.phone = message;
+        state.step = 'condominium';
+        response = 'Por último, indícame el nombre de tu condominio:';
+        break;
+
+      case 'condominium':
+        state.condominium = message;
+        state.step = 'units';
+        response = `Perfecto! Ahora, por favor, indícame la cantidad de inmuebles que hay en tu condominio:`;
+        break;
+
+      case 'units':
+        state.units = message;
+        state.step = 'quote';
+        response = `¡Agradecemos tu interés en nuestros servicios!\n\n Con la información que nos has proporcionado, podemos crear una propuesta a medida para ti. ¿Podrías detallar qué servicios te interesan?`;
+        break;
+
+      case 'quote':
+        state.quote = message;
+        await this.quoteService.createQuote({
+          name: state.name,
+          email: state.email,
+          phone: state.phone,
+          condominiumName: state.condominium,
+          unitCount: state.units,
+          message: state.quote,
+        });
+        response = `Gracias por tu tiempo! Te enviaremos una cotización que se adapte a tus necesidades.`;
+        state.step = null;
+        break;
+
+      default:
+        response =
+          'Ups, parace que no fui programado para entender este mensaje.\n\n Escribe *Menu* para ver las opciones disponibles';
+        break;
+    }
+    await this.whatsappService.sendMessage(from, response, messageId);
   }
 
   async handlePaymentFlow(from: string, message: any, messageId: any) {
@@ -381,8 +492,8 @@ export class MessageHandlerService {
       },
       phones: [
         {
-          phone: '+584243568411',
-          wa_id: '584243568411',
+          phone: '+584125553611',
+          wa_id: '584125553611',
           type: 'WORK',
         },
       ],
@@ -431,8 +542,8 @@ export class MessageHandlerService {
       },
       phones: [
         {
-          phone: '+584243568411',
-          wa_id: '584243568411',
+          phone: '+584125553611',
+          wa_id: '584125553611',
           type: 'WORK',
         },
       ],
@@ -452,17 +563,17 @@ export class MessageHandlerService {
     let user;
     const currencyValue = await this.currencyValueService.getLatestValue(1);
     switch (option) {
-      case 'register_option':
-        response = 'Vincula tu numero';
+      case 'website_option':
+        response = 'https://nexiadmin.com/';
         break;
       case 'sales_option':
-        response =
-          'Aquí tienes el contacto de nuestro representante de ventas!';
-        await this.sendContactSales(from);
+        this.quoteState[from] = { step: 'start' };
+        response = 'Indicame tu nombre y apellido para iniciar tu cotización!';
         break;
-      case 'support_option':
-        response = 'Aquí tienes el contacto de soporte tecnico!';
-        await this.sendContactIT(from);
+      case 'link_option':
+        this.linkState[from] = { step: 'start' };
+        response =
+          '¿Ya tienes tu código de vinculación? Escribe Si o No para continuar\n\nNota: Este código se obtiene en Perfil -> Vincular número';
         break;
 
       case 'debt_option':
