@@ -654,7 +654,7 @@ export class MessageHandlerService {
             currencyValue.value
           ).toFixed(2)}Bs`;
         } else if (debt == 0) {
-          response = 'Tu balance es 0$';
+          response = 'Tu deuda es 0$';
         }
         break;
       case 'list_unpaid_bills_option':
@@ -703,7 +703,11 @@ export class MessageHandlerService {
           )}Bs \n`;
           await this.whatsappService.sendMessage(from, response, id);
         }
-        response = 'Estos son todos tus recibos pendientes.';
+        if (billsDetails.length === 0) {
+          response = 'No tienes recibos pendientes.';
+        } else {
+          response = 'Estos son todos tus recibos pendientes.';
+        }
         break;
 
       case 'list_pay_option':
