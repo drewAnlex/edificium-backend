@@ -25,6 +25,16 @@ export class UsersService {
     });
   }
 
+  async findUsersPhoneVinculationPending() {
+    const users = await this.userRepo.find({
+      where: { phone: null },
+    });
+    if (!users) {
+      throw new NotFoundException(`Users not found`);
+    }
+    return users;
+  }
+
   async findOne(id: number) {
     const user = await this.userRepo.findOne({
       where: { id: id },
