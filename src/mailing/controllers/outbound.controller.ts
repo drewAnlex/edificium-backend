@@ -28,6 +28,13 @@ export class OutboundController {
     return { msg: 'Reminder sended' };
   }
 
+  @Roles('Staff')
+  @Get('whatsapp-reminder')
+  async sendWhatsAppReminder() {
+    await this.outbound.whatsAppBotAd();
+    return { msg: 'Reminder sended' };
+  }
+
   @Roles('Staff', 'Admin')
   @Get('debt-preview/:id')
   sendPreview(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {

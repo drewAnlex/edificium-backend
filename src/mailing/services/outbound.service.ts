@@ -277,4 +277,42 @@ Artículo 14º Fraude. El que, a través del uso indebido de tecnologías de inf
       }
     }
   }
+
+  async whatsAppBotAd(): Promise<void> {
+    const relativePath = '../../templates/whatsapp.html';
+    const absolutePath = path.resolve(__dirname, relativePath);
+
+    // Obtener usuarios pendientes de vinculación
+    const users = await this.userService.findUsersPhoneVinculationPending();
+
+    try {
+      // Leer el contenido del template
+      const welcome = await fs.readFile(absolutePath, 'utf8');
+
+      // Iterar sobre los usuarios y enviar un correo a cada uno
+      for (const user of users) {
+        if (user.email) {
+          const messageData = {
+            from: process.env.EMAIL_SYSTEM_ADDR,
+            to: user.email, // Correo del usuario actual
+            subject: '🎉 Ya puedes usar WhatsApp para gestionar tu condominio',
+            text: 'Aquí te presentamos nuestro asistente de WhatsApp',
+            html: welcome,
+          };
+
+          // Enviar correo utilizando Mailgun
+          const response = await this.mg.messages.create(
+            process.env.MAILING_DOMAIN,
+            messageData,
+          );
+          console.log(`Correo enviado a ${user.email}:`, response);
+        } else {
+          console.warn(`El usuario con ID ${user.id} no tiene un email.`);
+        }
+      }
+    } catch (error) {
+      console.error('Error al enviar los correos:', error);
+      throw new Error(error);
+    }
+  }
 }
