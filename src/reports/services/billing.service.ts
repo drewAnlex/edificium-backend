@@ -72,9 +72,9 @@ export class BillingService {
       : 'NEXIADMIN';
     const logoUrl = data.bill.buildingId.logoImg
       ? data.bill.buildingId.logoImg
-      : 'http://67.205.149.177/images/icon.jpeg';
+      : 'https://nexiadmin.com/images/icon.jpeg';
 
-    const nexiLogo = 'http://67.205.149.177/images/icon.jpeg';
+    const nexiLogo = 'https://nexiadmin.com/images/icon.jpeg';
     const response = await axios.get(logoUrl, { responseType: 'arraybuffer' });
     const imageBuffer = response.data;
     const responseNexi = await axios.get(nexiLogo, {
@@ -350,9 +350,9 @@ export class BillingService {
       : 'NEXIADMIN';
     const logoUrl = data.buildingId.logoImg
       ? data.buildingId.logoImg
-      : 'http://67.205.149.177/images/icon.jpeg';
+      : 'https://nexiadmin.com/images/icon.jpeg';
 
-    const nexiLogo = 'http://67.205.149.177/images/icon.jpeg';
+    const nexiLogo = 'https://nexiadmin.com/images/icon.jpeg';
     const response = await axios.get(logoUrl, { responseType: 'arraybuffer' });
     const imageBuffer = response.data;
     const responseNexi = await axios.get(nexiLogo, {
@@ -607,10 +607,10 @@ export class BillingService {
     const billTitle = building.billTitle ? building.billTitle : 'NEXIADMIN';
     const logoUrl = building.logoImg
       ? building.logoImg
-      : 'http://67.205.149.177/images/icon.jpeg';
+      : 'https://nexiadmin.com/images/icon.jpeg';
     const response = await axios.get(logoUrl, { responseType: 'arraybuffer' });
     const imageBuffer = response.data;
-    const nexiLogo = 'http://67.205.149.177/images/icon.jpeg';
+    const nexiLogo = 'https://nexiadmin.com/images/icon.jpeg';
     const responseNexi = await axios.get(nexiLogo, {
       responseType: 'arraybuffer',
     });
