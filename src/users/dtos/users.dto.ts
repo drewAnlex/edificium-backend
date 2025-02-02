@@ -6,6 +6,14 @@ export class CreateUserDto {
   @IsString()
   readonly name: string;
 
+  @IsOptional()
+  @IsString()
+  readonly provider: string;
+
+  @IsOptional()
+  @IsString()
+  readonly avatar: string;
+
   @IsNotEmpty()
   @IsString()
   @IsEmail()
@@ -15,7 +23,7 @@ export class CreateUserDto {
   @IsString()
   readonly phone: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   readonly password: string;
 

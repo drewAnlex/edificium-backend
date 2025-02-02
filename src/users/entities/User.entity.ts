@@ -20,6 +20,17 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+    default: 'credentials',
+  })
+  provider: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  avatar: string;
+
   @Column({ type: 'varchar', length: 32 })
   name: string;
 
