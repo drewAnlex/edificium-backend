@@ -16,6 +16,9 @@ export class PaymentMethod {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'varchar', length: 32, nullable: true })
+  icon: string;
+
   @Column({ type: 'varchar', length: 32 })
   name: string;
 
