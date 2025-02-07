@@ -26,6 +26,9 @@ export class Quote {
   @Column()
   unitCount: number;
 
+  @Column({ length: 256, nullable: true })
+  location: string;
+
   @Column({ type: 'text', nullable: true })
   message?: string;
 

@@ -9,6 +9,7 @@ import { IndividualBillsService } from 'src/payments/services/individual-bills.s
 import { BillingService } from 'src/reports/services/billing.service';
 import { UsersService } from 'src/users/services/users.service';
 import * as crypto from 'crypto';
+import { CreateQuoteDto } from 'src/landing/dtos/quote.dto';
 
 const formatter = new Intl.DateTimeFormat('es-ES'); // 'es-ES' para español de España
 
@@ -43,6 +44,36 @@ export class OutboundService {
 
       const response = await this.mg.messages.create(
         'sandbox0918d61f84384276b051e69e193a6178.mailgun.org',
+        messageData,
+      );
+      console.log(response); // logs response data
+    } catch (error) {
+      console.error(error); // logs any error
+      throw new Error(error);
+    }
+  }
+
+  async sendQuote(email: string, quote: CreateQuoteDto): Promise<void> {
+    try {
+      const messageData = {
+        from: 'Nexi <cotizacion@nexiadmin.com>',
+        to: [email],
+        subject: `Cotización de ${quote.condominiumName}`,
+        text: 'Nueva cotización',
+        html: `
+            <h3>Nueva solicitud de cotización</h3>
+            <p><strong>Nombre:</strong> ${quote.name}</p>
+            <p><strong>Email:</strong> ${quote.email}</p>
+            <p><strong>Teléfono:</strong> ${quote.phone}</p>
+            <p><strong>Condominio:</strong> ${quote.condominiumName}</p>
+            <p><strong>Ubicación:</strong> ${quote.location}</p>
+            <p><strong>Unidades:</strong> ${quote.unitCount}</p>
+            <p><strong>Mensaje:</strong> ${quote.message || 'N/A'}</p>
+        `,
+      };
+
+      const response = await this.mg.messages.create(
+        process.env.MAILING_DOMAIN,
         messageData,
       );
       console.log(response); // logs response data

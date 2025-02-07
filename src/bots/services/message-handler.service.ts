@@ -346,6 +346,7 @@ export class MessageHandlerService {
           phone: state.phone,
           condominiumName: state.condominium,
           unitCount: state.units,
+          location: 'whatsapp',
           message: state.quote,
         });
         response = `Gracias por tu tiempo! Te enviaremos una cotización que se adapte a tus necesidades.`;

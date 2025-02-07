@@ -18,6 +18,10 @@ export class CreateQuoteDto implements Readonly<CreateQuoteDto> {
   @Length(1, 100)
   condominiumName: string;
 
+  @IsString()
+  @Length(1, 256)
+  location: string;
+
   @IsInt()
   unitCount: number;
 
