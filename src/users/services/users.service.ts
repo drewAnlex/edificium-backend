@@ -60,6 +60,7 @@ export class UsersService {
   async findByEmailForGoogle(email: string) {
     const user = await this.userRepo.findOne({
       where: { email: email },
+      relations: ['role', 'building', 'apartments'],
     });
     if (!user) {
       return false;
