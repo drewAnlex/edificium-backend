@@ -57,6 +57,16 @@ export class UsersService {
     return user;
   }
 
+  async findByEmailForGoogle(email: string) {
+    const user = await this.userRepo.findOne({
+      where: { email: email },
+    });
+    if (!user) {
+      return false;
+    }
+    return user;
+  }
+
   async findByPhone(phoneNumber: string) {
     const user = await this.userRepo.findOne({
       where: { phone: phoneNumber },

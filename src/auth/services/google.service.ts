@@ -25,7 +25,7 @@ export class GoogleAuthService {
       if (!payload) throw new UnauthorizedException('Token inválido');
 
       // Buscar o registrar usuario en la base de datos
-      let user = await this.usersService.findByEmail(payload.email);
+      let user = await this.usersService.findByEmailForGoogle(payload.email);
       if (!user) {
         user = await this.usersService.create({
           email: payload.email,
@@ -50,6 +50,7 @@ export class GoogleAuthService {
       // Generar JWT interno
       return this.jwtService.sign(userPayload);
     } catch (error) {
+      console.log(error);
       throw new UnauthorizedException('Google OAuth inválido');
     }
   }
