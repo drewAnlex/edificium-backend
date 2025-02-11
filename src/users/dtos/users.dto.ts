@@ -12,6 +12,10 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsString()
+  readonly IdDocument?: string;
+
+  @IsOptional()
+  @IsString()
   readonly avatar: string;
 
   @IsNotEmpty()
