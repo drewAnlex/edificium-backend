@@ -132,7 +132,7 @@ export class UsersService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-    return user;
+    return token;
   }
 
   async create(payload: CreateUserDto) {

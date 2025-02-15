@@ -39,7 +39,12 @@ export class PaymentsService {
         },
         isRemoved: false,
       },
-      relations: ['IndividualBill', 'Method', 'paymentInfos'],
+      relations: [
+        'IndividualBill',
+        'Method',
+        'paymentInfos',
+        'IndividualBill.apartmentId',
+      ],
       order: { createdAt: 'DESC' },
     });
   }

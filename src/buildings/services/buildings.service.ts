@@ -61,7 +61,7 @@ export class BuildingsService {
   async findOneByOwner(id: number, userId: number) {
     const building = await this.buildingRepo.findOne({
       where: { id: id, apartments: { userId: { id: userId } } },
-      relations: ['baseCurrency', 'auxiliaryCurrency'],
+      relations: ['baseCurrency', 'auxiliaryCurrency', 'apartments'],
     });
     if (!building) {
       throw new NotFoundException(`Building #${id} not found`);
