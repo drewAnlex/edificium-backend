@@ -97,7 +97,7 @@ export class OutboundService {
       from: process.env.EMAIL_SYSTEM_ADDR,
       to: [email],
       subject: 'Recuperación de contraseña',
-      text: `Hola ${user.name}, haz click en el siguiente enlace para recuperar tu contraseña: ${process.env.DASHBOARD_DOMAIN}/auth/password/${token}`,
+      text: `Hola ${user.name}, haz click en el siguiente enlace para recuperar tu contraseña: ${process.env.DASHBOARD_DOMAIN}/auth/reset/${token}`,
     };
 
     try {
