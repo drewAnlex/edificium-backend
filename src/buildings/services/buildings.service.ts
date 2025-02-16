@@ -58,14 +58,27 @@ export class BuildingsService {
     return buildings;
   }
 
-  async findOneByOwner(id: number, userId: number) {
+  async findOneByOwner(buildingId: number, userId: number) {
+    // 1. Verificar si el usuario tiene al menos un apartamento en el edificio
+    const buildingExists = await this.buildingRepo
+      .createQueryBuilder('building')
+      .innerJoin('building.apartments', 'apartment')
+      .where('building.id = :buildingId', { buildingId })
+      .andWhere('apartment.userId = :userId', { userId })
+      .getExists(); // 👈 Retorna true/false
+
+    if (!buildingExists) {
+      throw new NotFoundException(
+        `Building #${buildingId} not found or you don't have access`,
+      );
+    }
+
+    // 2. Obtener el edificio con TODOS sus apartamentos
     const building = await this.buildingRepo.findOne({
-      where: { id: id, apartments: { userId: { id: userId } } },
+      where: { id: buildingId },
       relations: ['baseCurrency', 'auxiliaryCurrency', 'apartments'],
     });
-    if (!building) {
-      throw new NotFoundException(`Building #${id} not found`);
-    }
+
     return building;
   }
 
