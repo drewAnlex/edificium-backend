@@ -28,7 +28,7 @@ export class FundController {
     return this.fundService.findAll();
   }
 
-  @Roles('Staff', 'Admin')
+  @Roles('Staff', 'Admin', 'User')
   @Get(':id')
   getFund(@Param('id', ParseIntPipe) id: number) {
     return this.fundService.findOne(id);
