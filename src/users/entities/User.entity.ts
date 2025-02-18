@@ -44,8 +44,9 @@ export class User {
   @Column({ type: 'varchar', length: 255 })
   password: string;
 
-  @ManyToOne(() => Role)
-  role: Role;
+  @ManyToMany(() => Role, (role) => role.users)
+  @JoinTable()
+  role: Role[];
 
   @Column({ type: 'varchar', length: 32, nullable: true })
   phone: string;

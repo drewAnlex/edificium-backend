@@ -43,7 +43,7 @@ export class GoogleAuthService {
 
       const userPayload = {
         sub: user.id,
-        role: user?.role?.Name || 'User',
+        role: user?.role || 'User',
         building: user.building ? user.building : null,
         apartments: user.apartments ? user.apartments.map((a) => a.id) : null,
       };

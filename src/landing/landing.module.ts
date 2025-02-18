@@ -21,6 +21,7 @@ import { Building } from 'src/buildings/entities/building.entity';
 import { Apartment } from 'src/buildings/entities/apartment.entity';
 import { PaymentMethodList } from 'src/payment-method/entities/payment-method-list.entity';
 import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-day.entity';
+import { Role } from 'src/users/entities/Role.entity';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-da
       BuildingBill,
       IndividualBill,
       User,
+      Role,
       Building,
       Apartment,
       PaymentMethodList,

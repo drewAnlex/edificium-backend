@@ -35,12 +35,14 @@ import { SendToWhatsappService } from './services/http-service/send-to-whatsapp.
 import { Quote } from 'src/landing/entities/Quote.entity';
 import { LandingModule } from 'src/landing/landing.module';
 import { QuotesService } from 'src/landing/services/quotes.service';
+import { Role } from 'src/users/entities/Role.entity';
 
 @Module({
   imports: [
     CacheModule.register(),
     TypeOrmModule.forFeature([
       User,
+      Role,
       BuildingBill,
       IndividualBill,
       Building,

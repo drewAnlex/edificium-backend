@@ -30,6 +30,7 @@ import { BillingService } from 'src/reports/services/billing.service';
 import { CurrencyModule } from 'src/currency/currency.module';
 import { CurrencyValuePerDayService } from 'src/currency/services/currency-value-per-day.service';
 import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-day.entity';
+import { Role } from 'src/users/entities/Role.entity';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-da
       IndividualBill,
       Expense,
       User,
+      Role,
       PaymentMethodFields,
       currencyValuePerDay,
     ]),

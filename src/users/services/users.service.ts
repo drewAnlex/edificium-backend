@@ -11,11 +11,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { OutboundService } from '../../mailing/services/outbound.service';
+import { Role } from '../entities/Role.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepo: Repository<User>,
+    @InjectRepository(Role) private roleRepo: Repository<Role>,
     private mailingService: OutboundService,
   ) {}
 
@@ -136,21 +138,38 @@ export class UsersService {
   }
 
   async create(payload: CreateUserDto) {
+    // 1. Obtener el rol por defecto (ej: 'user' con id = 1)
+    const defaultRole = await this.roleRepo.findOne({
+      where: { id: 1 }, // Cambia el criterio según tu lógica
+    });
+
+    if (!defaultRole) {
+      throw new HttpException(
+        'Default role not found',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    // 2. Crear usuario con array de roles
     const newUser = this.userRepo.create({
       ...payload,
-      role: { id: 1 },
+      role: [defaultRole], // Asignar como array
     });
+
+    // 3. Hashear contraseña (mantienes esto igual)
     const hashPassword = await bcrypt.hash(newUser.password, 10);
     newUser.password = hashPassword;
+
     try {
       await this.userRepo.save(newUser);
       this.mailingService.userRegistrationEmail(newUser.email);
     } catch (error) {
       throw new HttpException(
-        `An error occurred while trying to create the User: ${error}`,
+        `Error creating user: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+
     return newUser;
   }
 

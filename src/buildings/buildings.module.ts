@@ -13,12 +13,13 @@ import { UsersService } from 'src/users/services/users.service';
 import { MyApartmentsController } from './controllers/my-apartments.controller';
 import { MyBuildingsController } from './controllers/my-buildings.controller';
 import { MailingModule } from 'src/mailing/mailing.module';
+import { Role } from 'src/users/entities/Role.entity';
 
 @Module({
   imports: [
     forwardRef(() => UsersModule),
     forwardRef(() => MailingModule),
-    TypeOrmModule.forFeature([Building, Apartment, User]),
+    TypeOrmModule.forFeature([Building, Apartment, User, Role]),
   ],
   providers: [UsersService, BuildingsService, ApartmentsService],
   controllers: [

@@ -27,12 +27,14 @@ import { UsersService } from 'src/users/services/users.service';
 import { CurrencyModule } from 'src/currency/currency.module';
 import { CurrencyValuePerDayService } from 'src/currency/services/currency-value-per-day.service';
 import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-day.entity';
+import { Role } from 'src/users/entities/Role.entity';
 
 @Module({
   imports: [
     forwardRef(() => BuildingsModule),
     TypeOrmModule.forFeature([
       User,
+      Role,
       Building,
       Apartment,
       BuildingBill,

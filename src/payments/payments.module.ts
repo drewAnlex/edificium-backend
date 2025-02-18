@@ -35,6 +35,7 @@ import { PaymentMethodDetailsService } from 'src/payment-method/services/payment
 import { CurrencyModule } from 'src/currency/currency.module';
 import { CurrencyValuePerDayService } from 'src/currency/services/currency-value-per-day.service';
 import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-day.entity';
+import { Role } from 'src/users/entities/Role.entity';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-da
       PaymentInfo,
       Expense,
       User,
+      Role,
       PaymentMethodList,
       PaymentMethodDetails,
       currencyValuePerDay,
