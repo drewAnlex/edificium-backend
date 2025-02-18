@@ -57,6 +57,12 @@ export class PaymentsController {
   }
 
   @Roles('Staff', 'Admin')
+  @Post('admin')
+  createAdminPayment(@Body() data: PaymentDTO) {
+    return this.paymentService.create(data, data.UserId.id);
+  }
+
+  @Roles('Staff', 'Admin')
   @Put(':id')
   updatePayment(
     @Param('id', ParseIntPipe) id: number,
