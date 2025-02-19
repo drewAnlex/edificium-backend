@@ -76,7 +76,12 @@ export class BuildingsService {
     // 2. Obtener el edificio con TODOS sus apartamentos
     const building = await this.buildingRepo.findOne({
       where: { id: buildingId },
-      relations: ['baseCurrency', 'auxiliaryCurrency', 'apartments'],
+      relations: [
+        'baseCurrency',
+        'auxiliaryCurrency',
+        'apartments',
+        'apartments.userId',
+      ],
     });
 
     return building;
