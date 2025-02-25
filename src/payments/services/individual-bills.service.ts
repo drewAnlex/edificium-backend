@@ -192,10 +192,17 @@ export class IndividualBillsService {
     const apartmentId = id ? id : payload.apartmentId.id;
     const apartment = await this.apartmentService.findOne(apartmentId);
     const balance = apartment.balance.toString();
+
+    // Inicializar Balance como 0 si no está definido
+    if (!payload.Balance) {
+      payload.Balance = 0;
+    }
+
     if (apartment.balance > 0) {
       payload.Balance =
         parseFloat(payload.Balance.toString()) + parseFloat(balance);
     }
+
     const newBill = this.billRepo.create(payload);
     try {
       await this.billRepo.save(newBill);
