@@ -89,6 +89,6 @@ export class PaymentsController {
     @Param('id', ParseIntPipe) id: number,
     @Body('Status') status: number,
   ) {
-    return this.paymentService.updateStatus(id, status);
+    return this.paymentService.updateStatus(id, 1);
   }
 }
