@@ -88,26 +88,15 @@ export class BuildingsService {
   }
 
   async findOneByRelation(
-    buildingId: string,
-    userId: string,
+    buildingId: number,
+    userId: number,
   ): Promise<Building> {
-    const building = await this.buildingRepo
-      .createQueryBuilder('building')
-      .innerJoin(
-        'user_building_building',
-        'ubb',
-        'ubb.buildingId = building.id',
-      )
-      .where('building.id = :buildingId', { buildingId })
-      .andWhere('ubb.userId = :userId', { userId })
-      .getOne();
-
+    const building = await this.buildingRepo.findOne({
+      where: [{ id: buildingId }, { admins: { id: userId } }],
+    });
     if (!building) {
-      throw new NotFoundException(
-        'Edificio no encontrado o no tienes acceso a él',
-      );
+      throw new NotFoundException(`Building not found`);
     }
-
     return building;
   }
 
