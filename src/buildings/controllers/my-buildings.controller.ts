@@ -44,12 +44,9 @@ export class MyBuildingsController {
 
   @Roles('Staff', 'Admin', 'User')
   @Get(':id')
-  getBuildingByOwner(
-    @Req() req: Request,
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  async findOne(@Param('id') id: string, @Req() req: Request) {
     const user = req.user as any;
-    return this.buildingsService.findOneByOwner(id, user.userId);
+    return this.buildingsService.findOneByRelation(id, user.id);
   }
 
   @Roles('Staff', 'Admin', 'User')
