@@ -625,7 +625,7 @@ export class MessageHandlerService {
       case 'link_option':
         this.linkState[from] = { step: 'start' };
         response =
-          '¿Ya tienes tu código de vinculación? Escribe Si o No para continuar\n\nNota: Este código se obtiene en Perfil -> Vincular número';
+          '¿Ya tienes tu código de vinculación? Escribe Si o No para continuar\n\nNota: Este código se obtiene en Chatbots -> WhatsApp';
         break;
 
       default:
