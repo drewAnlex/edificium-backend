@@ -52,6 +52,13 @@ export class MyBuildingsController {
     return this.buildingsService.findOneByOwner(id, user.userId);
   }
 
+  @Roles('Staff', 'Admin', 'User')
+  @Get('admin/:id')
+  async findOne(@Param('id') id: string, @Req() req: Request) {
+    const user = req.user as any;
+    return this.buildingsService.findOneByRelation(id, user.id);
+  }
+
   @Roles('Staff', 'Admin')
   @Put(':id')
   updateBuilding(
