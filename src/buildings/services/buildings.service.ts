@@ -87,6 +87,26 @@ export class BuildingsService {
     return building;
   }
 
+  async findOneByRelation(
+    buildingId: string,
+    userId: string,
+  ): Promise<Building> {
+    const building = await this.buildingRepo
+      .createQueryBuilder('building')
+      .leftJoinAndSelect('building.users', 'users')
+      .where('building.id = :buildingId', { buildingId })
+      .andWhere('users.id = :userId', { userId })
+      .getOne();
+
+    if (!building) {
+      throw new NotFoundException(
+        'Edificio no encontrado o no tienes acceso a él',
+      );
+    }
+
+    return building;
+  }
+
   async findOne(id: number) {
     const building = await this.buildingRepo.findOne({
       where: { id: id },
