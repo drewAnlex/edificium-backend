@@ -274,7 +274,7 @@ export class MessageHandlerService {
         state.confirmation = message;
         if (state.confirmation === 'no') {
           response =
-            'Inicia sesión en tu cuenta para obtener el código de vinculación, este se encuentra en tu Perfil -> Vincular número';
+            'Inicia sesión en tu cuenta para obtener el código de vinculación, este se encuentra en tu Chatbots -> WhatsApp';
           break;
         }
         response = 'Perfecto! Por favor, ingresa el código de vinculación.';
