@@ -93,9 +93,13 @@ export class BuildingsService {
   ): Promise<Building> {
     const building = await this.buildingRepo
       .createQueryBuilder('building')
-      .leftJoinAndSelect('building.users', 'users')
+      .innerJoin(
+        'user_building_building',
+        'ubb',
+        'ubb.buildingId = building.id',
+      )
       .where('building.id = :buildingId', { buildingId })
-      .andWhere('users.id = :userId', { userId })
+      .andWhere('ubb.userId = :userId', { userId })
       .getOne();
 
     if (!building) {
