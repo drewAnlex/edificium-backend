@@ -43,17 +43,17 @@ export class MyBuildingsController {
   }
 
   @Roles('Staff', 'Admin', 'User')
-  @Get(':id')
-  async findOne(@Param('id') id: string, @Req() req: Request) {
-    const user = req.user as any;
-    return this.buildingsService.findOneByOwner(parseInt(id), user.id);
-  }
-
-  @Roles('Staff', 'Admin', 'User')
   @Get('admin/:id')
   async findOneAdmin(@Param('id') id: string, @Req() req: Request) {
     const user = req.user as any;
     return this.buildingsService.findOneByRelation(parseInt(id), user.id);
+  }
+
+  @Roles('Staff', 'Admin', 'User')
+  @Get(':id')
+  async findOne(@Param('id') id: string, @Req() req: Request) {
+    const user = req.user as any;
+    return this.buildingsService.findOneByOwner(parseInt(id), user.id);
   }
 
   @Roles('Staff', 'Admin')

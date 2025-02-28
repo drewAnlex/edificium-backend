@@ -93,6 +93,12 @@ export class BuildingsService {
   ): Promise<Building> {
     const building = await this.buildingRepo.findOne({
       where: [{ id: buildingId }, { admins: { id: userId } }],
+      relations: [
+        'baseCurrency',
+        'auxiliaryCurrency',
+        'apartments',
+        'apartments.userId',
+      ],
     });
     if (!building) {
       throw new NotFoundException(`Building not found`);
