@@ -51,7 +51,7 @@ export class MyBuildingsController {
 
   @Roles('Staff', 'Admin', 'User')
   @Get('admin/:id')
-  async findOne(@Param('id') id: string, @Req() req: Request) {
+  async findOneAdmin(@Param('id') id: string, @Req() req: Request) {
     const user = req.user as any;
     return this.buildingsService.findOneByRelation(id, user.id);
   }
