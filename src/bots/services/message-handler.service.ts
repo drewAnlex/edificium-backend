@@ -11,6 +11,7 @@ import { PaymentMethodFieldsService } from 'src/payment-method/services/payment-
 import { PaymentsService } from 'src/payments/services/payments.service';
 import { PaymentInfoService } from 'src/payments/services/payment-info.service';
 import { QuotesService } from 'src/landing/services/quotes.service';
+import { AdminMenuHandlerService } from './admin-menu-handler.service';
 
 @Injectable()
 export class MessageHandlerService {
@@ -18,6 +19,14 @@ export class MessageHandlerService {
   quoteState;
   linkState;
   user;
+  private userStates: Map<
+    string,
+    {
+      state: string;
+      data?: any;
+    }
+  > = new Map();
+
   constructor(
     private whatsappService: WhatsappService,
     private userService: UsersService,
@@ -29,6 +38,7 @@ export class MessageHandlerService {
     private paymentInfoService: PaymentInfoService,
     private quoteService: QuotesService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private adminMenuHandler: AdminMenuHandlerService,
   ) {
     this.paymentState = {};
     this.quoteState = {};
@@ -91,18 +101,70 @@ export class MessageHandlerService {
     if (type === 'text') {
       const incomingMessage = text.body.toLowerCase().trim();
       if (this.isGreeting(incomingMessage) || this.isMenu(incomingMessage)) {
-        // await this.sendWelcomeMessage(from, id, senderInfo);
-        // await this.sendBasicMenu(from);
         await this.sendBasicList(from);
+      } else if (incomingMessage === 'admin') {
+        // Verificar si el usuario es administrador
+        const user = await this.userService.findByPhone(from);
+        const isAdmin =
+          user && user.role
+            ? user.role.some(
+                (role) => role.Name === 'Admin' || role.Name === 'Staff',
+              )
+            : false;
+
+        if (isAdmin) {
+          // Inicializar el estado de administrador
+          this.setUserState(from, 'ADMIN_MENU');
+          // Enviar menú de administrador
+          await this.adminMenuHandler.sendAdminMainMenu(from);
+        } else {
+          await this.whatsappService.sendMessage(
+            from,
+            'No tienes permisos de administrador para acceder a este menú.',
+            Number(id),
+          );
+        }
       } else if (this.paymentState[from]) {
         await this.handlePaymentFlow(from, incomingMessage, id);
       } else {
-        await this.handleMenuOption(from, incomingMessage, id);
+        // Verificar si hay un estado de administrador activo
+        const userState = this.getUserState(from);
+        if (userState.state.startsWith('ADMIN_')) {
+          const response = await this.handleAdminState(from, incomingMessage);
+          await this.whatsappService.sendMessage(from, response, Number(id));
+        } else {
+          await this.handleMenuOption(from, incomingMessage, id);
+        }
       }
       await this.whatsappService.markAsRead(id);
     } else if (type === 'interactive') {
-      const option = interactive?.list_reply?.id;
-      await this.handleBasicMenuList(from, option, id);
+      if (interactive?.list_reply) {
+        const option = interactive.list_reply.id;
+        await this.handleBasicMenuList(from, option, id);
+      } else if (interactive?.button_reply) {
+        const option = interactive.button_reply.id;
+
+        // Verificar si es una opción del menú de administrador
+        if (option.startsWith('admin_')) {
+          const userState = this.getUserState(from);
+          if (userState.state === 'ADMIN_MENU') {
+            const response =
+              await this.adminMenuHandler.processAdminMenuSelection(
+                option,
+                from,
+              );
+
+            // Actualizar el estado según la opción seleccionada
+            if (option === 'admin_apartment_payments') {
+              this.setUserState(from, 'ADMIN_APARTMENT_PAYMENTS');
+            }
+
+            await this.whatsappService.sendMessage(from, response, Number(id));
+          }
+        } else {
+          await this.handleMenuOption(from, option, id);
+        }
+      }
       await this.whatsappService.markAsRead(id);
     }
   }
@@ -722,5 +784,157 @@ export class MessageHandlerService {
         break;
     }
     await this.whatsappService.sendMessage(from, response, id);
+  }
+
+  /**
+   * Procesa un mensaje entrante de WhatsApp
+   * @param from Número de teléfono del remitente
+   * @param message Mensaje recibido
+   * @param isAdmin Indica si el usuario es administrador
+   */
+  async processMessage(
+    from: string,
+    message: string,
+    isAdmin = false,
+  ): Promise<string> {
+    // Obtener o inicializar el estado del usuario
+    const userState = this.getUserState(from);
+
+    // Comandos generales disponibles para todos
+    if (message.toLowerCase() === 'menu') {
+      this.resetUserState(from);
+      return this.getMainMenu(isAdmin);
+    }
+
+    // Menú de administrador
+    if (isAdmin && message.toLowerCase() === 'admin') {
+      this.setUserState(from, 'ADMIN_MENU');
+      const response = await this.adminMenuHandler.sendAdminMainMenu(from);
+      return response;
+    }
+
+    // Procesar según el estado actual del usuario
+    switch (userState.state) {
+      case 'ADMIN_MENU':
+        return await this.handleAdminMenuState(from, message);
+
+      case 'ADMIN_APARTMENT_PAYMENTS':
+        return await this.handleAdminApartmentPaymentsState(from, message);
+
+      // Otros estados existentes...
+
+      default:
+        // Si no hay estado específico, mostrar el menú principal
+        return this.getMainMenu(isAdmin);
+    }
+  }
+
+  /**
+   * Maneja el estado del menú de administrador
+   */
+  private async handleAdminMenuState(
+    from: string,
+    message: string,
+  ): Promise<string> {
+    const response = await this.adminMenuHandler.processAdminMenuSelection(
+      from,
+      message,
+    );
+
+    // Si seleccionó la opción de consulta de pagos por apartamento
+    if (message.trim() === '1') {
+      this.setUserState(from, 'ADMIN_APARTMENT_PAYMENTS');
+    }
+
+    return response;
+  }
+
+  /**
+   * Maneja el estado de consulta de pagos por apartamento
+   */
+  private async handleAdminApartmentPaymentsState(
+    from: string,
+    message: string,
+  ): Promise<string> {
+    const response = await this.adminMenuHandler.searchPaymentsByApartment(
+      message,
+    );
+    // Volver al menú de administrador después de mostrar los resultados
+    this.setUserState(from, 'ADMIN_MENU');
+    return response;
+  }
+
+  /**
+   * Obtiene el menú principal según el tipo de usuario
+   */
+  private getMainMenu(isAdmin: boolean): string {
+    let menu = `*🏢 Bienvenido al Asistente de Condominio*\n\n`;
+
+    menu += `Opciones disponibles:\n\n`;
+    menu += `📊 *estado* - Ver estado de cuenta\n`;
+    menu += `💰 *pagar* - Registrar un pago\n`;
+    menu += `❓ *ayuda* - Obtener ayuda\n`;
+
+    if (isAdmin) {
+      menu += `\n*Opciones de administrador:*\n`;
+      menu += `🔐 *admin* - Acceder al menú de administrador\n`;
+    }
+
+    return menu;
+  }
+
+  /**
+   * Obtiene el estado actual del usuario
+   */
+  private getUserState(from: string) {
+    if (!this.userStates.has(from)) {
+      this.userStates.set(from, { state: 'INITIAL' });
+    }
+    return this.userStates.get(from);
+  }
+
+  /**
+   * Establece el estado del usuario
+   */
+  private setUserState(from: string, state: string, data?: any) {
+    this.userStates.set(from, { state, data });
+  }
+
+  /**
+   * Reinicia el estado del usuario
+   */
+  private resetUserState(from: string) {
+    this.userStates.set(from, { state: 'INITIAL' });
+  }
+
+  /**
+   * Maneja los estados relacionados con el menú de administrador
+   */
+  private async handleAdminState(
+    from: string,
+    message: string,
+  ): Promise<string> {
+    const userState = this.getUserState(from);
+
+    switch (userState.state) {
+      case 'ADMIN_MENU':
+        // Este caso no debería ocurrir aquí, ya que se maneja con botones interactivos
+        return 'Por favor, selecciona una opción del menú de administrador.';
+
+      case 'ADMIN_APARTMENT_PAYMENTS':
+        const response = await this.adminMenuHandler.searchPaymentsByApartment(
+          message,
+        );
+        // Volver al menú de administrador después de mostrar los resultados
+        this.setUserState(from, 'ADMIN_MENU');
+        // Enviar nuevamente el menú de administrador
+        setTimeout(() => {
+          this.adminMenuHandler.sendAdminMainMenu(from);
+        }, 1000);
+        return response;
+
+      default:
+        return 'Estado no reconocido. Por favor, escribe "menu" para volver al menú principal.';
+    }
   }
 }
