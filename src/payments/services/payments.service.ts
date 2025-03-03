@@ -8,11 +8,16 @@ import { Payment } from '../entities/Payment.entity';
 import { PaymentDTO, PaymentUpdateDTO } from '../dtos/Payment.dto';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { IndividualBillsService } from './individual-bills.service';
 import { BuildingBillsService } from './building-bills.service';
 import { ApartmentsService } from 'src/buildings/services/apartments.service';
 import { OutboundService } from 'src/mailing/services/outbound.service';
+
+interface PaginationParams {
+  page?: number;
+  limit?: number;
+}
 
 @Injectable()
 export class PaymentsService {
@@ -49,8 +54,11 @@ export class PaymentsService {
     });
   }
 
-  async findBuildingPayments(buildingId: number) {
-    return await this.paymentRepo.find({
+  async findBuildingPayments(buildingId: number, params?: PaginationParams) {
+    const { page = 1, limit = 10 } = params || {};
+    const skip = (page - 1) * limit;
+
+    const [payments, total] = await this.paymentRepo.findAndCount({
       where: {
         isRemoved: false,
         IndividualBill: {
@@ -68,7 +76,19 @@ export class PaymentsService {
         'paymentInfos',
       ],
       order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
     });
+
+    return {
+      data: payments,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: number) {
@@ -190,5 +210,43 @@ export class PaymentsService {
     }
 
     return payment;
+  }
+
+  async findPaymentsByApartmentIdentifier(
+    identifier: string,
+    params?: PaginationParams,
+  ) {
+    const { page = 1, limit = 10 } = params || {};
+    const skip = (page - 1) * limit;
+
+    const [payments, total] = await this.paymentRepo.findAndCount({
+      where: {
+        isRemoved: false,
+        IndividualBill: {
+          apartmentId: {
+            identifier: ILike(`%${identifier}%`),
+          },
+        },
+      },
+      relations: [
+        'IndividualBill',
+        'IndividualBill.apartmentId',
+        'Method',
+        'paymentInfos',
+      ],
+      order: { createdAt: 'DESC' },
+      skip,
+      take: limit,
+    });
+
+    return {
+      data: payments,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }
