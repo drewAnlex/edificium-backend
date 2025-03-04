@@ -36,7 +36,6 @@ import { Quote } from 'src/landing/entities/Quote.entity';
 import { LandingModule } from 'src/landing/landing.module';
 import { QuotesService } from 'src/landing/services/quotes.service';
 import { Role } from 'src/users/entities/Role.entity';
-import { AdminMenuHandlerService } from './services/admin-menu-handler.service';
 
 @Module({
   imports: [
@@ -80,10 +79,6 @@ import { AdminMenuHandlerService } from './services/admin-menu-handler.service';
     PaymentInfoService,
     SendToWhatsappService,
     QuotesService,
-    AdminMenuHandlerService,
-  ],
-  exports: [
-    MessageHandlerService,
   ],
 })
 export class BotsModule {}
