@@ -19,14 +19,18 @@ import { IndividualBillsService } from './individual-bills.service';
 import { IndividualBillDto } from '../dtos/IndividualBill.dto';
 
 import { v4 as uuidv4 } from 'uuid';
+import { Expense } from '../entities/Expense.entity';
+import { ExpenseService } from './expense.service';
 
 @Injectable()
 export class BuildingBillsService {
   constructor(
     @InjectRepository(BuildingBill) private billRepo: Repository<BuildingBill>,
+    @InjectRepository(Expense) private expenseRepo: Repository<Expense>,
     @Inject(forwardRef(() => BuildingsService))
     private buildingService: BuildingsService,
     private billService: IndividualBillsService,
+    private expenseService: ExpenseService,
   ) {}
 
   async getLatestForEmail(building: number) {
@@ -280,6 +284,19 @@ export class BuildingBillsService {
     try {
       this.billRepo.merge(bill, { isRemoved: true });
       await this.billRepo.save(bill);
+      const expenses = await this.expenseService.findAllByBuilding(
+        bill.buildingId.id,
+      );
+      expenses.forEach(async () => {
+        await this.expenseRepo.update(
+          {
+            buildingBill: { id: bill.id },
+          },
+          {
+            buildingBill: null,
+          },
+        );
+      });
     } catch (error) {
       throw new HttpException(
         `An error occurred: ${error}`,

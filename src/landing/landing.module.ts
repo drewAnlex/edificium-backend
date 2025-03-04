@@ -22,6 +22,8 @@ import { Apartment } from 'src/buildings/entities/apartment.entity';
 import { PaymentMethodList } from 'src/payment-method/entities/payment-method-list.entity';
 import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-day.entity';
 import { Role } from 'src/users/entities/Role.entity';
+import { Expense } from 'src/payments/entities/Expense.entity';
+import { ExpenseService } from 'src/payments/services/expense.service';
 
 @Module({
   imports: [
@@ -35,6 +37,7 @@ import { Role } from 'src/users/entities/Role.entity';
       Apartment,
       PaymentMethodList,
       currencyValuePerDay,
+      Expense,
     ]),
     MailingModule,
     PaymentsModule,
@@ -51,6 +54,7 @@ import { Role } from 'src/users/entities/Role.entity';
     ApartmentsService,
     PaymentMethodListService,
     CurrencyValuePerDayService,
+    ExpenseService,
   ],
 })
 export class LandingModule {}

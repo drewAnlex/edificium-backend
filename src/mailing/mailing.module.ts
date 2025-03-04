@@ -28,6 +28,7 @@ import { CurrencyModule } from 'src/currency/currency.module';
 import { CurrencyValuePerDayService } from 'src/currency/services/currency-value-per-day.service';
 import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-day.entity';
 import { Role } from 'src/users/entities/Role.entity';
+import { ExpenseService } from 'src/payments/services/expense.service';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { Role } from 'src/users/entities/Role.entity';
     IndividualBillsService,
     BillingService,
     CurrencyValuePerDayService,
+    ExpenseService,
   ],
   exports: [OutboundService],
   controllers: [OutboundController],
