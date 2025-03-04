@@ -28,7 +28,8 @@ import { PaymentMethodDetails } from 'src/payment-method/entities/payment-method
 import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-day.entity';
 import { CurrencyModule } from 'src/currency/currency.module';
 import { CurrencyValuePerDayService } from 'src/currency/services/currency-value-per-day.service';
-
+import { Expense } from 'src/payments/entities/Expense.entity';
+import { ExpenseService } from 'src/payments/services/expense.service';
 @Module({
   imports: [
     forwardRef(() => MailingModule),
@@ -46,6 +47,7 @@ import { CurrencyValuePerDayService } from 'src/currency/services/currency-value
       PaymentMethodList,
       PaymentMethodDetails,
       currencyValuePerDay,
+      Expense,
     ]),
   ],
   controllers: [UsersController, RolesController, ProfileController],
@@ -60,6 +62,7 @@ import { CurrencyValuePerDayService } from 'src/currency/services/currency-value
     BillingService,
     BuildingsService,
     CurrencyValuePerDayService,
+    ExpenseService,
   ],
   exports: [UsersService, RolesService],
 })

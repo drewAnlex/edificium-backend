@@ -30,6 +30,7 @@ import { FundModule } from 'src/fund/fund.module';
 import { FundController } from './controllers/fund.controller';
 import { Fund } from 'src/fund/entities/Fund.entity';
 import { Role } from 'src/users/entities/Role.entity';
+import { ExpenseService } from 'src/payments/services/expense.service';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { Role } from 'src/users/entities/Role.entity';
     CurrencyValuePerDayService,
     FundService,
     FService,
+    ExpenseService,
   ],
   controllers: [BillingController, FundController],
 })
