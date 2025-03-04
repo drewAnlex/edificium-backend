@@ -9,8 +9,6 @@ import {
   ParseIntPipe,
   UseGuards,
   Req,
-  Query,
-  DefaultValuePipe,
 } from '@nestjs/common';
 import { PaymentDTO, PaymentUpdateDTO } from '../dtos/Payment.dto';
 import { PaymentsService } from '../services/payments.service';
@@ -46,16 +44,9 @@ export class PaymentsController {
   }
 
   @Roles('Admin', 'Condominium')
-  @Get('building/:buildingId')
-  async getBuildingPayments(
-    @Param('buildingId', ParseIntPipe) buildingId: number,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-  ) {
-    return this.paymentService.findBuildingPayments(buildingId, {
-      page,
-      limit,
-    });
+  @Get('building/:id')
+  getBuildingPayments(@Param('id', ParseIntPipe) id: number) {
+    return this.paymentService.findBuildingPayments(id);
   }
 
   @Roles('Staff', 'Admin')
@@ -94,20 +85,10 @@ export class PaymentsController {
 
   @Roles('Staff', 'Admin')
   @Put(':id/status')
-  updatePaymentStatus(@Param('id', ParseIntPipe) id: number) {
-    return this.paymentService.updateStatus(id, 1);
-  }
-
-  @Roles('Admin', 'Staff')
-  @Get('apartment/:identifier')
-  async getPaymentsByApartmentIdentifier(
-    @Param('identifier') identifier: string,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  updatePaymentStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('Status') status: number,
   ) {
-    return this.paymentService.findPaymentsByApartmentIdentifier(identifier, {
-      page,
-      limit,
-    });
+    return this.paymentService.updateStatus(id, 1);
   }
 }
