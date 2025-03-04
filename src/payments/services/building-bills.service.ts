@@ -341,7 +341,10 @@ export class BuildingBillsService {
       }
     });
     try {
-      await this.billRepo.merge(bill, { isPublished: true });
+      await this.billRepo.merge(bill, {
+        isPublished: true,
+        createdAt: new Date(),
+      });
       await this.billRepo.save(bill);
     } catch (error) {
       throw new HttpException(
