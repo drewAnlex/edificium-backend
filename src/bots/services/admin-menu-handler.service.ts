@@ -17,7 +17,7 @@ export class AdminMenuHandlerService {
    * @returns Mensaje de confirmación
    */
   async sendAdminMainMenu(to: string): Promise<string> {
-    const menuMessage = '*🔐Menú de Administrador*';
+    const menuMessage = '*🔐 Menú de Administrador*\n\nSelecciona una opción:';
     const buttons = [
       {
         type: 'reply',
