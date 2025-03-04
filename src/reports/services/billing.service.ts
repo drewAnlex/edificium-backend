@@ -201,7 +201,7 @@ export class BillingService {
         headers: [
           'TOTAL RECIBO',
           'TOTAL CUOTA',
-          'TOTAL DEUDA',
+          'DEUDA ANTERIOR',
           'FACTURAS PENDIENTES',
           'BALANCE',
         ],
@@ -213,7 +213,12 @@ export class BillingService {
               await this.currencyService.convertToCurrency(1, totalDeuda)
             ).toFixed(2)}Bs`,
             facturasPendientes.length.toString(),
-            `${data.apartment.balance}`,
+            `${data.apartment.balance} - ${(
+              await this.currencyService.convertToCurrency(
+                1,
+                data.apartment.balance,
+              )
+            ).toFixed(2)}Bs`,
           ],
         ],
       };
