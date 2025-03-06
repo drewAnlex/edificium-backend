@@ -249,4 +249,16 @@ export class PaymentsService {
       },
     };
   }
+
+  async getPendingPaymentsByBuilding(buildingId: number) {
+    const payments = await this.paymentRepo.find({
+      where: {
+        isRemoved: false,
+        Status: 0,
+        IndividualBill: { apartmentId: { buildingId: { id: buildingId } } },
+      },
+      relations: ['IndividualBill', 'IndividualBill.apartmentId'],
+    });
+    return payments;
+  }
 }

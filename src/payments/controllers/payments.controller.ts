@@ -32,6 +32,14 @@ export class PaymentsController {
     return this.paymentService.findAll();
   }
 
+  @Roles('Admin', 'Condominium')
+  @Get('building/pending/:buildingId')
+  async getPendingPaymentsByBuilding(
+    @Param('buildingId', ParseIntPipe) buildingId: number,
+  ) {
+    return this.paymentService.getPendingPaymentsByBuilding(buildingId);
+  }
+
   @Roles('User', 'Admin', 'Staff')
   @Get('user')
   getUserPayments(@Req() req: Request) {
