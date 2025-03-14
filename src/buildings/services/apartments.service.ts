@@ -64,7 +64,7 @@ export class ApartmentsService {
           apartmentIdentifier: apartment.identifier,
           currentBalance: apartment.balance,
           expectedBalance: Number(expectedBalance.toFixed(2)),
-          individualBillsTotal: sumBills,
+          individualBillsTotal: -1 * sumBills,
           paymentsTotal: sumPayments,
           discrepancyReason: `${discrepancyReason}. ${this.getAdditionalDetails(
             balanceDifference,
