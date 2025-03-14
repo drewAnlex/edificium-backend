@@ -38,7 +38,7 @@ export class ApartmentsService {
       );
 
       // Suma de pagos con verificación de relaciones anidadas y estado de pago
-      const sumPayments = (apartment.userId?.payments).reduce(
+      const sumPayments = (apartment.userId?.payments || []).reduce(
         (acc, payment) =>
           payment.Status === 1 && payment.isRemoved === false
             ? acc + (Number(payment.Amount) || 0)
