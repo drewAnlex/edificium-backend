@@ -47,8 +47,8 @@ export class ApartmentsService {
       );
 
       // eslint-disable-next-line prettier/prettier
-      const expectedBalance = sumBills - (-1* sumPayments);
-      const balanceDifference = expectedBalance - apartment.balance;
+      const expectedBalance = (-1 * sumBills) + sumPayments;
+      const balanceDifference = expectedBalance + apartment.balance;
 
       if (Math.abs(balanceDifference) > 0.0099) {
         const discrepancyReason =
