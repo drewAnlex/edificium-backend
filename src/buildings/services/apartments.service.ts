@@ -31,12 +31,14 @@ export class ApartmentsService {
     const discrepancies = [];
 
     for (const apartment of apartments) {
-      const sumBills = apartment.individualBills.reduce(
+      // Suma de facturas con verificación de existencia
+      const sumBills = (apartment.individualBills || []).reduce(
         (acc, bill) => acc + (Number(bill.Balance) || 0),
         0,
       );
 
-      const sumPayments = apartment.userId.payments.reduce(
+      // Suma de pagos con verificación de relaciones anidadas
+      const sumPayments = (apartment.userId?.payments || []).reduce(
         (acc, payment) => acc + (Number(payment.Amount) || 0),
         0,
       );
@@ -49,10 +51,10 @@ export class ApartmentsService {
           balanceDifference > 0
             ? `Balance es $${balanceDifference.toFixed(
                 2,
-              )} más bajo de lo esperado (Posibles pagos faltantes o facturas adicionales)`
+              )} más bajo de lo esperado`
             : `Balance es $${Math.abs(balanceDifference).toFixed(
                 2,
-              )} más alto de lo esperado (Posibles facturas faltantes o pagos adicionales)`;
+              )} más alto de lo esperado`;
 
         discrepancies.push({
           apartmentId: apartment.id,
@@ -61,12 +63,20 @@ export class ApartmentsService {
           expectedBalance: Number(expectedBalance.toFixed(2)),
           individualBillsTotal: sumBills,
           paymentsTotal: sumPayments,
-          discrepancyReason, // Nueva propiedad añadida
+          discrepancyReason: `${discrepancyReason}. ${this.getAdditionalDetails(
+            balanceDifference,
+          )}`,
         });
       }
     }
 
     return discrepancies;
+  }
+
+  private getAdditionalDetails(balanceDifference: number): string {
+    return balanceDifference > 0
+      ? 'Posibles pagos faltantes o facturas adicionales'
+      : 'Posibles facturas faltantes o pagos adicionales';
   }
 
   async findAll() {
