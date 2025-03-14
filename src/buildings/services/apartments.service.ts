@@ -33,7 +33,7 @@ export class ApartmentsService {
     for (const apartment of apartments) {
       // Suma de facturas con verificación de existencia
       const sumBills = (apartment.individualBills || []).reduce(
-        (acc, bill) => acc + (Number(bill.Balance) || 0),
+        (acc, bill) => acc + (Number(bill.Total) || 0),
         0,
       );
 
