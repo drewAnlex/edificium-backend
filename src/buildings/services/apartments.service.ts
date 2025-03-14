@@ -38,7 +38,7 @@ export class ApartmentsService {
       );
 
       // Suma de pagos con verificación de relaciones anidadas y estado de pago
-      const sumPayments = (apartment.userId?.payments || []).reduce(
+      const sumPayments = (apartment.userId?.payments).reduce(
         (acc, payment) =>
           payment.Status === 1 && payment.isRemoved === false
             ? acc + (Number(payment.Amount) || 0)
@@ -46,7 +46,8 @@ export class ApartmentsService {
         0,
       );
 
-      const expectedBalance = -1 * sumBills - sumPayments;
+      // eslint-disable-next-line prettier/prettier
+      const expectedBalance = (-1 * sumBills) - sumPayments;
       const balanceDifference = expectedBalance - apartment.balance;
 
       if (Math.abs(balanceDifference) > 0.0099) {
