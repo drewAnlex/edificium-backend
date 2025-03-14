@@ -46,7 +46,7 @@ export class ApartmentsService {
         0,
       );
 
-      const expectedBalance = sumBills - sumPayments;
+      const expectedBalance = -1 * sumBills - sumPayments;
       const balanceDifference = expectedBalance - apartment.balance;
 
       if (Math.abs(balanceDifference) > 0.0099) {
