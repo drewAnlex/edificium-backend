@@ -25,7 +25,11 @@ export class ApartmentsService {
   async auditBalances(building: number) {
     const apartments = await this.apartmentRepo.find({
       where: { buildingId: { id: building } },
-      relations: ['individualBills', 'userId.payments'],
+      relations: [
+        'individualBills',
+        'individualBills.payment',
+        'userId.payments',
+      ],
     });
 
     const discrepancies = [];
@@ -38,7 +42,9 @@ export class ApartmentsService {
       );
 
       // Suma de pagos con verificación de relaciones anidadas y estado de pago
-      const sumPayments = (apartment.userId?.payments || []).reduce(
+      const sumPayments = (
+        apartment.individualBills.flatMap((bill) => bill.payment) || []
+      ).reduce(
         (acc, payment) =>
           payment.Status === 1 && payment.isRemoved === false
             ? acc + (Number(payment.Amount) || 0)
@@ -47,8 +53,8 @@ export class ApartmentsService {
       );
 
       // eslint-disable-next-line prettier/prettier
-      const expectedBalance = (-1 * sumBills) + sumPayments;
-      const balanceDifference = expectedBalance + apartment.balance;
+      const expectedBalance = -1 * sumBills + sumPayments;
+      const balanceDifference = expectedBalance + Number(apartment.balance);
 
       if (Math.abs(balanceDifference) > 0.0099) {
         const discrepancyReason =

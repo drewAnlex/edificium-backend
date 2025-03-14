@@ -49,7 +49,7 @@ export class IndividualBill {
   isRemoved: boolean;
 
   @OneToMany(() => Payment, (payment) => payment.IndividualBill)
-  payment: Payment;
+  payment: Payment[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
