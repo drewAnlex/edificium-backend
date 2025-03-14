@@ -56,7 +56,10 @@ export class ApartmentsService {
       const expectedBalance = -1 * sumBills + sumPayments;
       const balanceDifference = expectedBalance + Number(apartment.balance);
 
-      if (Math.abs(expectedBalance) != Math.abs(Number(apartment.balance))) {
+      if (
+        Math.abs(expectedBalance).toFixed(2) !=
+        Math.abs(Number(apartment.balance)).toFixed(2)
+      ) {
         const discrepancyReason =
           balanceDifference > 0
             ? `Balance es $${balanceDifference.toFixed(
