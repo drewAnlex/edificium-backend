@@ -22,6 +22,53 @@ export class ApartmentsService {
     private userService: UsersService,
   ) {}
 
+  async auditBalances(building: number) {
+    const apartments = await this.apartmentRepo.find({
+      where: { buildingId: { id: building } },
+      relations: ['individualBills', 'userId.payments'],
+    });
+
+    const discrepancies = [];
+
+    for (const apartment of apartments) {
+      const sumBills = apartment.individualBills.reduce(
+        (acc, bill) => acc + (Number(bill.Balance) || 0),
+        0,
+      );
+
+      const sumPayments = apartment.userId.payments.reduce(
+        (acc, payment) => acc + (Number(payment.Amount) || 0),
+        0,
+      );
+
+      const expectedBalance = sumBills - sumPayments;
+      const balanceDifference = expectedBalance - apartment.balance;
+
+      if (Math.abs(balanceDifference) > 0.0099) {
+        const discrepancyReason =
+          balanceDifference > 0
+            ? `Balance es $${balanceDifference.toFixed(
+                2,
+              )} más bajo de lo esperado (Posibles pagos faltantes o facturas adicionales)`
+            : `Balance es $${Math.abs(balanceDifference).toFixed(
+                2,
+              )} más alto de lo esperado (Posibles facturas faltantes o pagos adicionales)`;
+
+        discrepancies.push({
+          apartmentId: apartment.id,
+          apartmentIdentifier: apartment.identifier,
+          currentBalance: apartment.balance,
+          expectedBalance: Number(expectedBalance.toFixed(2)),
+          individualBillsTotal: sumBills,
+          paymentsTotal: sumPayments,
+          discrepancyReason, // Nueva propiedad añadida
+        });
+      }
+    }
+
+    return discrepancies;
+  }
+
   async findAll() {
     return await this.apartmentRepo.find({
       relations: ['buildingId', 'userId', 'individualBills'],

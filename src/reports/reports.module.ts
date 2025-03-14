@@ -31,6 +31,8 @@ import { FundController } from './controllers/fund.controller';
 import { Fund } from 'src/fund/entities/Fund.entity';
 import { Role } from 'src/users/entities/Role.entity';
 import { ExpenseService } from 'src/payments/services/expense.service';
+import { AuditService } from './services/audit.service';
+import { AuditController } from './controllers/audit.controller';
 
 @Module({
   imports: [
@@ -67,7 +69,8 @@ import { ExpenseService } from 'src/payments/services/expense.service';
     FundService,
     FService,
     ExpenseService,
+    AuditService,
   ],
-  controllers: [BillingController, FundController],
+  controllers: [BillingController, FundController, AuditController],
 })
 export class ReportsModule {}

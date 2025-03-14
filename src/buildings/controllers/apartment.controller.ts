@@ -23,6 +23,12 @@ export class ApartmentController {
   constructor(private apartmentsService: ApartmentsService) {}
 
   @Roles('Staff')
+  @Get('audit/:buildingId')
+  async auditBalances(@Param('buildingId', ParseIntPipe) buildingId: number) {
+    return this.apartmentsService.auditBalances(buildingId);
+  }
+
+  @Roles('Staff')
   @Get()
   getApartments() {
     return this.apartmentsService.findAll();
