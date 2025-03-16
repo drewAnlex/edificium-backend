@@ -364,8 +364,8 @@ export class BuildingBillsService {
       },
     });
     const debt = bills.reduce((acc, bill) => {
-      return acc + Number(bill.balance);
+      return acc + (Number(bill.total) - Number(bill.balance));
     }, 0);
-    return debt.toFixed(2);
+    return (debt * -1).toFixed(2);
   }
 }
