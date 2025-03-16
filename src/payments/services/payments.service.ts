@@ -39,16 +39,21 @@ export class PaymentsService {
   async findUserPayments(userId: number) {
     return await this.paymentRepo.find({
       where: {
-        UserId: {
-          id: userId,
-        },
         isRemoved: false,
+        IndividualBill: {
+          apartmentId: {
+            userId: {
+              id: userId,
+            },
+          },
+        },
       },
       relations: [
         'IndividualBill',
         'Method',
         'paymentInfos',
         'IndividualBill.apartmentId',
+        'IndividualBill.apartmentId.userId',
       ],
       order: { createdAt: 'DESC' },
     });
