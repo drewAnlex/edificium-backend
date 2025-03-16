@@ -107,15 +107,26 @@ export class PaymentsController {
   }
 
   @Roles('Admin', 'Staff')
-  @Get('apartment/:identifier')
+  @Get('apartment/:identifier/:buildingId')
   async getPaymentsByApartmentIdentifier(
     @Param('identifier') identifier: string,
+    @Param('buildingId') buildingId: number,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
   ) {
-    return this.paymentService.findPaymentsByApartmentIdentifier(identifier, {
-      page,
-      limit,
-    });
+    return this.paymentService.findPaymentsByApartmentIdentifier(
+      identifier,
+      buildingId,
+      {
+        page,
+        limit,
+      },
+    );
+  }
+
+  @Roles('Admin', 'Staff', 'User')
+  @Get('apartmentId/:id')
+  async getPaymentsByApartment(@Param('id', ParseIntPipe) apartmentId: number) {
+    return this.paymentService.getPaymentsByApartment(apartmentId);
   }
 }

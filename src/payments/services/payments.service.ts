@@ -214,6 +214,7 @@ export class PaymentsService {
 
   async findPaymentsByApartmentIdentifier(
     identifier: string,
+    buildingId: number,
     params?: PaginationParams,
   ) {
     const { page = 1, limit = 10 } = params || {};
@@ -224,6 +225,7 @@ export class PaymentsService {
         isRemoved: false,
         IndividualBill: {
           apartmentId: {
+            buildingId: { id: buildingId },
             identifier: ILike(`%${identifier}%`),
           },
         },
@@ -248,6 +250,21 @@ export class PaymentsService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  async getPaymentsByApartment(apartmentId: number) {
+    const payments = await this.paymentRepo.find({
+      where: {
+        isRemoved: false,
+        IndividualBill: {
+          apartmentId: { id: apartmentId },
+        },
+      },
+      relations: ['IndividualBill', 'Method', 'paymentInfos'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return payments;
   }
 
   async getPendingPaymentsByBuilding(buildingId: number) {
