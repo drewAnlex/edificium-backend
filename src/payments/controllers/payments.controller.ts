@@ -48,6 +48,12 @@ export class PaymentsController {
   }
 
   @Roles('Admin', 'Staff')
+  @Put('reverse/:id')
+  reversePayment(@Param('id', ParseIntPipe) id: number) {
+    return this.paymentService.reversePayment(id);
+  }
+
+  @Roles('Admin', 'Staff')
   @Get('user/:id')
   getUserPaymentsById(@Param('id', ParseIntPipe) id: number) {
     return this.paymentService.findUserPayments(id);

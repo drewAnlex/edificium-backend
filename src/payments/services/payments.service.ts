@@ -102,6 +102,7 @@ export class PaymentsService {
       relations: [
         'IndividualBill',
         'IndividualBill.apartmentId',
+        'IndividualBill.buildingBillId',
         'UserId',
         'Method',
         'Method.paymentDetails',
@@ -282,5 +283,51 @@ export class PaymentsService {
       relations: ['IndividualBill', 'IndividualBill.apartmentId'],
     });
     return payments;
+  }
+
+  async reversePayment(id: number) {
+    const payment = await this.findOne(id);
+    const individualBill = await this.ibService.findOne(
+      Number(payment.IndividualBill.id),
+    );
+    const apartment = await this.apartmentService.findOne(
+      Number(individualBill.apartmentId.id),
+    );
+
+    // Revertir el balance del apartamento
+    apartment.balance = Number(apartment.balance) - Number(payment.Amount);
+    await this.apartmentService.update(Number(apartment.id), {
+      balance: Number(apartment.balance),
+    });
+
+    // Revertir el estado del pago individual
+    individualBill.Balance =
+      Number(individualBill.Balance) - Number(payment.Amount);
+    await this.ibService.update(Number(individualBill.id), {
+      Balance: Number(individualBill.Balance),
+    });
+
+    individualBill.IsPaid = false;
+    await this.ibService.update(Number(individualBill.id), {
+      IsPaid: false,
+    });
+
+    // Revertir el estado del pago del edificio si existe
+    if (individualBill.buildingBillId) {
+      const buildingBill = await this.bbService.findOne(
+        Number(individualBill.buildingBillId.id),
+      );
+      buildingBill.balance =
+        Number(buildingBill.balance) - Number(payment.Amount);
+      await this.bbService.update(Number(buildingBill.id), {
+        balance: Number(buildingBill.balance),
+      });
+    }
+
+    // Revertir el estado del pago
+    await this.paymentRepo.merge(payment, { Status: 0 });
+    await this.paymentRepo.save(payment);
+
+    return payment;
   }
 }
