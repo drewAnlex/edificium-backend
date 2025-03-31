@@ -33,6 +33,8 @@ import { Role } from 'src/users/entities/Role.entity';
 import { ExpenseService } from 'src/payments/services/expense.service';
 import { AuditService } from './services/audit.service';
 import { AuditController } from './controllers/audit.controller';
+import { IndividualExpense } from 'src/payments/entities/IndividualExpense.entity';
+import { IndividualExpensesService } from 'src/payments/services/individual-expenses.service';
 
 @Module({
   imports: [
@@ -41,6 +43,7 @@ import { AuditController } from './controllers/audit.controller';
       BuildingBill,
       IndividualBill,
       Expense,
+      IndividualExpense,
       User,
       Role,
       PaymentMethodList,
@@ -69,6 +72,7 @@ import { AuditController } from './controllers/audit.controller';
     FundService,
     FService,
     ExpenseService,
+    IndividualExpensesService,
     AuditService,
   ],
   controllers: [BillingController, FundController, AuditController],

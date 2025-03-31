@@ -30,6 +30,8 @@ import { CurrencyModule } from 'src/currency/currency.module';
 import { CurrencyValuePerDayService } from 'src/currency/services/currency-value-per-day.service';
 import { Expense } from 'src/payments/entities/Expense.entity';
 import { ExpenseService } from 'src/payments/services/expense.service';
+import { IndividualExpense } from 'src/payments/entities/IndividualExpense.entity';
+import { IndividualExpensesService } from 'src/payments/services/individual-expenses.service';
 @Module({
   imports: [
     forwardRef(() => MailingModule),
@@ -48,6 +50,7 @@ import { ExpenseService } from 'src/payments/services/expense.service';
       PaymentMethodDetails,
       currencyValuePerDay,
       Expense,
+      IndividualExpense,
     ]),
   ],
   controllers: [UsersController, RolesController, ProfileController],
@@ -63,6 +66,7 @@ import { ExpenseService } from 'src/payments/services/expense.service';
     BuildingsService,
     CurrencyValuePerDayService,
     ExpenseService,
+    IndividualExpensesService,
   ],
   exports: [UsersService, RolesService],
 })

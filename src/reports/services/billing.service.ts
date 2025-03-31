@@ -8,6 +8,10 @@ import { BuildingBillsService } from 'src/payments/services/building-bills.servi
 import { IndividualBillsService } from 'src/payments/services/individual-bills.service';
 import * as ExcelJS from 'exceljs';
 import { CurrencyValuePerDayService } from 'src/currency/services/currency-value-per-day.service';
+import { IndividualExpensesService } from 'src/payments/services/individual-expenses.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { IndividualExpense } from 'src/payments/entities/IndividualExpense.entity';
+import { Repository } from 'typeorm';
 
 const formatter = new Intl.DateTimeFormat('es-ES'); // 'es-ES' para español de España
 
@@ -21,6 +25,10 @@ export class BillingService {
     @Inject(forwardRef(() => BuildingsService))
     private buildingService: BuildingsService,
     private currencyService: CurrencyValuePerDayService,
+    private individualExpenseService: IndividualExpensesService,
+    private individualBillService: IndividualBillsService,
+    @InjectRepository(IndividualExpense)
+    private individualExpenseRepo: Repository<IndividualExpense>,
   ) {}
   async generateBillPDF(
     bill: number,
@@ -37,6 +45,20 @@ export class BillingService {
     const individualBill = individualBills.find(
       (billItem) => billItem.buildingBillId?.id === data.bill.id,
     );
+
+    // Obtener gastos individuales para este apartamento
+    const individualExpenses =
+      await this.individualExpenseService.findAllByApartment(
+        apartmentId ? apartmentId : data.apartment.id,
+      );
+
+    // Filtrar solo los gastos individuales asociados a esta factura
+    const billIndividualExpenses = individualExpenses.filter(
+      (expense) =>
+        expense.buildingBill?.id === data.bill.id &&
+        expense.isRemoved === false,
+    );
+
     let alternativeBalance = 0;
     if (!individualBill?.Total) {
       let totalPerShare = 0;
@@ -179,10 +201,20 @@ export class BillingService {
         (expense) => !expense.isFixed && expense.isRemoved === false,
       );
       const totalRecibo = data.bill.total;
-      const totalCuota =
-        individualBill?.Total != undefined
-          ? individualBill?.Total
-          : alternativeBalance.toFixed(2); // Manejar posible valor indefinido
+      const totalCuota = (
+        (individualBill?.Total != undefined
+          ? Number(individualBill?.Total)
+          : alternativeBalance) +
+        (billIndividualExpenses.length > 0
+          ? billIndividualExpenses.reduce(
+              (sum, expense) => sum + Number(expense.total),
+              0,
+            )
+          : 0)
+      ).toFixed(2);
+      individualBill?.Total != undefined
+        ? individualBill?.Total
+        : alternativeBalance.toFixed(2); // Manejar posible valor indefinido
       const totalDeuda = await this.ibService.adminIndividualDebt(
         data.apartment.id,
       );
@@ -208,8 +240,8 @@ export class BillingService {
         rows: [
           [
             `${totalRecibo?.toFixed(2)}$`,
-            `${totalCuota.toString()}$`,
-            `${totalDeuda.toString()}$ - ${(
+            `${Number(totalCuota).toFixed(2)}$`,
+            `${Number(totalDeuda).toFixed(2)}$ - ${(
               await this.currencyService.convertToCurrency(1, totalDeuda)
             ).toFixed(2)}Bs`,
             facturasPendientes.length.toString(),
@@ -273,32 +305,21 @@ export class BillingService {
         }),
       };
       doc.table(tableVariables, tableOptions);
+
+      // Añadir sección de gastos individuales si existen
+      if (billIndividualExpenses.length > 0) {
+        doc.moveDown(2);
+        const tableIndividualExpenses = {
+          headers: ['DESCRIPCIÓN DE GASTOS INDIVIDUALES', '', 'MONTO', ''],
+          rows: billIndividualExpenses.map((expense) => {
+            return [expense.name, '', `${expense.total.toString()}$`, ''];
+          }),
+        };
+        doc.fillColor('black');
+        doc.table(tableIndividualExpenses, tableOptions);
+      }
+
       doc.text(`AP: A: Aplica por alícuota P: Aplica por propietario `);
-      doc.moveDown(2);
-      tableOptions = {
-        width: doc.page.width, // Adjust table width
-        layout: 'lightHorizontalLines', // Add thin horizontal lines
-        cellPadding: 5, // Add some padding to cells
-        headerRows: 1, // Only show header row as bold
-        columnsSize: [260, 125, 125],
-      };
-      // const tableDebt = {
-      //   headers: ['TITULO', 'FECHA DE EMISIÓN', 'MONTO'],
-      //   rows: await Promise.all(
-      //     pastIndividualBills.map(async (bill) => {
-      //       return [
-      //         bill.Name,
-      //         formatter.format(bill.createdAt),
-      //         `${bill.Total.toString()}$ - ${await (
-      //           await this.currencyService.convertToCurrency(1, bill.Total)
-      //         ).toFixed(2)}Bs`,
-      //       ];
-      //     }),
-      //   ),
-      // };
-
-      // doc.table(tableDebt, tableOptions);
-
       doc.moveDown(2);
       tableOptions = {
         width: doc.page.width, // Adjust table width
@@ -349,6 +370,43 @@ export class BillingService {
 
   async generateBillPreviewPDF(bill: number): Promise<Buffer> {
     const data = await this.bbService.findOne(bill);
+
+    // Obtener todos los gastos individuales para esta factura
+    const individualExpenses = await this.individualExpenseRepo.find({
+      where: {
+        buildingBill: { id: data.id },
+        isRemoved: false,
+      },
+      relations: ['apartmentId'],
+    });
+
+    // Imprimir para debug (puedes quitar esto después)
+    console.log(
+      `Found ${individualExpenses.length} individual expenses for bill ${data.id}`,
+    );
+
+    // Agrupar gastos individuales por apartamento para la previsualización
+    const apartmentExpensesMap = new Map();
+
+    individualExpenses.forEach((expense) => {
+      const apartmentId = expense.apartmentId.id;
+      const apartmentIdentifier = expense.apartmentId.identifier;
+
+      if (!apartmentExpensesMap.has(apartmentId)) {
+        apartmentExpensesMap.set(apartmentId, {
+          identifier: apartmentIdentifier,
+          expenses: [],
+        });
+      }
+
+      apartmentExpensesMap.get(apartmentId).expenses.push(expense);
+    });
+
+    // Verificar que tengamos apartamentos con gastos (puedes quitar esto después)
+    console.log(
+      `Mapped ${apartmentExpensesMap.size} apartments with individual expenses`,
+    );
+
     let paymentMethodList = await this.paymnetMethodList.findByBuilding(
       data.buildingId.id,
     );
@@ -470,7 +528,7 @@ export class BillingService {
       const totalCuota = 0; // Manejar posible valor indefinido
       const totalDeuda = 0;
 
-      let tableOptions = {
+      const tableOptions = {
         width: doc.page.width, // Adjust table width
         layout: 'lightHorizontalLines', // Add thin horizontal lines
         cellPadding: 5, // Add some padding to cells
@@ -550,30 +608,41 @@ export class BillingService {
         }),
       };
       doc.table(tableVariables, tableOptions);
-      doc.moveDown(2);
-      tableOptions = {
-        width: doc.page.width, // Adjust table width
-        layout: 'lightHorizontalLines', // Add thin horizontal lines
-        cellPadding: 5, // Add some padding to cells
-        headerRows: 1, // Only show header row as bold
-        columnsSize: [260, 125, 125],
-      };
-      const tableDebt = {
-        headers: ['TITULO', 'FECHA DE EMISIÓN', 'MONTO'],
-        rows: [],
-      };
 
-      doc.table(tableDebt, tableOptions);
+      // Añadir sección de gastos individuales si existen
+      if (apartmentExpensesMap.size > 0) {
+        doc.moveDown(2);
+        doc.font('Helvetica-Bold').fontSize(12);
+        doc.text('Gastos individuales por apartamento:');
+        doc.font('Helvetica').fontSize(10);
 
-      doc.moveDown(2);
-      tableOptions = {
-        width: doc.page.width, // Adjust table width
-        layout: 'lightHorizontalLines', // Add thin horizontal lines
-        cellPadding: 5, // Add some padding to cells
-        headerRows: 1, // Only show header row as bold
-        columnsSize: [125, 125, 100, 60, 100],
-      };
-      doc.table(totalsTable, tableOptions);
+        // Para cada apartamento, mostrar sus gastos individuales
+        apartmentExpensesMap.forEach((apartmentData, apartmentId) => {
+          doc.moveDown(1);
+          doc.text(`Apartamento: ${apartmentData.identifier}`);
+
+          const tableIndividualExpenses = {
+            headers: [
+              'DESCRIPCIÓN DE GASTOS INDIVIDUALES',
+              'AP',
+              'MONTO',
+              'MONTO CUOTA',
+            ],
+            rows: apartmentData.expenses.map((expense) => {
+              return [
+                expense.name,
+                '',
+                `${expense.total.toString()}$`,
+                `${expense.total.toString()}$`,
+              ];
+            }),
+          };
+
+          doc.table(tableIndividualExpenses, tableOptions);
+          doc.moveDown(1);
+        });
+      }
+
       doc.text(`AP: A: Aplica por alícuota P: Aplica por propietario `);
 
       doc.moveDown(2);
@@ -793,5 +862,50 @@ export class BillingService {
     });
     const buffer = await workbook.xlsx.writeBuffer();
     return Buffer.from(buffer);
+  }
+
+  async findAllBillsByApartment(apartmentId: number) {
+    // ... existing code ...
+
+    // Obtenemos los gastos individuales para este apartamento
+    const individualExpenses =
+      await this.individualExpenseService.findAllByApartment(apartmentId);
+
+    // Para cada factura individual (individualBill)
+    // verificamos si hay gastos individuales asociados
+    const bills = await this.individualBillService.findAllByApartment(
+      apartmentId,
+    );
+
+    // Enriquecemos cada factura con información de sus gastos individuales
+    const enrichedBills = bills.map((bill) => {
+      // Filtramos los gastos individuales que pertenecen a esta factura
+      const expensesForThisBill = individualExpenses.filter(
+        (expense) => expense.buildingBill?.id === bill.buildingBillId?.id,
+      );
+
+      return {
+        ...bill,
+        individualExpenses: expensesForThisBill,
+      };
+    });
+
+    return enrichedBills;
+  }
+
+  async findOneBillByApartment(billId: number, apartmentId: number) {
+    // ... existing code ...
+
+    // Obtenemos los gastos individuales para este apartamento en esta factura
+    const individualExpenses =
+      await this.individualExpenseService.findAllByApartment(apartmentId);
+    const expensesForThisBill = individualExpenses.filter(
+      (expense) => expense.buildingBill?.id === billId,
+    );
+
+    // Incluimos estos gastos individuales en la respuesta
+    return {
+      individualExpenses: expensesForThisBill,
+    };
   }
 }

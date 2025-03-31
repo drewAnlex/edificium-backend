@@ -36,6 +36,9 @@ import { CurrencyModule } from 'src/currency/currency.module';
 import { CurrencyValuePerDayService } from 'src/currency/services/currency-value-per-day.service';
 import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-day.entity';
 import { Role } from 'src/users/entities/Role.entity';
+import { IndividualExpensesService } from './services/individual-expenses.service';
+import { IndividualExpensesController } from './controllers/individual-expenses.controller';
+import { IndividualExpense } from './entities/IndividualExpense.entity';
 
 @Module({
   imports: [
@@ -47,6 +50,7 @@ import { Role } from 'src/users/entities/Role.entity';
       Payment,
       PaymentInfo,
       Expense,
+      IndividualExpense,
       User,
       Role,
       PaymentMethodList,
@@ -72,6 +76,7 @@ import { Role } from 'src/users/entities/Role.entity';
     OutboundService,
     UsersService,
     CurrencyValuePerDayService,
+    IndividualExpensesService,
   ],
   controllers: [
     BuildingBillsController,
@@ -80,6 +85,7 @@ import { Role } from 'src/users/entities/Role.entity';
     PaymentInfoController,
     MyBuildingBillsController,
     ExpenseController,
+    IndividualExpensesController,
   ],
 })
 export class PaymentsModule {}

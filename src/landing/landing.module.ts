@@ -24,7 +24,8 @@ import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-da
 import { Role } from 'src/users/entities/Role.entity';
 import { Expense } from 'src/payments/entities/Expense.entity';
 import { ExpenseService } from 'src/payments/services/expense.service';
-
+import { IndividualExpense } from 'src/payments/entities/IndividualExpense.entity';
+import { IndividualExpensesService } from 'src/payments/services/individual-expenses.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -38,6 +39,7 @@ import { ExpenseService } from 'src/payments/services/expense.service';
       PaymentMethodList,
       currencyValuePerDay,
       Expense,
+      IndividualExpense,
     ]),
     MailingModule,
     PaymentsModule,
@@ -55,6 +57,7 @@ import { ExpenseService } from 'src/payments/services/expense.service';
     PaymentMethodListService,
     CurrencyValuePerDayService,
     ExpenseService,
+    IndividualExpensesService,
   ],
 })
 export class LandingModule {}

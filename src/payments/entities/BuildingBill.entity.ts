@@ -11,6 +11,7 @@ import { Building } from '../../buildings/entities/building.entity';
 import { User } from '../../users/entities/User.entity';
 import { IndividualBill } from './IndividualBill.entity';
 import { Expense } from './Expense.entity';
+import { IndividualExpense } from './IndividualExpense.entity';
 
 @Entity()
 export class BuildingBill {
@@ -34,6 +35,15 @@ export class BuildingBill {
     cascade: true,
   })
   expenses: Expense[];
+
+  @OneToMany(
+    () => IndividualExpense,
+    (individualExpense) => individualExpense.buildingBill,
+    {
+      cascade: true,
+    },
+  )
+  individualExpenses: IndividualExpense[];
 
   @OneToMany(
     () => IndividualBill,

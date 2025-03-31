@@ -21,12 +21,15 @@ import { IndividualBillDto } from '../dtos/IndividualBill.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { Expense } from '../entities/Expense.entity';
 import { ExpenseService } from './expense.service';
+import { IndividualExpense } from '../entities/IndividualExpense.entity';
 
 @Injectable()
 export class BuildingBillsService {
   constructor(
     @InjectRepository(BuildingBill) private billRepo: Repository<BuildingBill>,
     @InjectRepository(Expense) private expenseRepo: Repository<Expense>,
+    @InjectRepository(IndividualExpense)
+    private individualExpenseRepo: Repository<IndividualExpense>,
     @Inject(forwardRef(() => BuildingsService))
     private buildingService: BuildingsService,
     private billService: IndividualBillsService,
@@ -312,6 +315,8 @@ export class BuildingBillsService {
     const nApartments = building.nApartments;
     let totalPerShare = 0;
     let totalNotPerShare = 0;
+
+    // Calcular totales de gastos comunes
     bill.expenses.forEach((expense) => {
       if (expense.dependsOnShare) {
         const gasto = expense.total.toString();
@@ -320,17 +325,92 @@ export class BuildingBillsService {
         totalNotPerShare = totalNotPerShare + expense.total / nApartments;
       }
     });
-    (await building).apartments.forEach((Apartment) => {
+
+    // Obtener gastos individuales asociados a esta factura del edificio
+    const individualExpenses = await this.individualExpenseRepo.find({
+      where: {
+        buildingBill: { id: bill.id },
+        isRemoved: false,
+      },
+      relations: ['apartmentId'],
+    });
+
+    // Depuración - ver qué gastos individuales se encontraron
+    console.log(
+      `Found ${individualExpenses.length} individual expenses for bill ${bill.id}`,
+    );
+    individualExpenses.forEach((exp) => {
+      console.log(
+        `Expense: ${exp.name}, Amount: ${exp.total}, ApartmentId: ${
+          exp.apartmentId?.id || 'unknown'
+        }`,
+      );
+    });
+
+    // Agrupar gastos individuales por apartamento
+    const apartmentExpenses = new Map();
+    individualExpenses.forEach((expense) => {
+      // Asegúrate de que apartmentId existe y tiene un id
+      if (!expense.apartmentId || !expense.apartmentId.id) {
+        console.log(
+          `WARNING: Individual expense ${expense.id} has no valid apartment ID`,
+        );
+        return; // Saltar este gasto si no tiene un apartamento válido
+      }
+
+      const apartmentId = expense.apartmentId.id;
+      if (!apartmentExpenses.has(apartmentId)) {
+        apartmentExpenses.set(apartmentId, 0);
+      }
+
+      const expenseAmount = parseFloat(expense.total.toString());
+      apartmentExpenses.set(
+        apartmentId,
+        apartmentExpenses.get(apartmentId) + expenseAmount,
+      );
+
+      // Confirmar que se agregó correctamente
+      console.log(
+        `Added expense ${expense.id} with amount ${expenseAmount} to apartment ${apartmentId}`,
+      );
+    });
+
+    // Depuración - ver qué apartamentos tienen gastos individuales
+    console.log(
+      `Mapped ${apartmentExpenses.size} apartments with individual expenses`,
+    );
+    apartmentExpenses.forEach((total, aptId) => {
+      console.log(
+        `Apartment ${aptId} has individual expenses totaling ${total}`,
+      );
+    });
+
+    // Crear facturas individuales para cada apartamento
+    (await building).apartments.forEach((apartment) => {
+      // Calcular total base común para todos los apartamentos
+      let totalForApartment =
+        totalPerShare * apartment.share + totalNotPerShare;
+
+      // Añadir gastos individuales específicos de este apartamento si existen
+      if (apartmentExpenses.has(apartment.id)) {
+        const individualExpenseTotal = apartmentExpenses.get(apartment.id);
+        totalForApartment += individualExpenseTotal;
+        console.log(
+          `Adding ${individualExpenseTotal} to apartment ${apartment.id}'s bill, new total: ${totalForApartment}`,
+        );
+      }
+
       const payload: IndividualBillDto = {
         buildingBillId: bill,
-        apartmentId: Apartment,
-        Total: totalPerShare * Apartment.share + totalNotPerShare,
+        apartmentId: apartment,
+        Total: totalForApartment,
         Name: bill.name,
         Description: bill.description,
         IsPaid: false,
         Balance: 0,
         isRemoved: false,
       };
+
       try {
         this.billService.create(payload);
       } catch (error) {
@@ -340,6 +420,7 @@ export class BuildingBillsService {
         );
       }
     });
+
     try {
       await this.billRepo.merge(bill, {
         isPublished: true,
@@ -352,6 +433,7 @@ export class BuildingBillsService {
         HttpStatus.BAD_REQUEST,
       );
     }
+
     return bill;
   }
 

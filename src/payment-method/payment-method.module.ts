@@ -32,6 +32,8 @@ import { CurrencyValuePerDayService } from 'src/currency/services/currency-value
 import { currencyValuePerDay } from 'src/currency/entities/currency-value-per-day.entity';
 import { Role } from 'src/users/entities/Role.entity';
 import { ExpenseService } from 'src/payments/services/expense.service';
+import { IndividualExpense } from 'src/payments/entities/IndividualExpense.entity';
+import { IndividualExpensesService } from 'src/payments/services/individual-expenses.service';
 
 @Module({
   imports: [
@@ -44,6 +46,7 @@ import { ExpenseService } from 'src/payments/services/expense.service';
       BuildingBill,
       IndividualBill,
       Expense,
+      IndividualExpense,
       User,
       Role,
       PaymentMethodFields,
@@ -73,6 +76,7 @@ import { ExpenseService } from 'src/payments/services/expense.service';
     BillingService,
     CurrencyValuePerDayService,
     ExpenseService,
+    IndividualExpensesService,
   ],
 })
 export class PaymentMethodModule {}

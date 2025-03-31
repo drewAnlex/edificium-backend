@@ -38,6 +38,8 @@ import { QuotesService } from 'src/landing/services/quotes.service';
 import { Role } from 'src/users/entities/Role.entity';
 import { Expense } from 'src/payments/entities/Expense.entity';
 import { ExpenseService } from 'src/payments/services/expense.service';
+import { IndividualExpense } from 'src/payments/entities/IndividualExpense.entity';
+import { IndividualExpensesService } from 'src/payments/services/individual-expenses.service';
 
 @Module({
   imports: [
@@ -56,6 +58,7 @@ import { ExpenseService } from 'src/payments/services/expense.service';
       PaymentInfo,
       Quote,
       Expense,
+      IndividualExpense,
     ]),
     UsersModule,
     MailingModule,
@@ -83,6 +86,7 @@ import { ExpenseService } from 'src/payments/services/expense.service';
     SendToWhatsappService,
     QuotesService,
     ExpenseService,
+    IndividualExpensesService,
   ],
 })
 export class BotsModule {}
