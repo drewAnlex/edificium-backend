@@ -31,6 +31,12 @@ export class IndividualBillsService {
     return this.billRepo.find();
   }
 
+  async findAllByBuilding(buildingId: number) {
+    return this.billRepo.find({
+      where: { buildingBillId: { buildingId: { id: buildingId } } },
+    });
+  }
+
   async findUnpaidBillsByApartment(apartmentId: number) {
     const bills = await this.billRepo.find({
       where: {

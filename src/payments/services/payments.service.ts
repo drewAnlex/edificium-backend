@@ -338,7 +338,7 @@ export class PaymentsService {
     this.logger.log(
       `Iniciando actualización de pagos para el edificio ${buildingId}`,
     );
-    const bills = await this.ibService.findAllByApartment(buildingId);
+    const bills = await this.ibService.findAllByBuilding(buildingId);
     this.logger.debug(`Se encontraron ${bills.length} facturas para procesar`);
 
     let totalPaymentsUpdated = 0;
