@@ -113,6 +113,14 @@ export class PaymentsController {
   }
 
   @Roles('Admin', 'Staff')
+  @Put('building/:buildingId')
+  setAdminPaymentsToOwner(
+    @Param('buildingId', ParseIntPipe) buildingId: number,
+  ) {
+    return this.paymentService.setAdminPaymentsToOwner(buildingId);
+  }
+
+  @Roles('Admin', 'Staff')
   @Get('apartment/:identifier/:buildingId')
   async getPaymentsByApartmentIdentifier(
     @Param('identifier') identifier: string,

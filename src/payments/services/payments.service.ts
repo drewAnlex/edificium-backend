@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { Payment } from '../entities/Payment.entity';
 import { PaymentDTO, PaymentUpdateDTO } from '../dtos/Payment.dto';
@@ -21,6 +22,8 @@ interface PaginationParams {
 
 @Injectable()
 export class PaymentsService {
+  private readonly logger = new Logger(PaymentsService.name);
+
   constructor(
     @InjectRepository(Payment) private paymentRepo: Repository<Payment>,
     private ibService: IndividualBillsService,
@@ -329,5 +332,45 @@ export class PaymentsService {
     await this.paymentRepo.save(payment);
 
     return payment;
+  }
+
+  async setAdminPaymentsToOwner(buildingId: number) {
+    this.logger.log(
+      `Iniciando actualización de pagos para el edificio ${buildingId}`,
+    );
+    const bills = await this.ibService.findAllByApartment(buildingId);
+    this.logger.debug(`Se encontraron ${bills.length} facturas para procesar`);
+
+    let totalPaymentsUpdated = 0;
+    let totalBillsSkipped = 0;
+
+    for (const bill of bills) {
+      if (!bill.apartmentId?.userId) {
+        totalBillsSkipped++;
+        continue;
+      }
+
+      const apartmentUserId = bill.apartmentId.userId.id;
+      const apartmentIdentifier = bill.apartmentId.identifier;
+
+      for (const payment of bill.payment) {
+        if (payment.UserId?.id !== apartmentUserId) {
+          const oldUserId = payment.UserId?.id;
+          payment.UserId = bill.apartmentId.userId;
+          await this.paymentRepo.save(payment);
+          totalPaymentsUpdated++;
+
+          this.logger.debug(
+            `Pago actualizado - Factura: ${bill.id}, Apartamento: ${apartmentIdentifier}, ` +
+              `Usuario anterior: ${oldUserId}, Nuevo usuario: ${apartmentUserId}`,
+          );
+        }
+      }
+    }
+
+    this.logger.log(
+      `Proceso completado - Pagos actualizados: ${totalPaymentsUpdated}, ` +
+        `Facturas omitidas: ${totalBillsSkipped}`,
+    );
   }
 }
