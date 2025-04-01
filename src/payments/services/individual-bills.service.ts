@@ -34,7 +34,7 @@ export class IndividualBillsService {
   async findAllByBuilding(buildingId: number) {
     return this.billRepo.find({
       where: { buildingBillId: { buildingId: { id: buildingId } } },
-      relations: ['apartmentId', 'apartmentId.userId'],
+      relations: ['apartmentId', 'apartmentId.userId', 'payment'],
     });
   }
 
