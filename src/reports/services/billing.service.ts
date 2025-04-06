@@ -808,7 +808,9 @@ export class BillingService {
             return [
               '', // Dejar vacío ya que el círculo se dibuja manualmente
               apartment.identifier,
-              apartment.userId?.name ? apartment.userId.name : '',
+              apartment.userId?.name.toUpperCase()
+                ? apartment.userId.name.toUpperCase()
+                : '',
               apartment.individualBills.length.toString(),
               apartment.balance.toString(),
             ];
@@ -854,7 +856,9 @@ export class BillingService {
     apartments.forEach((apartment) => {
       worksheet.addRow({
         identifier: apartment.identifier,
-        name: apartment.userId?.name ? apartment.userId.name : '',
+        name: apartment.userId?.name.toUpperCase()
+          ? apartment.userId.name.toUpperCase()
+          : '',
         bills: apartment.individualBills.length,
         debt: apartment.balance,
         share: apartment.share,
