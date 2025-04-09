@@ -61,6 +61,15 @@ export class UsersController {
   }
 
   @Roles('Staff')
+  @Put('change-password/:userId')
+  changePassword(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Body() payload: { newPassword: string },
+  ) {
+    return this.usersService.changePasswordByStaff(userId, payload.newPassword);
+  }
+
+  @Roles('Staff')
   @Delete(':userId')
   deleteUser(@Param('userId', ParseIntPipe) userId: number) {
     return this.usersService.remove(userId);

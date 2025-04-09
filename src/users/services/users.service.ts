@@ -196,6 +196,20 @@ export class UsersService {
     }
   }
 
+  async changePasswordByStaff(id: number, newPassword: string) {
+    const user = await this.findOne(id);
+    const hashPassword = await bcrypt.hash(newPassword, 10);
+    try {
+      await this.update(user.id, { password: hashPassword });
+      return { message: 'Password changed successfully' };
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred while trying to change the password: ${error}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async update(id: number, payload: UpdateUserDto) {
     const user = await this.findOne(id);
     try {
